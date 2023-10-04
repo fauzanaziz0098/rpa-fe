@@ -149,6 +149,7 @@ import {
               </Grid.Col>
               <Grid.Col span={1}>
               <TextInput
+                  type="number"
                   label="Unit"
                   placeholder="Unit"
                   {...form.getInputProps("unit")}

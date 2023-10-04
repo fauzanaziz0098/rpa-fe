@@ -1,5 +1,5 @@
 import { Card, Title } from "@mantine/core";
-import FormControl from "@/components/views/MasterData/Product/formControl";
+import FormControl from "@/components/views/MasterData/Product/FormControl";
 
 export default function CreateProduct() {
   return (

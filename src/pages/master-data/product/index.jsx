@@ -115,8 +115,8 @@ export default function ProductPageIndex() {
           />
           <div style={{ display: 'flex', gap: '10px' }}>
             <Button color="violet">Import</Button>
-            <Button>
-              <Link style={{ textDecoration: 'none', color: 'white' }} href="/master-data/product/create">Create</Link>
+            <Button style={{ textDecoration: 'none', color: 'white' }} component={Link} href="/master-data/product/create">
+              Create
             </Button>
           </div>
         </div>

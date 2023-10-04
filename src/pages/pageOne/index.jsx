@@ -9,7 +9,16 @@ import axiosHour from "@/libs/service_per_hour/axios";
 import {getHeaderConfigAxios} from '@/utils/getHeaderConfigAxios'
 import moment from 'moment';
 import { useRouter } from 'next/router';
+import client from '@/libs/mqtt'
+
+client.subscribe("MC1:PLAN:RPA", {qos: 2})
 export default function Home() {
+
+    useEffect(() => {
+        client.on("message", (topic, message) => {
+            console.log(message);
+        })
+    }, [])
     const theme = useMantineTheme();
     const router = useRouter()
 
@@ -25,25 +34,27 @@ export default function Home() {
     const [noPlanMachine, setNoPlanMachine] = useState([])
     const [noPlanToday, setNoPlanToday] = useState([])
 
+    const fetchActiveData = async () => {
+        try {
+            const res1 = await axiosPlanning.get('planning-production', getHeaderConfigAxios())
+            setActivePlan(res1.data.data)
+            const res2 = await axiosPlanning.get('no-plan-machine', getHeaderConfigAxios())
+            setNoPlanMachine(res2.data.data)
+        } catch (error) {
+            console.log(error, 'error fetch data');
+        }
+    }
+
     useEffect(() => {
-        const fetchActiveData = async () => {
-            try {
-                const res = await axiosPlanning.get('planning-production', getHeaderConfigAxios())
-                setActivePlan(res.data.data)
-            } catch (error) {
-                console.log(error, 'active plan fetch error');
-            }
-        }
-        const fetchNoPlanMachine = async () => {
-            try {
-                const res = await axiosPlanning.get('no-plan-machine', getHeaderConfigAxios())
-                setNoPlanMachine(res.data.data)
-            } catch (error) {
-                console.log(error, 'noPlan fetch error');
-            }
-        }
         fetchActiveData()
-        fetchNoPlanMachine()
+
+        const interval = setInterval(() => {
+            fetchActiveData();
+          }, 60 * 1000);
+        
+          return () => {
+            clearInterval(interval); // Cleanup interval on unmount
+          };
     },[])
 
     useEffect(() => {
@@ -64,10 +75,6 @@ export default function Home() {
             setNoPlanToday(noPlanToday ? noPlanToday : [])
         }
     }, [activePlan])
-
-    console.log(activePlan, 'active plan');
-    console.log(productionData, 'active data');
-    console.log(noPlanToday, 'No Plan today');
 
     // Fungsi untuk mengubah kategori aktif
     const handleCategoryClick = (category) => {
@@ -574,7 +581,7 @@ return (
                     <p>:</p>
                 </div>
                 <div>
-                    <div style={{ backgroundColor: 'gainsboro', marginLeft: '10px', height: '75px', width: '1190px' }}>
+                    <div style={{ backgroundColor: 'gainsboro', marginLeft: '10px', height: '75px', minWidth: '1190px' }}>
                         <div>
                             <div style={{ display: 'flex', marginTop: '10px', fontWeight: 'bold' }}>
                                 <div style={{ display: 'flex', marginTop: '-7px' }}>

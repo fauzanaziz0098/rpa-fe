@@ -1,13 +1,13 @@
 import { useRouter } from "next/router"
-import FormControl from "@/components/views/MasterData/Product/FormControl"
+import FormControl from "@/components/views/MasterData/User/FormControl"
 import { Card, Title } from "@mantine/core"
 
-export default function EditProduct() {
+export default function EditUser() {
     const router = useRouter()
 
     return (
     <Card style={{ background: 'transparent' }}>
-        <Title size={'1rem'} mb={20}>Edit Product</Title>
+        <Title size={'1rem'} mb={20}>Edit User</Title>
         <FormControl id={router.query?.id}/>
     </Card>
     )

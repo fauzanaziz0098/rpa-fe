@@ -9,6 +9,7 @@ import {
   MANTINE_COLORS,
   ScrollArea,
   Alert,
+  Modal,
 } from "@mantine/core";
 import { IconAlertCircle, IconPencil, IconScan, IconSearch, IconTrash } from "@tabler/icons";
 import Layout from "../../../components/Layout/App";
@@ -17,17 +18,23 @@ import { useState } from "react";
 import { useEffect } from "react";
 import axiosAuth from '@/libs/auth/axios'
 import {getHeaderConfigAxios} from '@/utils/getHeaderConfigAxios'
+import Link from "next/link";
 
 export default function UserPageIndex() {
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const [users, setUsers] = useState([])
   const [searchValue, setSearchValue] = useState("")
+  const [userToDelete, setUserToDelete] = useState(null)
+
+  const [openedDelete, setOpenedDelete] = useState(false);
 
   useEffect(() => {
     if (searchValue != "") {
       setUsers(
-        rows.filter(item => item.name.includes(searchValue))
+        rows.filter(item => {
+          return item.part_name.toLowerCase().includes(searchValue)
+        })
       )
     } else {
       const fetchUser = async () => {
@@ -35,7 +42,7 @@ export default function UserPageIndex() {
           const {data} = await axiosAuth.get('users', getHeaderConfigAxios())
           setUsers(data.data)
         } catch (error) {
-          console.log(error, 'erro fetch data users');
+          console.log(error, 'error fetch data users');
         }
       }
       fetchUser()
@@ -51,6 +58,23 @@ export default function UserPageIndex() {
     setCurrentPage(newPage);
   };
 
+  const handleModalDelete = (id) => {
+    setOpenedDelete(true)
+    setUserToDelete(id)
+  }
+
+  const handleDelete = async () => {
+    try {
+      await axiosAuth.delete(`users/${userToDelete}`, getHeaderConfigAxios());
+      setOpenedDelete(false)
+      setTimeout(() => {
+        setUsers(users.filter((user) => user.id !== userToDelete));
+      }, 200);
+    } catch (error) {
+      console.log(error, 'error delete user');
+    }
+  }
+
   const icon = (
     <IconSearch style={{ color: "gray", width: "1rem", height: "1rem" }} />
   );
@@ -61,8 +85,18 @@ export default function UserPageIndex() {
 
   return (
     <div>
+        <Modal
+          opened={openedDelete}
+          onClose={() => setOpenedDelete(false)}
+          title="Are you sure want to delete this?"
+          // centered
+        >
+          <div style={{ display: 'flex', justifyContent:'center', gap: '1.2rem', padding: '1rem' }}>
+            <Button onClick={() => setOpenedDelete(false)}>Cancel</Button>
+            <Button onClick={handleDelete} color="red">Delete</Button>
+          </div>
+      </Modal>
       <ScrollArea>
-        
         <div
           style={{
             display: "flex",
@@ -79,7 +113,11 @@ export default function UserPageIndex() {
             style={{ width: "10rem", marginBottom: "2rem" }}
             onChange={(e) => setSearchValue(e.target.value)}
           />
-          <Button>Create</Button>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <Button>
+              <Link style={{ textDecoration: 'none', color: 'white' }} href="/master-data/user/create">Create</Link>
+            </Button>
+          </div>
         </div>
         <Table verticalSpacing="xs" fontSize="xs" highlightOnHover>
           <thead>
@@ -104,17 +142,17 @@ export default function UserPageIndex() {
             rows?.map((item, index) => (
               <tr key={index}>
                 <td>{item?.name}</td>
-                <td>{item?.nip ?? '-'}</td>
+                <td>-</td>
                 <td>{item?.email}</td>
-                <td>{item?.role.name}</td>
+                <td>{item?.role?.name}</td>
                 <td style={{ display: "flex", gap: "5px" }}>
-                  <Button>
+                  <Button component={Link} href={`/master-data/user/${item.id}`}>
                     <IconScan size={"1.2rem"} />
                   </Button>
-                  <Button color="yellow">
+                  <Button color="yellow" component={Link} href={`/master-data/user/${item.id}`}>
                     <IconPencil size={"1.2rem"} />
                   </Button>
-                  <Button color="red">
+                  <Button onClick={() => handleModalDelete(item.id)} color="red">
                     <IconTrash size={"1.2rem"} />
                   </Button>
                 </td>
