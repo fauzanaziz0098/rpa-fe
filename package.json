@@ -1,24 +1,56 @@
 {
-  "name": "rpa-fe",
+  "name": "hotmal-fe",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "format": "prettier --write .",
+    "ngrok": "ngrok http 3000"
   },
   "dependencies": {
-    "react": "^18",
-    "react-dom": "^18",
-    "next": "13.5.4"
+    "@emotion/react": "^11.10.5",
+    "@emotion/server": "^11.10.0",
+    "@mantine/carousel": "^5.8.4",
+    "@mantine/core": "^5.8.4",
+    "@mantine/dates": "^5.8.4",
+    "@mantine/dropzone": "^5.8.4",
+    "@mantine/form": "^5.8.4",
+    "@mantine/hooks": "^5.8.4",
+    "@mantine/modals": "^5.8.4",
+    "@mantine/next": "^5.8.4",
+    "@mantine/notifications": "^5.8.4",
+    "@mantine/nprogress": "^5.8.4",
+    "@mantine/prism": "^5.8.4",
+    "@mantine/spotlight": "^5.8.4",
+    "@mantine/tiptap": "^5.8.4",
+    "@tabler/icons": "^1.114.0",
+    "@tiptap/extension-link": "^2.0.0-beta.204",
+    "@tiptap/react": "^2.0.0-beta.204",
+    "@tiptap/starter-kit": "^2.0.0-beta.204",
+    "axios": "^0.27.2",
+    "cookies-next": "^2.1.1",
+    "dayjs": "^1.11.6",
+    "embla-carousel-react": "^7.0.5",
+    "moment": "^2.29.4",
+    "mqtt": "^5.0.5",
+    "next": "13.0.5",
+    "next-qrcode": "^2.4.0",
+    "ngrok": "^5.0.0-beta.2",
+    "prettier": "^2.8.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-query": "^3.39.2",
+    "sharp": "^0.31.2",
+    "socket.io-client": "^4.7.2",
+    "styled-components": "^6.0.7",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
-    "typescript": "^5",
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "eslint": "^8",
-    "eslint-config-next": "13.5.4"
+    "@types/node": "18.11.9",
+    "@types/react": "18.0.25",
+    "typescript": "4.9.3"
   }
 }
