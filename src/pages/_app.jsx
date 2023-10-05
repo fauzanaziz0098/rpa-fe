@@ -8,8 +8,9 @@ function MyApp({ Component, pageProps }) {
   const router = useRouter()
   const pathExcept = router.pathname.match(/[^/]+$/)?.[0] || ''; // Extract the last segment
   let path = router.pathname.slice(1)
+  let {id} = router.query
   if (pathExcept == "[id]") {
-    path = path.replace('[id]', "edit")
+    path = path.replace('[id]', id)
   }
 
   if (pathExcept == 'pageOne' || pathExcept == 'sign-in' || pathExcept == 'home') {

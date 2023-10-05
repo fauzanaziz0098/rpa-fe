@@ -121,7 +121,7 @@ const SignIn = () => {
                             <Title order={4} align={"center"}>
                                 RPA
                             </Title>
-                            <Text size={"sm"}>a development towards HJP Smart Factory</Text>
+                            {/* <Text size={"sm"}>a development towards HJP Smart Factory</Text> */}
                         </Flex>
                         <Flex gap={"md"} direction={"column"}>
                             <TextInput
