@@ -11,21 +11,18 @@ import moment from 'moment';
 import { useRouter } from 'next/router';
 import client from '@/libs/mqtt'
 
+client.subscribe("MC1:PLAN:RPA", {qos: 2})
 export default function Home() {
 
     const [mqttData, setMqttData] = useState([])
     useEffect(() => {
-        client
-        .subscribe("MC1:PLAN:RPA", {qos: 2})
-        .on("message", (topic, message) => {
+        client.on("message", (topic, message) => {
             setMqttData(JSON.parse(message))
             console.log('message got');
         })
-        return () => {
-            client.unsubscribe('MC1:PLAN:RPA', { qos: 2 })
-        }
-    }, [])
+    }, [client])
 
+    console.log(mqttData, 'test data mqtt');
     const theme = useMantineTheme();
     const router = useRouter()
 
@@ -628,7 +625,7 @@ return (
                                         <p key={index} style={index == 0 ? { width: '30px', marginLeft: '10px' } : {marginLeft: '80px', width: '30px'}}>{duration}</p>
                                     )
                                 })}
-                                <p style={{ marginLeft: '85px', width: '30px' }}>60</p>
+                                <p style={{ marginLeft: '80px', width: '30px' }}>60</p>
                                 <p style={{  marginLeft: '85px', width: '30px' }}>{(productionData.length * 60) - totalNoPlan()}</p>
                             </div>
                         </div>
@@ -663,7 +660,7 @@ return (
                                             <p key={index} style={index == 0 ?{ width: '30px', marginLeft: '10px' } : { marginLeft: '80px', width: '30px' }}>{Math.round((60 - noPlanTotal) * activePlan.qty_per_minute)}</p>
                                         )
                                     })}
-                                    <p style={{ marginLeft: '85px', width: '30px' }}>{Math.round(60 * activePlan.qty_per_minute)}</p>
+                                    <p style={{ marginLeft: '80px', width: '30px' }}>{Math.round(60 * activePlan.qty_per_minute)}</p>
                                     <p style={{  marginLeft: '82px', width: '30px' }}>{totalTarget()}</p>
                                 </div>
                             </div>
@@ -702,7 +699,7 @@ return (
                                         persentase = Math.round((item.qty_actual / Math.round(activePlan.qty_per_minute * (60 - noPlanTotal))) * 100)
                                         return <p key={index} style={index == 0 ? { width: '30px', marginLeft: '10px', color: `${persentase >= 100 ? 'green' : ''}`} : { marginLeft: '80px', width: '30px' , color: `${persentase >= 100 ? 'green' : ''}`}}>{persentase}%</p>
                                     })}
-                                    <p style={{ marginLeft: '82px', width: '30px' , color: `${(Math.round(qtyActualMqtt() / (Math.round(60 * activePlan.qty_per_minute))) * 100) >= 100 ? 'green' : ''}` }}>{Math.round(qtyActualMqtt() / (Math.round(60 * activePlan.qty_per_minute))) * 100}%</p>
+                                    <p style={{ marginLeft: '80px', width: '30px' , color: `${(Math.round(qtyActualMqtt() / (Math.round(60 * activePlan.qty_per_minute))) * 100) >= 100 ? 'green' : ''}` }}>{Math.round(qtyActualMqtt() / (Math.round(60 * activePlan.qty_per_minute))) * 100}%</p>
                                     <p style={{  marginLeft: '82px', width: '30px', color: `${Math.round((totalActual() / totalTarget()) * 100) >= 100 ? 'green' : 'red'}` }}>{Math.round(isNaN(totalActual() / totalTarget()) ? 0 : (totalActual() / totalTarget()) * 100)}%</p>
                                 </div>
                             </div>

@@ -1,4 +1,5 @@
 import Layout from '@/components/Layout/App/index'; // Import your layout component here
+import { NotificationsProvider } from '@mantine/notifications';
 import { hasCookie } from 'cookies-next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -19,7 +20,9 @@ function MyApp({ Component, pageProps }) {
        <Head>
         <title>RPA - Monitoring Machine</title>
       </Head>
-      <Component {...pageProps}/>
+      <NotificationsProvider>
+        <Component {...pageProps}/>
+      </NotificationsProvider>
       </>
     )
   }
@@ -29,7 +32,9 @@ function MyApp({ Component, pageProps }) {
         <title>RPA - Master Data</title>
       </Head>
     <Layout path={path}>
-      <Component {...pageProps} />
+      <NotificationsProvider>
+        <Component {...pageProps} />
+      </NotificationsProvider>
     </Layout>
     </>
   );
