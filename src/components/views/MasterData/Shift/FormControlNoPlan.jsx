@@ -44,7 +44,6 @@ import dayjs from "dayjs";
         console.log(error, "error submit shift");
       }
     };
-    console.log(form.values);
 
     return (
       <div>
