@@ -114,10 +114,6 @@ export default function Home() {
         return Math.round(total)
     }
 
-    const qtyActualMqtt = () => {
-        return mqttData.qty_actual - totalActual()
-    }
-
     const totalTarget = () => {
         // Math.round((activePlan?.qty_per_minute * 60)) * productionData.length
         let totalTarget = 0
@@ -154,11 +150,90 @@ export default function Home() {
         return total
     }
 
-    const percentage1 = '100%';
+    const totalDurasi = () => {
+        let duration = 0
+        {productionData.map((item) => {
+            let noPlanTotal = 0
+            noPlanToday.map(row => {
+                if (
+                    moment(row.time_in, 'HH:mm').isSameOrAfter(moment(item.time_start, 'HH:mm')) && moment(row.time_in, 'HH:mm').isSameOrBefore(moment(item.time, 'HH:mm')) &&
+                    moment(row.time_out, 'HH:mm').isSameOrAfter(moment(item.time_start, 'HH:mm')) && moment(row.time_out, 'HH:mm').isSameOrBefore(moment(item.time, 'HH:mm')) 
+                ) {
+                    noPlanTotal += row.total
+                } else if (
+                    moment(row.time_in, 'HH:mm').isSameOrAfter(moment(item.time_start, 'HH:mm')) && moment(row.time_in, 'HH:mm').isSameOrBefore(moment(item.time, 'HH:mm')) &&
+                    moment(row.time_out, 'HH:mm').isAfter(moment(item.time_start, 'HH:mm')) 
+                ) {
+                    noPlanTotal += (moment(row.time_out, "HH:mm").diff(moment(item.time, "HH:mm"), 'minutes') -1)
+                } else if (
+                    moment(row.time_in, 'HH:mm').isBefore(moment(item.time_start, "HH:mm")) && moment(row.time_out, "HH:mm").isSameOrAfter(moment(item.time_start, "HH:mm")) &&
+                    moment(row.time_out, "HH:mm").isSameOrBefore(moment(item.time, "HH:mm"))
+                ) {
+                    noPlanTotal += moment(row.time_out, "HH:mm").diff(moment(item.time_start, "HH:mm"), 'minutes')
+                }
+            })
+            duration += 60 - noPlanTotal
+        })}
+        return duration + durasiMqtt()
+    }
 
-    const isPercentage100 = (percentage) => {
-        return percentage === '100%';
-    };
+    const qtyActualMqtt = () => {
+        return mqttData.qty_actual - totalActual()
+    }
+
+    const qtyTargetMqtt = () => {
+        let duration = 60
+        const timeStart = moment(productionData[productionData.length - 1]?.time_start, "HH:mm").add(1, 'hours').format('HH:mm')
+        const timeEnd = moment(productionData[productionData.length - 1]?.time_start, "HH:mm").add(1, 'hours').add(59, 'minutes').format('HH:mm')
+        noPlanToday.map(row => {
+            if (
+                moment(row.time_in, 'HH:mm').isSameOrAfter(moment(timeStart, 'HH:mm')) && moment(row.time_in, 'HH:mm').isSameOrBefore(moment(timeEnd, 'HH:mm')) &&
+                moment(row.time_out, 'HH:mm').isSameOrAfter(moment(timeStart, 'HH:mm')) && moment(row.time_out, 'HH:mm').isSameOrBefore(moment(timeEnd, 'HH:mm')) 
+            ) {
+                duration -= row.total
+            } else if (
+                moment(row.time_in, 'HH:mm').isSameOrAfter(moment(timeStart, 'HH:mm')) && moment(row.time_in, 'HH:mm').isSameOrBefore(moment(timeEnd, 'HH:mm')) &&
+                moment(row.time_out, 'HH:mm').isAfter(moment(timeStart, 'HH:mm')) 
+            ) {
+                duration -= (moment(row.time_out, "HH:mm").diff(moment(timeEnd, "HH:mm"), 'minutes') -1)
+            } else if (
+                moment(row.time_in, 'HH:mm').isBefore(moment(timeStart, "HH:mm")) && moment(row.time_out, "HH:mm").isSameOrAfter(moment(timeStart, "HH:mm")) &&
+                moment(row.time_out, "HH:mm").isSameOrBefore(moment(timeEnd, "HH:mm"))
+            ) {
+                duration -= moment(row.time_out, "HH:mm").diff(moment(timeStart, "HH:mm"), 'minutes')
+            }
+        })
+        return Math.round(duration * activePlan.qty_per_minute)
+    }
+
+    const durasiMqtt = () => {
+        let duration = 60
+        const timeStart = moment(productionData[productionData.length - 1]?.time_start, "HH:mm").add(1, 'hours').format('HH:mm')
+        const timeEnd = moment(productionData[productionData.length - 1]?.time_start, "HH:mm").add(1, 'hours').add(59, 'minutes').format('HH:mm')
+        noPlanToday.map(row => {
+            if (
+                moment(row.time_in, 'HH:mm').isSameOrAfter(moment(timeStart, 'HH:mm')) && moment(row.time_in, 'HH:mm').isSameOrBefore(moment(timeEnd, 'HH:mm')) &&
+                moment(row.time_out, 'HH:mm').isSameOrAfter(moment(timeStart, 'HH:mm')) && moment(row.time_out, 'HH:mm').isSameOrBefore(moment(timeEnd, 'HH:mm')) 
+            ) {
+                duration -= row.total
+            } else if (
+                moment(row.time_in, 'HH:mm').isSameOrAfter(moment(timeStart, 'HH:mm')) && moment(row.time_in, 'HH:mm').isSameOrBefore(moment(timeEnd, 'HH:mm')) &&
+                moment(row.time_out, 'HH:mm').isAfter(moment(timeStart, 'HH:mm')) 
+            ) {
+                duration -= (moment(row.time_out, "HH:mm").diff(moment(timeEnd, "HH:mm"), 'minutes') -1)
+            } else if (
+                moment(row.time_in, 'HH:mm').isBefore(moment(timeStart, "HH:mm")) && moment(row.time_out, "HH:mm").isSameOrAfter(moment(timeStart, "HH:mm")) &&
+                moment(row.time_out, "HH:mm").isSameOrBefore(moment(timeEnd, "HH:mm"))
+            ) {
+                duration -= moment(row.time_out, "HH:mm").diff(moment(timeStart, "HH:mm"), 'minutes')
+            }
+        })
+        return duration
+    }
+
+    const persentaseMqtt = () => {
+        return Math.round(qtyActualMqtt() / qtyTargetMqtt() * 100)
+    }
 
     let content;
 if (isFullActive) {
@@ -591,6 +666,13 @@ return (
                     <p style={{ marginBottom: '33px' }}>:</p>
                     <p>:</p>
                 </div>
+                {activePlan.length == 0 ? (
+                    <div>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '10px', backgroundColor: '#99c2a1', marginLeft: '10px', height: '75px', minWidth: '1190px' }}>
+                            No Active Plan
+                        </div>
+                    </div>
+                ) : (
                 <div>
                     <div style={{ backgroundColor: 'gainsboro', marginLeft: '10px', height: '75px', minWidth: '1190px' }}>
                         <div>
@@ -628,8 +710,8 @@ return (
                                         <p key={index} style={index == 0 ? { width: '30px', marginLeft: '10px' } : {marginLeft: '80px', width: '30px'}}>{duration}</p>
                                     )
                                 })}
-                                <p style={{ marginLeft: '85px', width: '30px' }}>60</p>
-                                <p style={{  marginLeft: '85px', width: '30px' }}>{(productionData.length * 60) - totalNoPlan()}</p>
+                                <p style={{ marginLeft: '85px', width: '30px' }}>{durasiMqtt()}</p>
+                                <p style={{  marginLeft: '85px', width: '30px' }}>{totalDurasi()}</p>
                             </div>
                         </div>
                     </div>
@@ -663,8 +745,8 @@ return (
                                             <p key={index} style={index == 0 ?{ width: '30px', marginLeft: '10px' } : { marginLeft: '80px', width: '30px' }}>{Math.round((60 - noPlanTotal) * activePlan.qty_per_minute)}</p>
                                         )
                                     })}
-                                    <p style={{ marginLeft: '85px', width: '30px' }}>{Math.round(60 * activePlan.qty_per_minute)}</p>
-                                    <p style={{  marginLeft: '82px', width: '30px' }}>{totalTarget()}</p>
+                                    <p style={{ marginLeft: '85px', width: '30px' }}>{qtyTargetMqtt()}</p>
+                                    <p style={{  marginLeft: '82px', width: '30px' }}>{totalTarget() + qtyTargetMqtt()}</p>
                                 </div>
                             </div>
                             <div style={{ display: 'flex', fontSize: '35px', fontWeight: 'bold', color: 'gold' }}>
@@ -673,7 +755,7 @@ return (
                                         <p key={index} style={index == 0 ? { width: '30px', marginLeft: '10px' } : { marginLeft: '80px', width: '30px' }}>{item.qty_actual}</p>
                                     ))}
                                     <p style={{ marginLeft: '80px', width: '30px' }}>{qtyActualMqtt()}</p>
-                                    <p style={{  marginLeft: '80px', width: '30px' }}>{totalActual() - qtyActualMqtt()}</p>
+                                    <p style={{  marginLeft: '80px', width: '30px' }}>{mqttData.qty_actual}</p>
                                 </div>
                             </div>
                             <div style={{ display: 'flex', fontSize: '22px', fontWeight: 'bold', color: 'firebrick' }}>
@@ -702,13 +784,15 @@ return (
                                         persentase = Math.round((item.qty_actual / Math.round(activePlan.qty_per_minute * (60 - noPlanTotal))) * 100)
                                         return <p key={index} style={index == 0 ? { width: '30px', marginLeft: '10px', color: `${persentase >= 100 ? 'green' : ''}`} : { marginLeft: '80px', width: '30px' , color: `${persentase >= 100 ? 'green' : ''}`}}>{persentase}%</p>
                                     })}
-                                    <p style={{ marginLeft: '82px', width: '30px' , color: `${(Math.round(qtyActualMqtt() / (Math.round(60 * activePlan.qty_per_minute))) * 100) >= 100 ? 'green' : ''}` }}>{Math.round(qtyActualMqtt() / (Math.round(60 * activePlan.qty_per_minute))) * 100}%</p>
-                                    <p style={{  marginLeft: '82px', width: '30px', color: `${Math.round((totalActual() / totalTarget()) * 100) >= 100 ? 'green' : 'red'}` }}>{Math.round(isNaN(totalActual() / totalTarget()) ? 0 : (totalActual() / totalTarget()) * 100)}%</p>
+                                    <p style={{ marginLeft: '82px', width: '30px' , color: `${(persentaseMqtt()) >= 100 ? 'green' : ''}` }}>{persentaseMqtt()}%</p>
+                                    <p style={{  marginLeft: '82px', width: '30px', color: `${Math.round((totalActual() / totalTarget()) * 100) >= 100 ? 'green' : 'red'}` }}>{Math.round(isNaN(totalActual() / totalTarget()) ? 0 : ((totalActual() + qtyActualMqtt()) / (totalTarget() + qtyTargetMqtt())) * 100)}%</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                )}
             </div>
         </div>
         <div style={{ display: 'flex' }}>
