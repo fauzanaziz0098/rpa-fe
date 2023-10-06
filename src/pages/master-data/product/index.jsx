@@ -19,6 +19,7 @@ import { useEffect } from "react";
 import axiosPlanning from '@/libs/planning/axios'
 import {getHeaderConfigAxios} from '@/utils/getHeaderConfigAxios'
 import Link from "next/link";
+import { showNotification } from "@mantine/notifications";
 
 export default function ProductPageIndex() {
   const router = useRouter();
@@ -69,6 +70,12 @@ export default function ProductPageIndex() {
       setOpenedDelete(false)
       setTimeout(() => {
         setProducts(products.filter((product) => product.id !== productToDelete));
+        showNotification({
+          title: "Success",
+          message: "User deleted successfully.",
+          color: "teal",
+          icon: <IconAlertCircle size={16} />,
+        });
       }, 200);
     } catch (error) {
       console.log(error, 'error delete product');

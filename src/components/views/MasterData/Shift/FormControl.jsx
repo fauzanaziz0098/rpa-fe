@@ -16,12 +16,13 @@ import {
   import { useRouter } from "next/router";
   import Link from "next/link";
 import { TimeInput } from "@mantine/dates";
-import * as moment from "moment";
-import { IconClockHour1, IconClockHour9 } from "@tabler/icons";
+import { IconClockHour1, IconClockHour9, IconFaceId, IconFaceIdError } from "@tabler/icons";
 import dayjs from "dayjs";
+import { showNotification } from "@mantine/notifications";
   
   export default function FormControl({ id }) {
     const router = useRouter();
+    const [visible, setVisible] = useState(false);
   
     const form = useForm({
       initialValues: {
@@ -58,9 +59,25 @@ import dayjs from "dayjs";
               await axiosPlanning.post("shift", form.values, getHeaderConfigAxios());
               router.push("/master-data/shift");
           }
+          showNotification({
+            title: "Successful Submit",
+            message: "Submit Success👏",
+            icon: <IconFaceId />,
+            color: "teal",
+        });
       } catch (error) {
-        console.log(error, "error submit shift");
-      }
+        if (error instanceof AxiosError) {
+            showNotification({
+                title: "Error Attempting Authorization",
+                message: error?.response?.data?.message ?? "Connection Error",
+                icon: <IconFaceIdError />,
+                color: "red",
+            });
+
+        }
+    } finally {
+        setVisible(false);
+    }
     };
 
     return (
