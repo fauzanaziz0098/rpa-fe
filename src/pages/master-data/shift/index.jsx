@@ -19,6 +19,7 @@ import { useEffect } from "react";
 import axiosPlanning from '@/libs/planning/axios'
 import {getHeaderConfigAxios} from '@/utils/getHeaderConfigAxios'
 import Link from "next/link";
+import { showNotification } from "@mantine/notifications";
 
 export default function ShiftPageIndex() {
   const router = useRouter();
@@ -84,6 +85,12 @@ export default function ShiftPageIndex() {
       setOpenedDelete(false)
       setTimeout(() => {
         setShift(shift.filter((shift) => shift.id !== ShiftToDelete));
+        showNotification({
+          title: "Success",
+          message: "User deleted successfully.",
+          color: "teal",
+          icon: <IconAlertCircle size={16} />,
+        });
       }, 200);
     } catch (error) {
       console.log(error, 'error delete shift');

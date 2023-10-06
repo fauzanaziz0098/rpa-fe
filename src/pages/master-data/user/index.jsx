@@ -17,6 +17,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { useEffect } from "react";
 import axiosAuth from '@/libs/auth/axios'
+import { showNotification } from "@mantine/notifications";
 import {getHeaderConfigAxios} from '@/utils/getHeaderConfigAxios'
 import Link from "next/link";
 
@@ -69,6 +70,12 @@ export default function UserPageIndex() {
       setOpenedDelete(false)
       setTimeout(() => {
         setUsers(users.filter((user) => user.id !== userToDelete));
+        showNotification({
+          title: "Success",
+          message: "User deleted successfully.",
+          color: "teal",
+          icon: <IconAlertCircle size={16} />,
+        });
       }, 200);
     } catch (error) {
       console.log(error, 'error delete user');
