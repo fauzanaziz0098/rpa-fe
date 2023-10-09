@@ -11,6 +11,7 @@ import * as moment from 'moment-timezone';
 import { useRouter } from 'next/router';
 import client from '@/libs/mqtt'
 import DownTime from '@/components/views/Dashboard/MonitorMachine/DownTime';
+import MachineCondition from '@/components/views/Dashboard/MonitorMachine/MachineCondition';
 
 export default function Home() {
 
@@ -616,6 +617,10 @@ if (isFullActive) {
     );
 }
 
+const totalPersentase = (
+    productionData.length == 0 ? (Math.round(qtyActualMqtt() / qtyTargetMqtt() * 100)) : (Math.round(isNaN(totalActual() / totalTarget()) ? 0 : ((totalActual() + qtyActualMqtt()) / (totalTarget() + qtyTargetMqtt())) * 100))
+)
+
 return (
     <div>
         <div style={{
@@ -788,7 +793,7 @@ return (
                                         return <p key={index} style={index == 0 ? { width: '30px', marginLeft: '10px', color: `${persentase >= 100 ? 'green' : ''}`} : { marginLeft: '80px', width: '30px' , color: `${persentase >= 100 ? 'green' : ''}`}}>{persentase}%</p>
                                     })}
                                     <p style={{ marginLeft: '82px', width: '30px' , color: `${(persentaseMqtt()) >= 100 ? 'green' : ''}` }}>{persentaseMqtt()}%</p>
-                                    <p style={{  marginLeft: '82px', width: '30px', color: `${Math.round((totalActual() / totalTarget()) * 100) >= 100 ? 'green' : 'red'}` }}>{ productionData.length == 0 ? (qtyActualMqtt() / qtyTargetMqtt() * 100) : (Math.round(isNaN(totalActual() / totalTarget()) ? 0 : ((totalActual() + qtyActualMqtt()) / (totalTarget() + qtyTargetMqtt())) * 100))}%</p>
+                                    <p style={{  marginLeft: '82px', width: '30px', color: `${totalPersentase >= 100 ? 'green' : 'red'}` }}>{totalPersentase}%</p>
                                 </div>
                             </div>
                         </div>
@@ -818,35 +823,7 @@ return (
                 </div>
             </div>
             <DownTime/>
-            <div
-                style={{ width: '480px', border: '10px solid skyblue', textAlign: 'center', height: '304px', marginLeft: '25px' }}>
-                <div style={{ marginTop: '-16px' }}>
-                    <p style={{ backgroundColor: 'gainsboro', padding: '10px' }}>Kondisi Mesin</p>
-                </div>
-                <div
-                    style={{ backgroundColor: 'lavender', height: '266px', marginTop: '-16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                    <div
-                        style={{ backgroundColor: 'lavender', borderRadius: '10px', height: '50px', width: '400px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '2px solid grey'}}>
-                        <p style={{ fontSize: '1.1rem', textAlign: 'center', marginLeft: '20px' }}>Zero Set Position Machine</p>
-                        <div style={{ backgroundColor: 'lime', width: '70px', height: '35px', marginRight: '20px', boxShadow: 'inset 5px 5px 5px green, inset -5px -5px 5px green'  }}></div>
-                    </div>
-                    <div
-                        style={{ backgroundColor: 'lavender', borderRadius: '10px', height: '50px', width: '400px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '10px', border: '2px solid grey'}}>
-                        <p style={{ fontSize: '1.1rem', textAlign: 'center', marginLeft: '20px' }}>Zero Set Position Jig</p>
-                        <div style={{ backgroundColor: 'gold', width: '70px', height: '35px', marginRight: '20px', boxShadow: 'inset 5px 5px 5px #6c6e00, inset -5px -5px 5px #6c6e00'  }}></div>
-                    </div>
-                    <div
-                        style={{ backgroundColor: 'lavender', borderRadius: '10px', height: '50px', width: '400px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '10px', border: '2px solid grey'}}>
-                        <p style={{ fontSize: '1.1rem', textAlign: 'center', marginLeft: '20px' }}>CO2 Gas</p>
-                        <div style={{ backgroundColor: 'lime', width: '70px', height: '35px', marginRight: '20px', boxShadow: 'inset 5px 5px 5px green, inset -5px -5px 5px green'  }}></div>
-                    </div>
-                    <div
-                        style={{ backgroundColor: 'lavender', borderRadius: '10px', height: '50px', width: '400px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '10px', border: '2px solid grey'}}>
-                        <p style={{ fontSize: '1.1rem', textAlign: 'center', marginLeft: '20px' }}>Welding Jig</p>
-                        <div style={{ backgroundColor: 'firebrick', width: '70px', height: '35px', marginRight: '20px', boxShadow: 'inset 5px 5px 5px #400400, inset -5px -5px 5px #400400'  }}></div>
-                    </div>
-                </div>
-            </div>
+           <MachineCondition/>
         </div>
         <div
             style={{ backgroundColor: 'lavender', height: '50px', borderRadius: '10px', marginTop: '10px', border: '2px solid skyblue', display: 'flex', alignItems: 'center', justifyContent: 'center'  }}>

@@ -1,4 +1,4 @@
-import { ActionIcon, Table } from "@mantine/core"
+import { ActionIcon, ScrollArea, Table } from "@mantine/core"
 import { IconCircleDot } from "@tabler/icons"
 import { useEffect, useState } from "react"
 import axiosLosstime from "@/libs/losstime/axios"
@@ -10,29 +10,30 @@ const DownTime = () => {
     const [lineStopDatas, setLineStopDatas] = useState([])
     useEffect(() => {
         client
-        .subscribe("MC1:DT:RPA", {qos: 2})
+        .subscribe("MC1:LS:RPA", {qos: 2})
         .on("message", (topic, message) => {
-            if (topic == "MC1:DT:RPA") {
+            if (topic == "MC1:LS:RPA") {
                 setMqttDataLS1(JSON.parse(message))
             }
         })
         return () => {
-            client.unsubscribe('MC1:DT:RPA', { qos: 2 })
+            client.unsubscribe('MC1:LS:RPA', { qos: 2 })
         }
     }, [])
 
     useEffect(() => {
         const fetchLineStop = async () => {
-            const res = await axiosLosstime.get('line-stop', getHeaderConfigAxios()).then(item => item.data)
-            setLineStopDatas(res.data)
+            try {
+                const res = await axiosLosstime.get('line-stop', getHeaderConfigAxios()).then(item => item.data)
+                setLineStopDatas(res.data)
+            } catch (error) {
+                console.log(error, 'error fetch ls');
+            }
         }
         fetchLineStop()
     },[])
-
-    console.log(lineStopDatas, 'ls');
-    console.log(mqttDataLS1, 'mqtt ls');
     return (
-        <div style={{ width: '650px', border: '10px solid skyblue', textAlign: 'center', height: '304px', marginLeft: '25px'}}>
+        <ScrollArea style={{ width: '650px', border: '10px solid skyblue', textAlign: 'center', maxHeight: '304px', height: '304px', marginLeft: '25px'}}>
             <Table highlightOnHover withColumnBorders>
                 <thead style={{ backgroundColor: 'gainsboro', textAlign: 'center' }}>
                     <tr>
@@ -43,12 +44,12 @@ const DownTime = () => {
                 </thead>
                 <tbody>
                     {lineStopDatas.map((row, index) => (
-                        <tr key={index}>
+                        <tr key={index} style={ index == lineStopDatas?.length -1 ? { borderBottom: '1px #d4d6d9 solid' } : {}}>
                             <td>{row.name}</td>
-                            <td>{mqttDataLS1[`causeLS${row.typeId}`] == null ? '-' : mqttDataLS1[`causeLS${row.typeId}`]}</td>
+                            <td>{mqttDataLS1[`CauseLS${row.typeId}`] == null ? '-' : mqttDataLS1[`CauseLS${row.typeId}`]}</td>
                             <td style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '20px'}}>
                                 <ActionIcon>
-                                    <IconCircleDot style={{ color: 'white', backgroundColor: `${mqttDataLS1['isActive'] == row.typeId ? 'red' : mqttDataLS1[`causeLS${row.typeId}`] == 0 ? 'green' : 'yellow'}`, borderRadius: '100%'}} />
+                                    <IconCircleDot style={{ color: 'white', backgroundColor: `${mqttDataLS1['IsActive'] == row.typeId ? 'red' : mqttDataLS1[`CauseLS${row.typeId}`] == 0 ? 'green' : 'yellow'}`, borderRadius: '100%'}} />
                                 </ActionIcon>
                             </td>
                         </tr>
@@ -118,7 +119,7 @@ const DownTime = () => {
                     </tr> */}
                 </tbody>
             </Table>
-        </div>
+        </ScrollArea>
     )
 }
 
