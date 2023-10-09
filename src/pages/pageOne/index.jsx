@@ -7,19 +7,22 @@ import { useState, useEffect, useRef } from 'react';
 import axiosPlanning from "@/libs/planning/axios";
 import axiosHour from "@/libs/service_per_hour/axios";
 import {getHeaderConfigAxios} from '@/utils/getHeaderConfigAxios'
-import moment from 'moment';
+import * as moment from 'moment-timezone';
 import { useRouter } from 'next/router';
 import client from '@/libs/mqtt'
+import DownTime from '@/components/views/Dashboard/MonitorMachine/DownTime';
 
 export default function Home() {
 
-    const [mqttData, setMqttData] = useState([])
+    const [mqttData1, setMqttData1] = useState([])
     useEffect(() => {
         client
         .subscribe("MC1:PLAN:RPA", {qos: 2})
         .on("message", (topic, message) => {
-            setMqttData(JSON.parse(message))
-            console.log('message got');
+            if (topic == 'MC1:PLAN:RPA') {
+                setMqttData1(JSON.parse(message))
+                console.log('message got');
+            }
         })
         return () => {
             client.unsubscribe('MC1:PLAN:RPA', { qos: 2 })
@@ -178,7 +181,7 @@ export default function Home() {
     }
 
     const qtyActualMqtt = () => {
-        return mqttData.qty_actual - totalActual()
+        return mqttData1.qty_actual - totalActual()
     }
 
     const qtyTargetMqtt = () => {
@@ -681,7 +684,7 @@ return (
                                     {productionData.map((item, index) => (
                                         <p key={index} style={index == 0 ? { width: '40px', marginLeft: '5px' } : {marginLeft: '72px', width: '40px'}}>{item.time_start}</p>
                                     ))}
-                                    <p style={{ marginLeft: '72px', width: '40px' }}>{moment(productionData[productionData.length - 1]?.time_start, "HH:mm").add(1, 'hours').format('HH:mm')}</p>
+                                    <p style={{ marginLeft: '72px', width: '40px' }}>{productionData.length > 0 ? moment(productionData[productionData.length - 1]?.time_start, "HH:mm").add(1, 'hours').format('HH:mm') : moment(activePlan.date_time_in).tz('Asia/Bangkok').format("HH")+':00'}</p>
                                     <p style={{ marginLeft: '55px', display: 'flex', width: '100px', flexWrap: 'nowrap' }}>Total Shift</p>
                                 </div>
                             </div>
@@ -755,7 +758,7 @@ return (
                                         <p key={index} style={index == 0 ? { width: '30px', marginLeft: '10px' } : { marginLeft: '80px', width: '30px' }}>{item.qty_actual}</p>
                                     ))}
                                     <p style={{ marginLeft: '80px', width: '30px' }}>{qtyActualMqtt()}</p>
-                                    <p style={{  marginLeft: '80px', width: '30px' }}>{mqttData.qty_actual}</p>
+                                    <p style={{  marginLeft: '80px', width: '30px' }}>{mqttData1.qty_actual}</p>
                                 </div>
                             </div>
                             <div style={{ display: 'flex', fontSize: '22px', fontWeight: 'bold', color: 'firebrick' }}>
@@ -785,7 +788,7 @@ return (
                                         return <p key={index} style={index == 0 ? { width: '30px', marginLeft: '10px', color: `${persentase >= 100 ? 'green' : ''}`} : { marginLeft: '80px', width: '30px' , color: `${persentase >= 100 ? 'green' : ''}`}}>{persentase}%</p>
                                     })}
                                     <p style={{ marginLeft: '82px', width: '30px' , color: `${(persentaseMqtt()) >= 100 ? 'green' : ''}` }}>{persentaseMqtt()}%</p>
-                                    <p style={{  marginLeft: '82px', width: '30px', color: `${Math.round((totalActual() / totalTarget()) * 100) >= 100 ? 'green' : 'red'}` }}>{Math.round(isNaN(totalActual() / totalTarget()) ? 0 : ((totalActual() + qtyActualMqtt()) / (totalTarget() + qtyTargetMqtt())) * 100)}%</p>
+                                    <p style={{  marginLeft: '82px', width: '30px', color: `${Math.round((totalActual() / totalTarget()) * 100) >= 100 ? 'green' : 'red'}` }}>{ productionData.length == 0 ? (qtyActualMqtt() / qtyTargetMqtt() * 100) : (Math.round(isNaN(totalActual() / totalTarget()) ? 0 : ((totalActual() + qtyActualMqtt()) / (totalTarget() + qtyTargetMqtt())) * 100))}%</p>
                                 </div>
                             </div>
                         </div>
@@ -796,7 +799,7 @@ return (
             </div>
         </div>
         <div style={{ display: 'flex' }}>
-            <div style={{ width: '100px', border: '10px solid skyblue', textAlign: 'center', height: '304px' }}>
+            <div style={{ width: '100px', border: '10px solid skyblue', textAlign: 'center', minHeight: '304px' }}>
                 <div style={{ marginTop: '-16px' }}>
                     <p style={{ backgroundColor: 'gainsboro', padding: '10px' }}>Operator</p>
                     <p style={{ padding: '10px', marginTop: '-16px' }}>{activePlan?.user}</p>
@@ -811,85 +814,10 @@ return (
                 </div>
                 <div>
                     <p style={{ backgroundColor: 'gainsboro', padding: '10px', marginTop: '-16px' }}>Cycle Time</p>
-                    <p style={{ padding: '10px', marginTop: '-16px' }}>{activePlan?.product?.cycle_time}</p>
+                    <p style={{ padding: '0', marginTop: '-16px' }}>{activePlan?.product?.cycle_time}</p>
                 </div>
             </div>
-            <div style={{ width: '650px', border: '10px solid skyblue', textAlign: 'center', height: '304px', marginLeft: '25px'}}>
-                <Table highlightOnHover withColumnBorders>
-                    <thead style={{ backgroundColor: 'gainsboro', textAlign: 'center' }}>
-                        <tr>
-                            <th style={{ textAlign: 'center' }}>Down Time</th>
-                            <th style={{ textAlign: 'center' }}>Durasi</th>
-                            <th style={{ textAlign: 'center' }}>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>MACHINE</td>
-                            <td>0</td>
-                            <td style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '20px'}}>
-                                <ActionIcon>
-                                <IconCircleDot style={{ color: 'white', backgroundColor: 'green', borderRadius: '100%'}} />
-                                </ActionIcon>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>MATERIAL</td>
-                            <td>20</td>
-                            <td style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '20px'}}>
-                                <ActionIcon>
-                                <IconCircleDot style={{ color: 'white', backgroundColor: 'firebrick', borderRadius: '100%'}} />
-                                </ActionIcon>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>MAN POWER</td>
-                            <td>10</td>
-                            <td style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '20px'}}>
-                                <ActionIcon>
-                                <IconCircleDot style={{ color: 'white', backgroundColor: 'gold', borderRadius: '100%'}} />
-                                </ActionIcon>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>JIG PROCESS WELDING</td>
-                            <td>5</td>
-                            <td style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '20px'}}>
-                                <ActionIcon>
-                                <IconCircleDot style={{ color: 'white', backgroundColor: 'firebrick', borderRadius: '100%'}} />
-                                </ActionIcon>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>PACKING STANDAR</td>
-                            <td>7</td>
-                            <td style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '20px'}}>
-                                <ActionIcon>
-                                <IconCircleDot style={{ color: 'white', backgroundColor: 'green', borderRadius: '100%'}} />
-                                </ActionIcon>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>GAS & WIRE WELDING</td>
-                            <td>0</td>
-                            <td style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '20px'}}>
-                                <ActionIcon>
-                                <IconCircleDot style={{ color: 'white', backgroundColor: 'green', borderRadius: '100%'}} />
-                                </ActionIcon>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>OTHERS</td>
-                            <td>5</td>
-                            <td style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '20px'}}>
-                                <ActionIcon>
-                                <IconCircleDot style={{ color: 'white', backgroundColor: 'gold', borderRadius: '100%'}} />
-                                </ActionIcon>
-                            </td>
-                        </tr>
-                    </tbody>
-                </Table>
-            </div>
+            <DownTime/>
             <div
                 style={{ width: '480px', border: '10px solid skyblue', textAlign: 'center', height: '304px', marginLeft: '25px' }}>
                 <div style={{ marginTop: '-16px' }}>
