@@ -239,6 +239,11 @@ export default function Home() {
         return Math.round(qtyActualMqtt() / qtyTargetMqtt() * 100)
     }
 
+    
+    const totalPersentase = (
+        productionData.length == 0 ? (Math.round(qtyActualMqtt() / qtyTargetMqtt() * 100)) : (Math.round(isNaN(totalActual() / totalTarget()) ? 0 : ((totalActual() + qtyActualMqtt()) / (totalTarget() + qtyTargetMqtt())) * 100))
+    )
+
     let content;
 if (isFullActive) {
     content = (
@@ -617,10 +622,6 @@ if (isFullActive) {
     );
 }
 
-const totalPersentase = (
-    productionData.length == 0 ? (Math.round(qtyActualMqtt() / qtyTargetMqtt() * 100)) : (Math.round(isNaN(totalActual() / totalTarget()) ? 0 : ((totalActual() + qtyActualMqtt()) / (totalTarget() + qtyTargetMqtt())) * 100))
-)
-
 return (
     <div>
         <div style={{
@@ -676,7 +677,7 @@ return (
                 </div>
                 {activePlan.length == 0 ? (
                     <div>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '10px', backgroundColor: '#99c2a1', marginLeft: '10px', height: '75px', minWidth: '1190px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '10px', backgroundColor: '#99c2a1', height: '75px', minWidth: '1190px' }}>
                             No Active Plan
                         </div>
                     </div>
@@ -687,7 +688,7 @@ return (
                             <div style={{ display: 'flex', marginTop: '10px', fontWeight: 'bold' }}>
                                 <div style={{ display: 'flex', marginTop: '-7px' }}>
                                     {productionData.map((item, index) => (
-                                        <p key={index} style={index == 0 ? { width: '40px', marginLeft: '5px' } : {marginLeft: '72px', width: '40px'}}>{item.time_start}</p>
+                                        <p key={index} style={index == 0 ? { width: '40px', marginLeft: '8px' } : {marginLeft: '72px', width: '40px'}}>{item.time_start}</p>
                                     ))}
                                     <p style={{ marginLeft: '72px', width: '40px' }}>{productionData.length > 0 ? moment(productionData[productionData.length - 1]?.time_start, "HH:mm").add(1, 'hours').format('HH:mm') : moment(activePlan.date_time_in).tz('Asia/Bangkok').format("HH")+':00'}</p>
                                     <p style={{ marginLeft: '55px', display: 'flex', width: '100px', flexWrap: 'nowrap' }}>Total Shift</p>
@@ -793,7 +794,7 @@ return (
                                         return <p key={index} style={index == 0 ? { width: '30px', marginLeft: '10px', color: `${persentase >= 100 ? 'green' : ''}`} : { marginLeft: '80px', width: '30px' , color: `${persentase >= 100 ? 'green' : ''}`}}>{persentase}%</p>
                                     })}
                                     <p style={{ marginLeft: '82px', width: '30px' , color: `${(persentaseMqtt()) >= 100 ? 'green' : ''}` }}>{persentaseMqtt()}%</p>
-                                    <p style={{  marginLeft: '82px', width: '30px', color: `${totalPersentase >= 100 ? 'green' : 'red'}` }}>{totalPersentase}%</p>
+                                    <p style={{  marginLeft: '82px', width: '30px', color: `${totalPersentase >= 100 ? 'green' : ''}` }}>{totalPersentase}%</p>
                                 </div>
                             </div>
                         </div>
@@ -823,7 +824,7 @@ return (
                 </div>
             </div>
             <DownTime/>
-           <MachineCondition/>
+           <MachineCondition activePlan={activePlan}/>
         </div>
         <div
             style={{ backgroundColor: 'lavender', height: '50px', borderRadius: '10px', marginTop: '10px', border: '2px solid skyblue', display: 'flex', alignItems: 'center', justifyContent: 'center'  }}>

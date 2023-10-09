@@ -4,22 +4,65 @@ import client from '@/libs/mqtt'
 import { useEffect, useState } from "react"
 import { yellow } from "@material-ui/core/colors"
 import { Button, Modal, Table } from "@mantine/core"
+import moment from "moment"
+import { showNotification } from "@mantine/notifications"
+import { IconCheck, IconFaceIdError } from "@tabler/icons"
 
-const MachineCondition = () => {
+const MachineCondition = ({activePlan}) => {
     const [conditionMachineProductionDatas, setConditionMachineProductionDatas] = useState([])
+    const [mqttConditionMachine, setMqttConditionMachine] = useState(null)
     const [openModal, setOpenModal] = useState({
         isOpen: false,
         data: null
     })
+
     useEffect(() => {
-        const fetchConditionMachine = async () => {
-            try {
-                const res = await axiosPlanning.get('condition-machine-production', getHeaderConfigAxios()).then(item => item.data)
-                setConditionMachineProductionDatas(res.data)
-            } catch (error) {
-                console.log(error, 'error fetch condition machine');
+        client
+        .subscribe("MC1:CD:RPA", {qos: 2})
+        .on("message", (topic, message) => {
+            if (topic == "MC1:CD:RPA") {
+                setMqttConditionMachine(JSON.parse(message));
             }
+        })
+    },[])
+
+
+    useEffect(() => {
+        if (mqttConditionMachine) {
+            conditionMachineProductionDatas.map(async(item) => {
+                if (item.id == mqttConditionMachine['ConditionMachineID']) {
+                    try {
+                        await axiosPlanning.patch(`condition-machine-production/${item.id}`, {status: mqttConditionMachine["Status"]},getHeaderConfigAxios())
+                        fetchConditionMachine()        
+                        if (item.status != mqttConditionMachine["Status"]) {
+                            showNotification({
+                                title: "Successful Update",
+                                message: "Update Status Success",
+                                icon: <IconCheck />,
+                                color: "teal",
+                            });        
+                        }
+                    } catch (error) {
+                        showNotification({
+                            title: "Failed to Update",
+                            message: error?.response?.data?.message ?? "Connection Error",
+                            icon: <IconFaceIdError />,
+                            color: "red",
+                        });
+                    }
+                }
+            })
         }
+    }, [mqttConditionMachine])
+    const fetchConditionMachine = async () => {
+        try {
+            const res = await axiosPlanning.get('condition-machine-production', getHeaderConfigAxios()).then(item => item.data)
+            setConditionMachineProductionDatas(res.data)
+        } catch (error) {
+            console.log(error, 'error fetch condition machine');
+        }
+    }
+    useEffect(() => {
         fetchConditionMachine()
     },[])
 
@@ -30,9 +73,23 @@ const MachineCondition = () => {
     const handleUpdateStatus = async (status) => {
         try {
             await axiosPlanning.patch(`condition-machine-production/${openModal?.data?.id}`, {status: status},getHeaderConfigAxios())
+            fetchConditionMachine()
             setOpenModal({isOpen: false, data: null})
-            router.reload()
-        } catch (error) {}
+
+            showNotification({
+                title: "Successful Update",
+                message: "Update Status Success",
+                icon: <IconCheck />,
+                color: "teal",
+            });        
+        } catch (error) {
+            showNotification({
+                title: "Error Attempting Authorization",
+                message: error?.response?.data?.message ?? "Connection Error",
+                icon: <IconFaceIdError />,
+                color: "red",
+            });
+        }
     }
 
     return (
@@ -44,16 +101,16 @@ const MachineCondition = () => {
                     <thead>
                         <tr>
                             <th>Condition</th>
-                            <th>Status</th>
+                            <th>Update Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td width={"50%"}>{openModal?.data?.conditionMachine?.name}</td>
                             <td style={{ display: 'flex', gap: '10px' }}>
-                                <Button onClick={() => handleUpdateStatus(0)} style={{ background: 'lime', borderRadius: '2px' , width: '70px', height: '35px', boxShadow: `inset 5px 5px 5px green, inset -5px -5px 5px green`}}></Button>
-                                <Button onClick={() => handleUpdateStatus(1)} style={{ background: 'gold', borderRadius: '2px' , width: '70px', height: '35px', boxShadow: `inset 5px 5px 5px  #6c6e00, inset -5px -5px 5px #6c6e00`}}></Button>
-                                <Button onClick={() => handleUpdateStatus(2)} style={{ background: 'firebrick', borderRadius: '2px' , width: '70px', height: '35px', boxShadow: `inset 5px 5px 5px #400400, inset -5px -5px 5px #400400`}}></Button>
+                                <Button disabled={moment().diff(moment(activePlan.created_at), 'minutes') < 15 ? false : true} onClick={() => handleUpdateStatus(0)} style={{ opacity: `${moment().diff(moment(activePlan.created_at), 'minutes') < 15 ? '1' : '0.7'}`, background: 'lime', borderRadius: '2px' , width: '70px', height: '35px', boxShadow: `inset 5px 5px 5px green, inset -5px -5px 5px green`}}></Button>
+                                <Button disabled={moment().diff(moment(activePlan.created_at), 'minutes') < 15 ? false : true} onClick={() => handleUpdateStatus(1)} style={{ opacity: `${moment().diff(moment(activePlan.created_at), 'minutes') < 15 ? '1' : '0.7'}`, background: 'gold', borderRadius: '2px' , width: '70px', height: '35px', boxShadow: `inset 5px 5px 5px  #6c6e00, inset -5px -5px 5px #6c6e00`}}></Button>
+                                <Button disabled={moment().diff(moment(activePlan.created_at), 'minutes') < 15 ? false : true} onClick={() => handleUpdateStatus(2)} style={{ opacity: `${moment().diff(moment(activePlan.created_at), 'minutes') < 15 ? '1' : '0.7'}`, background: 'firebrick', borderRadius: '2px' , width: '70px', height: '35px', boxShadow: `inset 5px 5px 5px #400400, inset -5px -5px 5px #400400`}}></Button>
                             </td>
                         </tr>
                     </tbody>
@@ -71,7 +128,7 @@ const MachineCondition = () => {
                 <div
                     onClick={() => handleModalOpen(row)}
                     key={index}
-                    style={{ marginTop: `${index != 0 ? '10px' : '0'}`, backgroundColor: 'lavender', borderRadius: '10px', height: '50px', width: '400px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '2px solid grey'}}>
+                    style={{ cursor: 'pointer', marginTop: `${index != 0 ? '10px' : '0'}`, backgroundColor: 'lavender', borderRadius: '10px', height: '50px', width: '400px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '2px solid grey'}}>
                     <p style={{ fontSize: '1.1rem', textAlign: 'center', marginLeft: '20px' }}>{row?.conditionMachine?.name}</p>
                     <div style={{ backgroundColor: `${row?.status == 0 ? 'lime' : row?.status == 1 ? 'gold' : 'firebrick'}`, width: '70px', height: '35px', marginRight: '20px', boxShadow: `inset 5px 5px 5px  ${row?.status == 0 ? 'green' : row?.status == 1 ? '#6c6e00' : '#400400'}, inset -5px -5px 5px  ${row?.status == 0 ? 'green' : row?.status == 1 ? '#6c6e00' : '#400400'}`  }}></div>
                 </div>
