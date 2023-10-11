@@ -5,6 +5,7 @@ import {
     Grid,
     Group,
     Select,
+    Text,
     TextInput,
     Title,
   } from "@mantine/core";
@@ -14,36 +15,62 @@ import {
   import axiosPlanning from "@/libs/planning/axios";
   import { getHeaderConfigAxios } from "@/utils/getHeaderConfigAxios";
   import { useRouter } from "next/router";
+  import { AxiosError } from "axios";
   import Link from "next/link";
-import { TimeInput } from "@mantine/dates";
-import { IconClockHour1, IconClockHour9, IconFaceId, IconFaceIdError } from "@tabler/icons";
-import dayjs from "dayjs";
 import { showNotification } from "@mantine/notifications";
+import { IconFaceId, IconFaceIdError } from "@tabler/icons";
   
   export default function FormControl({ id }) {
     const router = useRouter();
+    const [roles, setRoles] = useState([]);
     const [visible, setVisible] = useState(false);
   
     const form = useForm({
       initialValues: {
-        name: '',
-        time_start: '',
-        time_end: '',
+        name: "",
+        // code: "",
+        // part_number: "",
+        // cycle_time: "",
+        // unit: "",
+        // status: "",
       },
     });
+    // console.log(form, 'form');
   
+    useEffect(() => {
+      const fetchDataClients = async () => {
+        try {
+          const { data } = (await axiosAuth.get("roles", getHeaderConfigAxios()))
+            .data;
+          setRoles(
+            data.map((item) => ({
+              label: item.name,
+              value: item.name,
+            }))
+          );
+        } catch (error) {
+          console.log(error, "error fetch data clients");
+        }
+      };
+      fetchDataClients();
+  
+    }, []);
+
     useEffect(() => {
         if (id) {
             (async (id) => {
                 try {
-                  const { data } = await axiosPlanning.get(`shift/${id}`, getHeaderConfigAxios()).then(item => item.data)
+                  const { data } = await axiosAuth.get(`roles/${id}`, getHeaderConfigAxios()).then(item => item.data)
                 form.setValues({
-                    name: data.name,
-                    time_start: dayjs(`${dayjs().format('YYYY-MM-DD')} ${data.time_start}`).toDate(),
-                    time_end: dayjs(`${dayjs().format('YYYY-MM-DD')} ${data.time_end}`).toDate(),          
+                        name: data.name,
+                        // code: data.code,
+                        // part_number: data.part_number,
+                        // cycle_time: data.cycle_time,
+                        // unit: data.unit,
+                        // status: data.status,
                     })
                 } catch (error) {
-                    console.log(error, 'error fetch shift data');
+                    console.log(error, 'error fetch product data');
                 }
             })(id)
         }
@@ -53,16 +80,16 @@ import { showNotification } from "@mantine/notifications";
     const handleSubmit = async () => {
       try {
           if (id) {
-              await axiosPlanning.patch(`shift/${id}`, form.values, getHeaderConfigAxios());
-              router.push("/master-data/shift");
+              await axiosAuth.patch(`roles/${id}`, form.values, getHeaderConfigAxios());
+              router.push("/master-data/role");
           } else {
-              await axiosPlanning.post("shift", form.values, getHeaderConfigAxios());
-              router.push("/master-data/shift");
+              await axiosAuth.post("roles", form.values, getHeaderConfigAxios());
+              router.push("/master-data/role");
           }
           showNotification({
             title: "Successful Submit",
             message: "Submit Success👏",
-            icon: <IconFaceIds />,
+            icon: <IconFaceId />,
             color: "teal",
         });
       } catch (error) {
@@ -79,7 +106,6 @@ import { showNotification } from "@mantine/notifications";
         setVisible(false);
     }
     };
-
     return (
       <div>
           <form
@@ -88,33 +114,17 @@ import { showNotification } from "@mantine/notifications";
           >
           <Grid columns={3}>
               <Grid.Col span={1}>
-              <TextInput
-                  label="Name"
-                  placeholder="Name"
-                  withAsterisk
-                  {...form.getInputProps("name")}
-              />
-              </Grid.Col>
-              <Grid.Col span={1}>
-              <TimeInput
-                label="Time Start"
-                withAsterisk
-                icon={<IconClockHour1 size={18} />}
-                {...form.getInputProps("time_start")}
-              />
-              </Grid.Col>
-              <Grid.Col span={1}>
-              <TimeInput
-                label="Time End"
-                withAsterisk
-                icon={<IconClockHour9 size={18} />}
-                {...form.getInputProps("time_end")}
-              />
+                <TextInput
+                    label="Name"
+                    placeholder="Name"
+                    withAsterisk
+                    {...form.getInputProps("name")}
+                />
               </Grid.Col>
           </Grid>
   
           <Group position="right" mt="xl">
-              <Button color="red" component={Link} href="/master-data/shift">
+              <Button color="red" component={Link} href="/master-data/role">
               Back
               </Button>
               <Button type="submit">Submit</Button>

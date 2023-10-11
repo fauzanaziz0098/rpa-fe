@@ -17,6 +17,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import axiosAuth from '@/libs/auth/axios'
 import {getHeaderConfigAxios} from '@/utils/getHeaderConfigAxios'
+import Link from "next/link";
 
 export default function RolePageIndex() {
   const router = useRouter();
@@ -83,7 +84,7 @@ export default function RolePageIndex() {
             style={{ width: "10rem", marginBottom: "2rem" }}
             onChange={(e) => setSearchValue(e.target.value)}
           />
-          <Button>Create</Button>
+          <Button component={Link} href="/master-data/role/create">Create</Button>
         </div>
         <Table verticalSpacing="xs" fontSize="xs" highlightOnHover>
           <thead>
@@ -108,7 +109,7 @@ export default function RolePageIndex() {
                 <td>{item?.name}</td>
                 <td>{item?.guard_name ?? '-'}</td>
                 <td style={{ display: "flex", gap: "5px" }}>
-                  <Button color="yellow">
+                  <Button color="yellow" component={Link} href={`/master-data/role/${item.id}`}>
                     <IconPencil size={"1.2rem"} />
                   </Button>
                   <Button color="red">
