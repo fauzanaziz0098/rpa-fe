@@ -2,13 +2,17 @@ import { useRouter } from "next/router"
 import FormControl from "@/components/views/MasterData/Role/FormControl"
 import { Button, Card, Checkbox, Divider, Grid, Group, Pagination, Select, Space, Title } from "@mantine/core"
 import { useSetState } from "@mantine/hooks";
+import { showNotification } from "@mantine/notifications";
 import { useEffect, useState } from "react";
 import axiosAuth from '@/libs/auth/axios'
+import { AxiosError } from "axios";
 import {getHeaderConfigAxios} from '@/utils/getHeaderConfigAxios'
+import { IconFaceId, IconFaceIdError } from "@tabler/icons";
 
 export default function EditProduct({role}) {
     const router = useRouter()
     const [permissions, setPermissions] = useState([])
+    const [visible, setVisible] = useState(false)
 
     const [name, setName] = useState(role);
 	const [selectedPermissions, setSelectedPermission] = useState([]);
@@ -59,10 +63,30 @@ export default function EditProduct({role}) {
 	};
 
 
-    const handleAssignPermission = async () => {
-		const roleId = router.query.id
-		await axiosAuth.post(`roles/permissions/${roleId}`, {permissionIds: selectedPermissions}, getHeaderConfigAxios());
-		// router.push('/master-data/role');
+    // const handleAssignPermission = async () => {
+	// 	const roleId = router.query.id
+	// 	await axiosAuth.post(`roles/permissions/${roleId}`, {permissionIds: selectedPermissions}, getHeaderConfigAxios());
+	// };
+
+	const handleAssignPermission = async () => {
+		const roleId = router.query.id;
+		try {
+			await axiosAuth.post(`roles/permissions/${roleId}`, {permissionIds: selectedPermissions}, getHeaderConfigAxios());
+			showNotification({
+				title: "Successful Sync Permission",
+				message: "Submit Sync Permission👏",
+				icon: <IconFaceId />,
+				color: "teal",
+			});
+		}catch (error) {
+			showNotification({
+				title: "Error",
+				message: "Failed to sync permissions",
+				color: "red",
+			});
+		}finally {
+			setVisible(false);
+		}
 	};
 
     const handleCheckboxChange = e => {
