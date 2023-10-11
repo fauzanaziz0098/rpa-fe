@@ -63,8 +63,10 @@ const MachineCondition = ({activePlan, machineId}) => {
         }
     }
     useEffect(() => {
-        fetchConditionMachine()
-    },[])
+        if (activePlan) {
+            fetchConditionMachine()
+        }
+    },[activePlan])
 
     const handleModalOpen = (data) => {
         setOpenModal({isOpen: true, data: data})

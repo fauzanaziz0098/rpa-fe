@@ -14,7 +14,7 @@ import DownTime from '@/components/views/Dashboard/MonitorMachine/DownTime';
 import MachineCondition from '@/components/views/Dashboard/MonitorMachine/MachineCondition';
 import { getCookie } from 'cookies-next';
 
-export default function Home() {
+export default function Home({headers}) {
 
     const [mqttData1, setMqttData1] = useState([])
 
@@ -83,18 +83,12 @@ export default function Home() {
         }
     }, [activePlan])
 
-    // setInterval(async () => {
-    //     if (activePlan) {
-    //         const res = await axiosHour.get(`production/data-active/${activePlan.id}`, {
-    //             headers: {
-    //                 Authorization: getCookie("auth")
-    //             }
-    //         })
-    //         setProductionData(res.data.data)
-    //     }
-    //     console.log(productionData,'test');
-    // }, 1000 * 5);
-
+    if (activePlan.id) {
+        setInterval(async () => {
+            const res = await axiosHour.get(`production/data-active/${activePlan.id}`, headers)
+            setProductionData(res.data.data)
+        }, 1000 * 60);
+    }
     // Fungsi untuk mengubah kategori aktif
     const handleCategoryClick = (category) => {
         setActiveCategory(category === activeCategory ? null : category);
@@ -850,3 +844,21 @@ return (
     </div>
 );
 }
+
+export async function getServerSideProps(context) {
+    try {
+      const headers = getHeaderConfigAxios(context.req, context.res);
+      return {
+        props: {
+          headers: headers,
+        },
+      };
+    } catch (error) {
+      return {
+        props: {
+          error: 'Error message',
+        },
+      };
+    }
+  }
+  
