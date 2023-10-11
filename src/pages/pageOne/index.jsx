@@ -12,23 +12,11 @@ import { useRouter } from 'next/router';
 import client from '@/libs/mqtt'
 import DownTime from '@/components/views/Dashboard/MonitorMachine/DownTime';
 import MachineCondition from '@/components/views/Dashboard/MonitorMachine/MachineCondition';
+import { getCookie } from 'cookies-next';
 
 export default function Home() {
 
     const [mqttData1, setMqttData1] = useState([])
-    useEffect(() => {
-        client
-        .subscribe("MC1:PLAN:RPA", {qos: 2})
-        .on("message", (topic, message) => {
-            if (topic == 'MC1:PLAN:RPA') {
-                setMqttData1(JSON.parse(message))
-                console.log('message got');
-            }
-        })
-        return () => {
-            client.unsubscribe('MC1:PLAN:RPA', { qos: 2 })
-        }
-    }, [])
 
     const theme = useMantineTheme();
     const router = useRouter()
@@ -57,17 +45,25 @@ export default function Home() {
     }
 
     useEffect(() => {
+        if (activePlan.length != 0) {
+            client
+            .subscribe(`MC${activePlan.machine.id}:PLAN:RPA`, {qos: 2})
+            .on("message", (topic, message) => {
+                if (topic == `MC${activePlan.machine.id}:PLAN:RPA`) {
+                    setMqttData1(JSON.parse(message))
+                    console.log('message got');
+                }
+            })
+            return () => {
+                client.unsubscribe(`MC${activePlan.machine.id}:PLAN:RPA`, { qos: 2 })
+            }
+        }
+    }, [activePlan])
+
+    useEffect(() => {
         fetchActiveData()
-
-        const interval = setInterval(() => {
-            fetchActiveData();
-          }, 60 * 1000);
-        
-          return () => {
-            clearInterval(interval); // Cleanup interval on unmount
-          };
     },[])
-
+    
     useEffect(() => {
         if (activePlan?.id) {
             const fetchData = async () => {
@@ -86,6 +82,18 @@ export default function Home() {
             setNoPlanToday(noPlanToday ? noPlanToday : [])
         }
     }, [activePlan])
+
+    // setInterval(async () => {
+    //     if (activePlan) {
+    //         const res = await axiosHour.get(`production/data-active/${activePlan.id}`, {
+    //             headers: {
+    //                 Authorization: getCookie("auth")
+    //             }
+    //         })
+    //         setProductionData(res.data.data)
+    //     }
+    //     console.log(productionData,'test');
+    // }, 1000 * 5);
 
     // Fungsi untuk mengubah kategori aktif
     const handleCategoryClick = (category) => {
@@ -182,7 +190,8 @@ export default function Home() {
     }
 
     const qtyActualMqtt = () => {
-        return mqttData1.qty_actual - totalActual()
+        let qtyActualMqtt = mqttData1.qty_actual ? mqttData1.qty_actual : 0
+        return qtyActualMqtt - totalActual()
     }
 
     const qtyTargetMqtt = () => {
@@ -764,7 +773,7 @@ return (
                                         <p key={index} style={index == 0 ? { width: '30px', marginLeft: '10px' } : { marginLeft: '80px', width: '30px' }}>{item.qty_actual}</p>
                                     ))}
                                     <p style={{ marginLeft: '80px', width: '30px' }}>{qtyActualMqtt()}</p>
-                                    <p style={{  marginLeft: '80px', width: '30px' }}>{mqttData1.qty_actual}</p>
+                                    <p style={{  marginLeft: '80px', width: '30px' }}>{mqttData1.qty_actual ? mqttData1.qty_actual : 0}</p>
                                 </div>
                             </div>
                             <div style={{ display: 'flex', fontSize: '22px', fontWeight: 'bold', color: 'firebrick' }}>
@@ -823,8 +832,8 @@ return (
                     <p style={{ padding: '0', marginTop: '-16px' }}>{activePlan?.product?.cycle_time}</p>
                 </div>
             </div>
-            <DownTime/>
-           <MachineCondition activePlan={activePlan}/>
+            <DownTime machineId={activePlan?.machine?.id} />
+           <MachineCondition activePlan={activePlan} machineId={activePlan?.machine?.id}/>
         </div>
         <div
             style={{ backgroundColor: 'lavender', height: '50px', borderRadius: '10px', marginTop: '10px', border: '2px solid skyblue', display: 'flex', alignItems: 'center', justifyContent: 'center'  }}>

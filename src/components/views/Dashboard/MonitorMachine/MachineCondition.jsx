@@ -3,12 +3,12 @@ import {getHeaderConfigAxios} from '@/utils/getHeaderConfigAxios'
 import client from '@/libs/mqtt'
 import { useEffect, useState } from "react"
 import { yellow } from "@material-ui/core/colors"
-import { Button, Modal, Table } from "@mantine/core"
+import { Button, Modal, ScrollArea, Table } from "@mantine/core"
 import moment from "moment"
 import { showNotification } from "@mantine/notifications"
 import { IconCheck, IconFaceIdError } from "@tabler/icons"
 
-const MachineCondition = ({activePlan}) => {
+const MachineCondition = ({activePlan, machineId}) => {
     const [conditionMachineProductionDatas, setConditionMachineProductionDatas] = useState([])
     const [mqttConditionMachine, setMqttConditionMachine] = useState(null)
     const [openModal, setOpenModal] = useState({
@@ -18,13 +18,13 @@ const MachineCondition = ({activePlan}) => {
 
     useEffect(() => {
         client
-        .subscribe("MC1:CD:RPA", {qos: 2})
+        .subscribe(`MC${machineId}:CD:RPA`, {qos: 2})
         .on("message", (topic, message) => {
-            if (topic == "MC1:CD:RPA") {
+            if (topic == `MC${machineId}:CD:RPA`) {
                 setMqttConditionMachine(JSON.parse(message));
             }
         })
-    },[])
+    },[machineId])
 
 
     useEffect(() => {
@@ -124,6 +124,8 @@ const MachineCondition = ({activePlan}) => {
         <div
             style={{ backgroundColor: 'lavender', height: '266px', marginTop: '-16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
         >
+            <ScrollArea>
+
             {conditionMachineProductionDatas.map((row, index) => (
                 <div
                     onClick={() => handleModalOpen(row)}
@@ -133,6 +135,7 @@ const MachineCondition = ({activePlan}) => {
                     <div style={{ backgroundColor: `${row?.status == 0 ? 'lime' : row?.status == 1 ? 'gold' : 'firebrick'}`, width: '70px', height: '35px', marginRight: '20px', boxShadow: `inset 5px 5px 5px  ${row?.status == 0 ? 'green' : row?.status == 1 ? '#6c6e00' : '#400400'}, inset -5px -5px 5px  ${row?.status == 0 ? 'green' : row?.status == 1 ? '#6c6e00' : '#400400'}`  }}></div>
                 </div>
             ))}
+            </ScrollArea>
             {/* <div
                 style={{ backgroundColor: 'lavender', borderRadius: '10px', height: '50px', width: '400px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '10px', border: '2px solid grey'}}>
                 <p style={{ fontSize: '1.1rem', textAlign: 'center', marginLeft: '20px' }}>Zero Set Position Jig</p>

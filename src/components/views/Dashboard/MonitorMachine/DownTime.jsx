@@ -5,21 +5,23 @@ import axiosLosstime from "@/libs/losstime/axios"
 import {getHeaderConfigAxios} from '@/utils/getHeaderConfigAxios'
 import client from '@/libs/mqtt'
 
-const DownTime = () => {
+const DownTime = ({machineId}) => {
     const [mqttDataLS1, setMqttDataLS1] = useState([])
     const [lineStopDatas, setLineStopDatas] = useState([])
     useEffect(() => {
-        client
-        .subscribe("MC1:LS:RPA", {qos: 2})
-        .on("message", (topic, message) => {
-            if (topic == "MC1:LS:RPA") {
-                setMqttDataLS1(JSON.parse(message))
+        if (machineId) {
+            client
+            .subscribe(`MC${machineId}:LS:RPA`, {qos: 2})
+            .on("message", (topic, message) => {
+                if (topic == `MC${machineId}:LS:RPA`) {
+                    setMqttDataLS1(JSON.parse(message))
+                }
+            })
+            return () => {
+                client.unsubscribe(`MC${machineId}:LS:RPA`, { qos: 2 })
             }
-        })
-        return () => {
-            client.unsubscribe('MC1:LS:RPA', { qos: 2 })
         }
-    }, [])
+    }, [machineId])
 
     useEffect(() => {
         const fetchLineStop = async () => {
