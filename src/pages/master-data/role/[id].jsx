@@ -114,8 +114,7 @@ export default function EditProduct({role}) {
 				/>
 				<Pagination
 					style={{ marginLeft: '150px' }}
-					totalPages={totalPages}
-					activePage={activePage}
+					value={activePage}
 					onChange={handlePageChange}
 					total={totalPages}
 				/>
