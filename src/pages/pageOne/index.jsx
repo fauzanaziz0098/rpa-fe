@@ -1,4 +1,4 @@
-import { Table, Menu, Button, Space, ActionIcon, Select, Text, rem, useMantineTheme } from '@mantine/core';
+import { Table, Menu, Button, Space, ActionIcon, Select, Text, rem, useMantineTheme, ScrollArea } from '@mantine/core';
 import Image from 'next/image';
 import mht from '@/assets/mht.png';
 import robot from '@/assets/robot.png';
@@ -833,9 +833,9 @@ return (
             style={{ backgroundColor: 'lavender', height: '50px', borderRadius: '10px', marginTop: '10px', border: '2px solid skyblue', display: 'flex', alignItems: 'center', justifyContent: 'center'  }}>
             <Menu position="top-end" width={310} withinPortal>
             <Menu.Target>
-                <div>
+                <ScrollArea>
                     {content}
-                </div>
+                </ScrollArea>
             </Menu.Target>
                 
                 

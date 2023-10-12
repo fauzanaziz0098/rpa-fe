@@ -44,7 +44,9 @@ const changePage = () => {
         <div style={{ display: 'flex', fontWeight: 'bold' }}>
           <Menu shadow="md" width={200}>
             <Menu.Target>
-                <Image src={mht} alt="Deskripsi Gambar" width={60} height={60} style={{ marginTop: '10px' }} />
+                <div>
+                    <Image src={mht} alt="Deskripsi Gambar" width={60} height={60} style={{ marginTop: '10px' }} />
+                </div>
             </Menu.Target>
             <Menu.Dropdown>
               <Menu.Label>
@@ -112,7 +114,7 @@ const changePage = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '-150px', height: '220px' }}>
             <div style={{ height: '220px',width: '300px', marginLeft: '100px' }}>
                 <div>
-                    <Image src={table} width={300} />
+                    <Image alt="" src={table} width={300} />
                     <div
                         style={{ display: 'flex', fontSize: '50px', fontWeight: 'bold', color: 'skyblue', justifyContent: 'space-between', marginTop: '-130px' }}>
                         <p style={{ marginLeft: '30px' }}>75%</p>
