@@ -689,15 +689,15 @@ return (
                     <div style={{ backgroundColor: 'gainsboro', marginLeft: '10px', height: '75px', minWidth: '1190px' }}>
                         <div>
                             <div style={{ display: 'flex', marginTop: '10px', fontWeight: 'bold' }}>
-                                <div style={{ display: 'flex', marginTop: '-7px' }}>
+                                <div style={{ display: 'flex', marginTop: '-7px', marginLeft: '20px', gap: '70px', justifyContent: 'center', alignItems: 'center' }}>
                                     {productionData.map((item, index) => (
-                                        <p key={index} style={index == 0 ? { width: '40px', marginLeft: '8px' } : {marginLeft: '72px', width: '40px'}}>{item.time_start}</p>
+                                        <p key={index} style={index == 0 ? { width: '50px', textAlign: 'center' } : { width: '50px', textAlign: 'center'}}>{item.time_start}</p>
                                     ))}
-                                    <p style={{ marginLeft: '72px', width: '40px' }}>{productionData.length > 0 ? moment(productionData[productionData.length - 1]?.time_start, "HH:mm").add(1, 'hours').format('HH:mm') : moment(activePlan.date_time_in).tz('Asia/Bangkok').format("HH")+':00'}</p>
-                                    <p style={{ marginLeft: '55px', display: 'flex', width: '100px', flexWrap: 'nowrap' }}>Total Shift</p>
+                                    <p style={{width: '50px', textAlign: 'center' }}>{productionData.length > 0 ? moment(productionData[productionData.length - 1]?.time_start, "HH:mm").add(1, 'hours').format('HH:mm') : moment(activePlan.date_time_in).tz('Asia/Bangkok').format("HH")+':00'}</p>
+                                    <p style={{display: 'flex', width: '100px', flexWrap: 'nowrap', justifyContent: 'center' }}>Total Shift</p>
                                 </div>
                             </div>
-                            <div style={{ display: 'flex', marginTop: '-16px', textAlign: 'center' }}>
+                            <div style={{ display: 'flex', marginTop: '-16px', marginLeft: '20px', textAlign: 'center', gap: '70px' }}>
                                 {productionData.map((item, index) => {
                                     let duration = 60
                                     noPlanToday.map(row => {
@@ -719,11 +719,11 @@ return (
                                         }
                                     })
                                     return (
-                                        <p key={index} style={index == 0 ? { width: '30px', marginLeft: '10px' } : {marginLeft: '80px', width: '30px'}}>{duration}</p>
+                                        <p key={index} style={index == 0 ? { width: '50px', textAlign: 'center' } : { width: '50px', textAlign: 'center'}}>{duration}</p>
                                     )
                                 })}
-                                <p style={{ marginLeft: '85px', width: '30px' }}>{durasiMqtt()}</p>
-                                <p style={{  marginLeft: '85px', width: '30px' }}>{totalDurasi()}</p>
+                                <p style={{width: '50px', textAlign: 'center' }}>{durasiMqtt()}</p>
+                                <p style={{width: '100px' }}>{totalDurasi()}</p>
                             </div>
                         </div>
                     </div>
@@ -731,8 +731,8 @@ return (
                         style={{ backgroundColor: 'lightcyan', marginTop: '-15px', marginLeft: '10px', marginTop: '10px', height: '140px', textAlign: 'center' }}>
                         <div>
                             <div
-                                style={{ display: 'flex', marginTop: '10px', fontSize: '25px', fontWeight: 'bold', color: 'cornflowerblue' }}>
-                                <div style={{ display: 'flex', marginTop: '-20px' }}>
+                                style={{ display: 'flex', marginTop: '10px', marginLeft: '20px', fontSize: '25px', fontWeight: 'bold', color: 'cornflowerblue' }}>
+                                <div style={{ display: 'flex', marginTop: '-20px', gap: '70px' }}>
                                     {productionData.map((item, index) => {
                                         let noPlanTotal = 0
                                         noPlanToday.map(row => {
@@ -754,24 +754,24 @@ return (
                                             }
                                         })
                                         return (
-                                            <p key={index} style={index == 0 ?{ width: '30px', marginLeft: '10px' } : { marginLeft: '80px', width: '30px' }}>{Math.round((60 - noPlanTotal) * activePlan.qty_per_minute)}</p>
+                                            <p key={index} style={index == 0 ?{ width: '50px', textAlign: 'center'} : { width: '50px', textAlign: 'center' }}>{Math.round((60 - noPlanTotal) * activePlan.qty_per_minute)}</p>
                                         )
                                     })}
-                                    <p style={{ marginLeft: '85px', width: '30px' }}>{qtyTargetMqtt()}</p>
-                                    <p style={{  marginLeft: '82px', width: '30px' }}>{totalTarget() + qtyTargetMqtt()}</p>
+                                    <p style={{ width: '50px', textAlign: 'center' }}>{qtyTargetMqtt()}</p>
+                                    <p style={{  width: '100px' }}>{totalTarget() + qtyTargetMqtt()}</p>
                                 </div>
                             </div>
                             <div style={{ display: 'flex', fontSize: '35px', fontWeight: 'bold', color: 'gold' }}>
-                                <div style={{ display: 'flex', marginTop: '-40px' }}>
+                                <div style={{ display: 'flex', marginTop: '-40px', marginLeft: '20px', gap: '70px' }}>
                                     {productionData.map((item, index) => (
-                                        <p key={index} style={index == 0 ? { width: '30px', marginLeft: '10px' } : { marginLeft: '80px', width: '30px' }}>{item.qty_actual}</p>
+                                        <p key={index} style={index == 0 ? { width: '50px', textAlign: 'center' } : { width: '50px', textAlign: 'center' }}>{item.qty_actual}</p>
                                     ))}
-                                    <p style={{ marginLeft: '80px', width: '30px' }}>{qtyActualMqtt()}</p>
-                                    <p style={{  marginLeft: '80px', width: '30px' }}>{mqttData1.qty_actual ? mqttData1.qty_actual : 0}</p>
+                                    <p style={{ width: '50px', textAlign: 'center' }}>{qtyActualMqtt()}</p>
+                                    <p style={{  width: '100px' }}>{mqttData1.qty_actual ? mqttData1.qty_actual : 0}</p>
                                 </div>
                             </div>
                             <div style={{ display: 'flex', fontSize: '22px', fontWeight: 'bold', color: 'firebrick' }}>
-                                <div style={{ display: 'flex', marginTop: '-40px' }}>
+                                <div style={{ display: 'flex', marginTop: '-40px', marginLeft: '28px', gap: '70px' }}>
                                     {productionData.map((item,index) => {
                                         let persentase = 0
                                         let noPlanTotal = 0
@@ -794,10 +794,10 @@ return (
                                             }
                                         })
                                         persentase = Math.round((item.qty_actual / Math.round(activePlan.qty_per_minute * (60 - noPlanTotal))) * 100)
-                                        return <p key={index} style={index == 0 ? { width: '30px', marginLeft: '10px', color: `${persentase >= 100 ? 'green' : ''}`} : { marginLeft: '80px', width: '30px' , color: `${persentase >= 100 ? 'green' : ''}`}}>{persentase}%</p>
+                                        return <p key={index} style={index == 0 ? { width: '50px', textAlign: 'center', color: `${persentase >= 100 ? 'green' : ''}`} : { width: '50px', textAlign: 'center' , color: `${persentase >= 100 ? 'green' : ''}`}}>{persentase}%</p>
                                     })}
-                                    <p style={{ marginLeft: '82px', width: '30px' , color: `${(persentaseMqtt()) >= 100 ? 'green' : ''}` }}>{persentaseMqtt()}%</p>
-                                    <p style={{  marginLeft: '82px', width: '30px', color: `${totalPersentase >= 100 ? 'green' : ''}` }}>{totalPersentase}%</p>
+                                    <p style={{ width: '50px', textAlign: 'center' , color: `${(persentaseMqtt()) >= 100 ? 'green' : ''}` }}>{persentaseMqtt()}%</p>
+                                    <p style={{  width: '100px', color: `${totalPersentase >= 100 ? 'green' : ''}` }}>{totalPersentase}%</p>
                                 </div>
                             </div>
                         </div>
