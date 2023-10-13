@@ -52,6 +52,7 @@ const SignIn = () => {
                     username: form.values.username,
                     password: form.values.password,
                 });
+                console.log(data, 'dta');
                 setCookie("auth", `Bearer ${data.data.token}`, {
                     maxAge: 60 * 6 * 24,
                 });
@@ -67,6 +68,12 @@ const SignIn = () => {
                         maxAge: 60 * 6 * 24,
                     }
                 );
+                setCookie("role", data.data.role.name, {
+                    maxAge: 60 * 6 * 24,
+                });
+                setCookie("permissions", data.data.role.permissions.map((permission) => permission.name).toString(), {
+                    maxAge: 60 * 6 * 24,
+                });
                 showNotification({
                     title: "Successful Login",
                     message: "Login Success👏",
@@ -121,7 +128,7 @@ const SignIn = () => {
                             <Title order={4} align={"center"}>
                                 RPA
                             </Title>
-                            <Text size={"sm"}>a development towards HJP Smart Factory</Text>
+                            <Text size={"sm"}>website RPA</Text>
                         </Flex>
                         <Flex gap={"md"} direction={"column"}>
                             <TextInput

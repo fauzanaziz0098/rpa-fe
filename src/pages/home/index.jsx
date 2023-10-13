@@ -34,6 +34,8 @@ const changePage = () => {
     }
     deleteCookie('auth')
     deleteCookie('user')
+    deleteCookie('role')
+    deleteCookie('permissions')
     setTimeout(() => {
         router.push('/sign-in')
     },500)

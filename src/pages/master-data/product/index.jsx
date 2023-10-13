@@ -31,23 +31,15 @@ export default function ProductPageIndex() {
   const [openedDelete, setOpenedDelete] = useState(false);
 
   useEffect(() => {
-    if (searchValue != "") {
-      setProducts(
-        rows.filter(item => {
-          return item.part_name.toLowerCase().includes(searchValue)
-        })
-      )
-    } else {
       const fetchUser = async () => {
         try {
-          const {data} = await axiosPlanning.get('product', getHeaderConfigAxios())
+          const {data} = await axiosPlanning.get(`product?filter.part_name=${searchValue}`, getHeaderConfigAxios())
           setProducts(data.data)
         } catch (error) {
           console.log(error, 'error fetch data products');
         }
       }
       fetchUser()
-    }
   }, [searchValue])
 
   const itemsPerPage = 5;

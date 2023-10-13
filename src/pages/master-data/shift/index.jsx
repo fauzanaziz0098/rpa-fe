@@ -36,23 +36,16 @@ export default function ShiftPageIndex() {
   const [noPlanToDelete, setNoPlanToDelete] = useState(null)
 
   useEffect(() => {
-    if (searchValue != "") {
-      setShift(
-        rows.filter(item => {
-          return item.name.toLowerCase().includes(searchValue)
-        })
-      )
-    } else {
       const fetchShift = async () => {
         try {
-          const {data} = await axiosPlanning.get('shift', getHeaderConfigAxios())
+          const {data} = await axiosPlanning.get(`shift?filter.name=${searchValue}`, getHeaderConfigAxios())
+          console.log(data);
           setShift(data.data)
         } catch (error) {
           console.log(error, 'error fetch data shift');
         }
       }
       fetchShift()
-    }
   }, [searchValue])
 
   const itemsPerPage = 5;

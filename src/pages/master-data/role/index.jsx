@@ -9,6 +9,7 @@ import {
   MANTINE_COLORS,
   ScrollArea,
   Alert,
+  Card,
 } from "@mantine/core";
 import { IconAlertCircle, IconPencil, IconScan, IconSearch, IconTrash } from "@tabler/icons";
 import Layout from "../../../components/Layout/App";
@@ -18,29 +19,33 @@ import { useEffect } from "react";
 import axiosAuth from '@/libs/auth/axios'
 import {getHeaderConfigAxios} from '@/utils/getHeaderConfigAxios'
 import Link from "next/link";
+import { getCookie } from "cookies-next";
+import Error from "next/error";
 
-export default function RolePageIndex() {
+export default function RolePageIndex({errors}) {
+  
+  if (errors) {
+    return (
+        <Card p={"xl"}>
+            <Error title={"Forbidden "} statusCode={403} />
+        </Card>
+    );
+  }
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const [roles, setRoles] = useState([])
   const [searchValue, setSearchValue] = useState("")
 
   useEffect(() => {
-    if (searchValue != "") {
-      setRoles(
-        rows.filter(item => item.name.includes(searchValue))
-      )
-    } else {
-      const fetchUser = async () => {
-        try {
-          const {data} = await axiosAuth.get('roles', getHeaderConfigAxios())
-          setRoles(data.data)
-        } catch (error) {
-          console.log(error, 'error fetch data roles');
-        }
+    const fetchUser = async () => {
+      try {
+        const {data} = await axiosAuth.get(`roles?filter.name=${searchValue}`, getHeaderConfigAxios())
+        setRoles(data.data)
+      } catch (error) {
+        console.log(error, 'error fetch data roles');
       }
-      fetchUser()
     }
+    fetchUser()
   }, [searchValue])
 
   const itemsPerPage = 5;
@@ -136,3 +141,19 @@ export default function RolePageIndex() {
 RolePageIndex.getLayout = (page) => {
   return <Layout>{page}</Layout>;
 };
+
+export async function getServerSideProps({req, res}) {
+  if (!getCookie("permissions", { req, res }).split(",")?.includes("READ:ROLE")) {
+    return {
+          props: {
+              errors: true,
+          },
+      };
+  } else {
+      return {
+          props: {
+              errors: false,
+          },
+      };
+  }
+}

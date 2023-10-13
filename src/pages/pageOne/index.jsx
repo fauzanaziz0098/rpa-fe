@@ -81,14 +81,19 @@ export default function Home({headers}) {
             const noPlanToday = noPlanMachine.filter(item => item.day == today)
             setNoPlanToday(noPlanToday ? noPlanToday : [])
         }
+        if (activePlan.id) {
+            setInterval(async () => {
+                try {
+                    console.log('re-fetch');
+                    const res = await axiosHour.get(`production/data-active/${activePlan.id}`, headers)
+                    setProductionData(res.data.data)
+                } catch (error) {
+                    console.log(error, 'error refetch');
+                }
+            }, 1000 * 60);
+        }
     }, [activePlan])
 
-    if (activePlan.id) {
-        setInterval(async () => {
-            const res = await axiosHour.get(`production/data-active/${activePlan.id}`, headers)
-            setProductionData(res.data.data)
-        }, 1000 * 60);
-    }
     // Fungsi untuk mengubah kategori aktif
     const handleCategoryClick = (category) => {
         setActiveCategory(category === activeCategory ? null : category);
@@ -807,28 +812,30 @@ return (
                 )}
             </div>
         </div>
-        <div style={{ display: 'flex' }}>
-            <div style={{ width: '100px', border: '10px solid skyblue', textAlign: 'center', minHeight: '304px' }}>
-                <div style={{ marginTop: '-16px' }}>
-                    <p style={{ backgroundColor: 'gainsboro', padding: '10px' }}>Operator</p>
-                    <p style={{ padding: '10px', marginTop: '-16px' }}>{activePlan?.user}</p>
+        <ScrollArea>
+            <div style={{ display: 'flex' }}>
+                <div style={{ width: '100px', border: '10px solid skyblue', textAlign: 'center', minHeight: '304px' }}>
+                    <div style={{ marginTop: '-16px' }}>
+                        <p style={{ backgroundColor: 'gainsboro', padding: '10px' }}>Operator</p>
+                        <p style={{ padding: '10px', marginTop: '-16px' }}>{activePlan?.user}</p>
+                    </div>
+                    <div>
+                        <p style={{ backgroundColor: 'gainsboro', padding: '10px', marginTop: '-16px' }}>Shift</p>
+                        <p style={{ padding: '10px', marginTop: '-16px' }}>{activePlan?.shift?.name}</p>
+                    </div>
+                    <div>
+                        <p style={{ backgroundColor: 'gainsboro', padding: '10px', marginTop: '-16px' }}>Nama Part</p>
+                        <p style={{ padding: '10px', marginTop: '-16px' }}>{activePlan?.product?.part_name}</p>
+                    </div>
+                    <div>
+                        <p style={{ backgroundColor: 'gainsboro', padding: '10px', marginTop: '-16px' }}>Cycle Time</p>
+                        <p style={{ padding: '0', marginTop: '-16px' }}>{activePlan?.product?.cycle_time}</p>
+                    </div>
                 </div>
-                <div>
-                    <p style={{ backgroundColor: 'gainsboro', padding: '10px', marginTop: '-16px' }}>Shift</p>
-                    <p style={{ padding: '10px', marginTop: '-16px' }}>{activePlan?.shift?.name}</p>
-                </div>
-                <div>
-                    <p style={{ backgroundColor: 'gainsboro', padding: '10px', marginTop: '-16px' }}>Nama Part</p>
-                    <p style={{ padding: '10px', marginTop: '-16px' }}>{activePlan?.product?.part_name}</p>
-                </div>
-                <div>
-                    <p style={{ backgroundColor: 'gainsboro', padding: '10px', marginTop: '-16px' }}>Cycle Time</p>
-                    <p style={{ padding: '0', marginTop: '-16px' }}>{activePlan?.product?.cycle_time}</p>
-                </div>
+                <DownTime machineId={activePlan?.machine?.id} />
+            <MachineCondition activePlan={activePlan} machineId={activePlan?.machine?.id}/>
             </div>
-            <DownTime machineId={activePlan?.machine?.id} />
-           <MachineCondition activePlan={activePlan} machineId={activePlan?.machine?.id}/>
-        </div>
+        </ScrollArea>
         <div
             style={{ backgroundColor: 'lavender', height: '50px', borderRadius: '10px', marginTop: '10px', border: '2px solid skyblue', display: 'flex', alignItems: 'center', justifyContent: 'center'  }}>
             <Menu position="top-end" width={310} withinPortal>
