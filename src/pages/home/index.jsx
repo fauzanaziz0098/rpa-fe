@@ -12,7 +12,7 @@ export default function Home() {
 
 const router = useRouter()
 const changePage = () => {
-    router.push('/pageOne')
+    router.push('/monitor-machine')
 }
   const rows = [
     { position: 6, mass: 12.011, symbol: 'C', name: 'Carbon' },
