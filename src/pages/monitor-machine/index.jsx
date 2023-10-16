@@ -37,8 +37,6 @@ export default function Home({headers}) {
         try {
             const res1 = await axiosPlanning.get('planning-production', getHeaderConfigAxios())
             setActivePlan(res1.data.data)
-            const res2 = await axiosPlanning.get('no-plan-machine', getHeaderConfigAxios())
-            setNoPlanMachine(res2.data.data)
         } catch (error) {
             console.log(error, 'error fetch data');
         }
@@ -74,12 +72,13 @@ export default function Home({headers}) {
                     console.log(error, 'production fetch error');
                 }
             }
+
+            const fetchNoPlanMachineByShiftToday = async () => {
+                const res2 = await axiosPlanning.get(`no-plan-machine/findOneByShift/${activePlan.shift.id}`, getHeaderConfigAxios())
+                setNoPlanToday(res2.data.data)
+            }
+            fetchNoPlanMachineByShiftToday()
             fetchData()
-        }
-        if (noPlanMachine) {
-            const today = moment().format('dddd')?.toLowerCase()
-            const noPlanToday = noPlanMachine.filter(item => item.day == today)
-            setNoPlanToday(noPlanToday ? noPlanToday : [])
         }
         if (activePlan.id) {
             setInterval(async () => {
