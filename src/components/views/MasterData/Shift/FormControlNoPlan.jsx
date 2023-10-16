@@ -17,8 +17,9 @@ import {
   import Link from "next/link";
 import { TimeInput } from "@mantine/dates";
 import * as moment from "moment";
-import { IconClockHour1, IconClockHour9 } from "@tabler/icons";
+import { IconClockHour1, IconClockHour9, IconFaceId, IconFaceIdError } from "@tabler/icons";
 import dayjs from "dayjs";
+import { showNotification } from "@mantine/notifications";
   
   export default function FormControl({ id }) {
     const router = useRouter();
@@ -40,13 +41,24 @@ import dayjs from "dayjs";
       try {
         await axiosPlanning.post("no-plan-machine", form.values, getHeaderConfigAxios());
         router.push("/master-data/shift");
+        showNotification({
+          title: "Submit Success",
+          message: "No Plan Data Saved Successfully",
+          icon: <IconFaceId />,
+          color: "teal",
+      });
       } catch (error) {
-        console.log(error, "error submit shift");
+        showNotification({
+          title: "Submit Failed",
+          message: (typeof error?.response?.data?.message == 'object' ? error?.response?.data?.message?.map(item => item + ', ') : error?.response?.data?.message) || "Connection Error",
+          icon: <IconFaceIdError />,
+          color: "red",
+        });
       }
     };
 
     return (
-      <div>
+      <div style={{ paddingBottom: '50px' }}>
           <form
           onSubmit={form.onSubmit(() => handleSubmit())}
           style={{ paddingTop: "10px", paddingBottom: "10px" }}
@@ -54,10 +66,11 @@ import dayjs from "dayjs";
           <Grid columns={3}>
               <Grid.Col span={1}>
               <Select
+                dropdownPosition="bottom"
+                maxDropdownHeight="100px"
                 label="Day"
                 placeholder="Select Day"
                 data={['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']}
-                defaultValue="React"
                 clearable
                 searchable
                 {...form.getInputProps("day")}

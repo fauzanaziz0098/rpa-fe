@@ -17,8 +17,9 @@ import {
   import Link from "next/link";
 import { TimeInput } from "@mantine/dates";
 import * as moment from "moment";
-import { IconClockHour1, IconClockHour9 } from "@tabler/icons";
+import { IconAlertCircle, IconClockHour1, IconClockHour9 } from "@tabler/icons";
 import dayjs from "dayjs";
+import { showNotification } from "@mantine/notifications";
   
   export default function FormControl({ id }) {
     const router = useRouter();
@@ -60,7 +61,19 @@ import dayjs from "dayjs";
               await axiosPlanning.post("no-plan-machine", form.values, getHeaderConfigAxios());
               router.push("/master-data/shift");
           }
+      showNotification({
+          title: "Submit Success",
+          message: "No Plan Data Updated Successfully",
+          icon: <IconAlertCircle />,
+          color: "teal",
+      });
       } catch (error) {
+         showNotification({
+          title: "Submit Failed",
+          message: (typeof error?.response?.data?.message == 'object' ? error?.response?.data?.message?.map(item => item + ', ') : error?.response?.data?.message) || "Connection Error",
+          icon: <IconAlertCircle />,
+          color: "red",
+        });
         console.log(error, "error submit no plan");
       }
     };
