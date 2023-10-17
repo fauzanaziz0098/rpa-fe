@@ -13,8 +13,10 @@ import {
   Card,
   Select,
   Flex,
+  Input,
+  NumberInput,
 } from "@mantine/core";
-import { IconAlertCircle, IconPencil, IconScan, IconSearch, IconTrash, IconCalendarOff, IconReplace } from "@tabler/icons";
+import { IconAlertCircle, IconPencil, IconScan, IconSearch, IconTrash, IconCalendarOff, IconReplace, IconBox, IconCheck } from "@tabler/icons";
 import Layout from "../../../components/Layout/App";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -38,45 +40,36 @@ export default function PlanningPageIndex({errors}) {
     );
   }
 
-  const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const [planningProductions, setPlanningProductions] = useState([])
   const [searchValue, setSearchValue] = useState("")
-  const [planningToDelete, setPlanningToDelete] = useState(null)
-
-  const [openedDelete, setOpenedDelete] = useState(false);
 
   const [openNoPlan, setOpenNoPlan] = useState(false);
   const [noPlans, setNoPlans] = useState([])
 
+  const [openReject, setOpenReject] = useState({
+    isOpen: false,
+    data: null,
+  })
+  const [qtyReject, setQtyReject] = useState("")
+
   const filter = useForm({
     initialValues: {
       status: "",
-      qtyRejectFilter: "",
+      qtyReject: "",
     },
   })
   useEffect(() => {
       const fetchPlan = async () => {
         try {
-          const {data} = await axiosPlanning.get(`planning-production/get-all-data?filter.machine=${searchValue}`, getHeaderConfigAxios())
+          const {data} = await axiosPlanning.get(`planning-production/get-all-data?filter.machine=${searchValue}&filter.status=${filter.values.status}&filter.qtyReject=${filter.values.qtyReject}`, getHeaderConfigAxios())
           setPlanningProductions(data.data)
         } catch (error) {
           console.log(error, 'error fetch data planning productions');
         }
       }
       fetchPlan()
-  }, [searchValue])
-  useEffect(() => {
-      const fetchPlan = async () => {
-        try {
-          const {data} = await axiosPlanning.get(`planning-production/get-all-data?filter.machine=${searchValue}`, getHeaderConfigAxios())
-          setPlanningProductions(data.data)
-        } catch (error) {
-          console.log(error, 'error fetch data planning productions');
-        }
-      }
-      fetchPlan()
-  }, [filter.values.status, filter.values.qtyRejectFilter])
+  }, [filter.values.status, filter.values.qtyReject, searchValue])
 
   const itemsPerPage = 5;
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -86,29 +79,6 @@ export default function PlanningPageIndex({errors}) {
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
   };
-
-  const handleModalDelete = (id) => {
-    setOpenedDelete(true)
-    setPlanningToDelete(id)
-  }
-
-  const handleDelete = async () => {
-    try {
-      await axiosPlanning.delete(`planning-production/${planningToDelete}`, getHeaderConfigAxios());
-      setOpenedDelete(false)
-      setTimeout(() => {
-        setPlanningProductions(planningProductions.filter((plan) => plan.id !== planningToDelete));
-        showNotification({
-          title: "Success",
-          message: "Plan deleted successfully.",
-          color: "teal",
-          icon: <IconAlertCircle size={16} />,
-        });
-      }, 200);
-    } catch (error) {
-      console.log(error, 'error delete plan');
-    }
-  }
 
   const statues = [
     {
@@ -128,11 +98,11 @@ export default function PlanningPageIndex({errors}) {
   const reject = [
     {
       label: 'Sudah di-input',
-      value: true
+      value: '1'
     },
     {
       label: 'Belum di-input',
-      value: false
+      value: '0'
     },
   ]
 
@@ -148,6 +118,32 @@ export default function PlanningPageIndex({errors}) {
     setOpenNoPlan(true)
     const {data} = (await axiosPlanning.get(`no-plan-machine/shift/${shiftId}`)).data
     setNoPlans(data)
+  }
+
+  const handleModalReject = async (id) => {
+    setOpenReject({isOpen: true})
+    const {data} = (await axiosPlanning.get(`planning-production/${id}`)).data
+    setOpenReject({data: data})
+  }
+
+  const handleSubmitReject = async () => {
+    try {
+      await axiosPlanning.patch(`planning-production/${openReject.data.id}`, {qty_reject: qtyReject}, getHeaderConfigAxios());
+      showNotification({
+        title: "Success",
+        message: "Qty reject updated",
+        color: "teal",
+        icon: <IconCheck size={16} />,
+      });
+      setOpenReject({isOpen: false, data: null})
+    } catch (error) {
+      showNotification({
+        title: "Failed",
+        message: (typeof error?.response?.data?.message == 'object' ? error?.response?.data?.message?.map(item => item + ', ') : error?.response?.data?.message) || "Connection Error",
+        icon: <IconAlertCircle />,
+        color: "red",
+      });
+    }
   }
 
   return (
@@ -183,14 +179,17 @@ export default function PlanningPageIndex({errors}) {
           </Table>
         </Modal>
         <Modal
-          opened={openedDelete}
-          onClose={() => setOpenedDelete(false)}
-          title="Are you sure want to delete this?"
-          // centered
+          transition="fade"
+          transitionDuration={600}
+          transitionTimingFunction="ease"
+          opened={openReject.isOpen}
+          onClose={() => setOpenReject({isOpen: false})}
+          title="Qty Reject"
+          centered
         >
-          <div style={{ display: 'flex', justifyContent:'center', gap: '1.2rem', padding: '1rem' }}>
-            <Button onClick={() => setOpenedDelete(false)}>Cancel</Button>
-            <Button onClick={handleDelete} color="red">Delete</Button>
+          <NumberInput value={openReject?.data?.qty_reject} label="Qty Reject" mb="sm" onChange={(e) => setQtyReject(e)} />
+          <div style={{ display: 'flex', justifyContent:'end' }}>
+            <Button onClick={handleSubmitReject}>Submit</Button>
           </div>
       </Modal>
       <ScrollArea>
@@ -221,7 +220,7 @@ export default function PlanningPageIndex({errors}) {
                   placeholder="Select Qty Reject"
                   data={reject}
                   clearable
-                  {...filter.getInputProps("qtyRejectFilter")}
+                  {...filter.getInputProps("qtyReject")}
               />
           </Flex>
           <div style={{ display: 'flex', gap: '10px' }}>
@@ -261,7 +260,7 @@ export default function PlanningPageIndex({errors}) {
                 <td>{item?.product?.part_name}</td>
                 <td>{item?.qty_planning}</td>
                 <td>{item?.shift?.name}</td>
-                <td>{moment(item?.date_time_in).format("DD-MM-YYYY HH:mm:ss")}</td>
+                <td>{item?.date_time_in ? moment(item?.date_time_in).format("DD-MM-YYYY HH:mm:ss") : '-'}</td>
                 <td>{item?.date_time_out ? moment(item?.date_time_out).format("DD-MM-YYYY HH:mm:ss") : '-'}</td>
                 <td>
                   <Button onClick={() => handleModalNoPlan(item?.shift?.id)}>
@@ -269,10 +268,12 @@ export default function PlanningPageIndex({errors}) {
                   </Button>
                 </td>
                 <td>
-                  {item?.qty_per_hour}
+                  {item?.total_time_actual}
                 </td>
                 <td style={{ display: "flex", gap: "5px" }}>
-                  -
+                  <Button color="green" onClick={() => handleModalReject(item?.id)}>
+                    <IconBox size={"1.2rem"}/>
+                  </Button>
                 </td>
               </tr>
             ))

@@ -5,6 +5,7 @@ import {
     Center,
     Grid,
     Group,
+    NumberInput,
     PasswordInput,
     Select,
     TextInput,
@@ -42,6 +43,7 @@ import { IconAlertCircle, IconCheck, IconFaceId, IconFaceIdError } from "@tabler
         user: "",
         qty_planning: "",
         dandory_time: "",
+        remark: ""
       },
     });
   
@@ -148,7 +150,6 @@ import { IconAlertCircle, IconCheck, IconFaceId, IconFaceIdError } from "@tabler
     }
     };
 
-    console.log(form.values);
     return (
       <div>
           <form
@@ -201,8 +202,7 @@ import { IconAlertCircle, IconCheck, IconFaceId, IconFaceIdError } from "@tabler
               />
               </Grid.Col>
               <Grid.Col span={1}>
-              <TextInput
-                  type="number"
+              <NumberInput
                   label="Masukkan Qty planning"
                   placeholder="Qty Planning"
                   withAsterisk
@@ -229,8 +229,7 @@ import { IconAlertCircle, IconCheck, IconFaceId, IconFaceIdError } from "@tabler
               />
               </Grid.Col>
               <Grid.Col span={1}>
-              <TextInput
-                  type="number"
+              <NumberInput
                   label="Dandory Time"
                   placeholder="Dandory Time"
                   {...form.getInputProps("dandory_time")}
@@ -240,6 +239,7 @@ import { IconAlertCircle, IconCheck, IconFaceId, IconFaceIdError } from "@tabler
                 <Textarea
                   label="Catatan"
                   placeholder="Catatan"
+                  {...form.getInputProps("remark")}
                 >
 
                 </Textarea>
