@@ -10,6 +10,7 @@ import {
   ScrollArea,
   Alert,
   Modal,
+  Card,
 } from "@mantine/core";
 import { IconAlertCircle, IconPencil, IconScan, IconSearch, IconTrash } from "@tabler/icons";
 import Layout from "../../../components/Layout/App";
@@ -20,8 +21,19 @@ import axiosAuth from '@/libs/auth/axios'
 import { showNotification } from "@mantine/notifications";
 import {getHeaderConfigAxios} from '@/utils/getHeaderConfigAxios'
 import Link from "next/link";
+import { getCookie } from "cookies-next";
+import Error from "next/error";
 
-export default function UserPageIndex() {
+export default function UserPageIndex({errors}) {
+
+  if (errors) {
+    return (
+        <Card p={"xl"}>
+            <Error title={"Forbidden "} statusCode={403} />
+        </Card>
+    );
+  }
+
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const [users, setUsers] = useState([])
@@ -31,23 +43,15 @@ export default function UserPageIndex() {
   const [openedDelete, setOpenedDelete] = useState(false);
 
   useEffect(() => {
-    if (searchValue != "") {
-      setUsers(
-        rows.filter(item => {
-          return item.part_name.toLowerCase().includes(searchValue)
-        })
-      )
-    } else {
       const fetchUser = async () => {
         try {
-          const {data} = await axiosAuth.get('users', getHeaderConfigAxios())
+          const {data} = await axiosAuth.get(`users?filter.name=${searchValue}`, getHeaderConfigAxios())
           setUsers(data.data)
         } catch (error) {
           console.log(error, 'error fetch data users');
         }
       }
       fetchUser()
-    }
   }, [searchValue])
 
   const itemsPerPage = 5;
@@ -183,3 +187,19 @@ export default function UserPageIndex() {
 UserPageIndex.getLayout = (page) => {
   return <Layout>{page}</Layout>;
 };
+
+export async function getServerSideProps({req, res}) {
+  if (!getCookie("permissions", { req, res }).split(",")?.includes("READ:USER")) {
+    return {
+          props: {
+              errors: true,
+          },
+      };
+  } else {
+      return {
+          props: {
+              errors: false,
+          },
+      };
+  }
+}

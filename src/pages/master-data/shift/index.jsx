@@ -36,23 +36,16 @@ export default function ShiftPageIndex() {
   const [noPlanToDelete, setNoPlanToDelete] = useState(null)
 
   useEffect(() => {
-    if (searchValue != "") {
-      setShift(
-        rows.filter(item => {
-          return item.name.toLowerCase().includes(searchValue)
-        })
-      )
-    } else {
       const fetchShift = async () => {
         try {
-          const {data} = await axiosPlanning.get('shift', getHeaderConfigAxios())
+          const {data} = await axiosPlanning.get(`shift?filter.name=${searchValue}`, getHeaderConfigAxios())
+          console.log(data);
           setShift(data.data)
         } catch (error) {
           console.log(error, 'error fetch data shift');
         }
       }
       fetchShift()
-    }
   }, [searchValue])
 
   const itemsPerPage = 5;
@@ -87,12 +80,18 @@ export default function ShiftPageIndex() {
         setShift(shift.filter((shift) => shift.id !== ShiftToDelete));
         showNotification({
           title: "Success",
-          message: "User deleted successfully.",
+          message: "Shift deleted successfully.",
           color: "teal",
           icon: <IconAlertCircle size={16} />,
         });
       }, 200);
     } catch (error) {
+      showNotification({
+        title: "Success",
+        message: "Shift failed to delete.",
+        color: "red",
+        icon: <IconAlertCircle size={16} />,
+      });
       console.log(error, 'error delete shift');
     }
   }
@@ -104,8 +103,20 @@ export default function ShiftPageIndex() {
       setOpenNoPlan(false)
       setTimeout(() => {
         setNoPlans(noPlans.filter((noPlan) => noPlan.id !== noPlanToDelete));
+        showNotification({
+          title: "Success",
+          message: "No Plan deleted successfully.",
+          color: "teal",
+          icon: <IconAlertCircle size={16} />,
+        });
       }, 200);
     } catch (error) {
+      showNotification({
+        title: "Failed",
+        message: (typeof error?.response?.data?.message == 'object' ? error?.response?.data?.message?.map(item => item + ', ') : error?.response?.data?.message) || "Connection Error",
+        color: "red",
+        icon: <IconAlertCircle size={16} />,
+      });
       console.log(error, 'error delete noPlans');
     }
   }

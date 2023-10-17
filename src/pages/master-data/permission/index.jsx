@@ -49,6 +49,11 @@ export default function PermissionPageIndex() {
   return (
     <div>
       <ScrollArea>
+        <div style={{ textAlign: 'end' }}>
+          <Button component={Link} style={{ textDecoration: 'none', color: 'white' }} href="/master-data/permission/create">
+            Create
+          </Button>
+        </div>
         <div
           style={{
             display: "flex",

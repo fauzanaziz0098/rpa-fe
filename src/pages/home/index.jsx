@@ -12,7 +12,7 @@ export default function Home() {
 
 const router = useRouter()
 const changePage = () => {
-    router.push('/pageOne')
+    router.push('/monitor-machine')
 }
   const rows = [
     { position: 6, mass: 12.011, symbol: 'C', name: 'Carbon' },
@@ -34,6 +34,8 @@ const changePage = () => {
     }
     deleteCookie('auth')
     deleteCookie('user')
+    deleteCookie('role')
+    deleteCookie('permissions')
     setTimeout(() => {
         router.push('/sign-in')
     },500)
@@ -44,7 +46,9 @@ const changePage = () => {
         <div style={{ display: 'flex', fontWeight: 'bold' }}>
           <Menu shadow="md" width={200}>
             <Menu.Target>
-                <Image src={mht} alt="Deskripsi Gambar" width={60} height={60} style={{ marginTop: '10px' }} />
+                <div>
+                    <Image src={mht} alt="Deskripsi Gambar" width={60} height={60} style={{ marginTop: '10px' }} />
+                </div>
             </Menu.Target>
             <Menu.Dropdown>
               <Menu.Label>
@@ -112,7 +116,7 @@ const changePage = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '-150px', height: '220px' }}>
             <div style={{ height: '220px',width: '300px', marginLeft: '100px' }}>
                 <div>
-                    <Image src={table} width={300} />
+                    <Image alt="" src={table} width={300} />
                     <div
                         style={{ display: 'flex', fontSize: '50px', fontWeight: 'bold', color: 'skyblue', justifyContent: 'space-between', marginTop: '-130px' }}>
                         <p style={{ marginLeft: '30px' }}>75%</p>

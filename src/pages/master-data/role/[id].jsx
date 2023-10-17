@@ -19,7 +19,7 @@ export default function EditProduct({role}) {
 
 	const [activePage, setActivePage] = useState(1);
 	const [totalPages, setTotalPages] = useState(1);
-	const [itemsPerPage, setItemsPerPage] = useState(20);
+	const [itemsPerPage, setItemsPerPage] = useState(5);
 
     const handleItemsPerPageChange = value => {
 		setItemsPerPage(parseInt(value));
@@ -106,7 +106,8 @@ export default function EditProduct({role}) {
         <FormControl id={router.query?.id}/>
         <Divider size="sm" />
 			<Group position="right" style={{ marginTop: '30px' }}>
-			<Select
+				<Select
+					defaultValue="5"
 					maw={200}
 					placeholder="Select Number"
 					data={['5', '10', '20']}
@@ -114,8 +115,7 @@ export default function EditProduct({role}) {
 				/>
 				<Pagination
 					style={{ marginLeft: '150px' }}
-					totalPages={totalPages}
-					activePage={activePage}
+					value={activePage}
 					onChange={handlePageChange}
 					total={totalPages}
 				/>
