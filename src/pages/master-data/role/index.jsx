@@ -9,6 +9,7 @@ import {
   MANTINE_COLORS,
   ScrollArea,
   Alert,
+  Modal,
 } from "@mantine/core";
 import { IconAlertCircle, IconPencil, IconScan, IconSearch, IconTrash } from "@tabler/icons";
 import Layout from "../../../components/Layout/App";
@@ -18,12 +19,17 @@ import { useEffect } from "react";
 import axiosAuth from '@/libs/auth/axios'
 import {getHeaderConfigAxios} from '@/utils/getHeaderConfigAxios'
 import Link from "next/link";
+import { showNotification } from "@mantine/notifications";
 
 export default function RolePageIndex() {
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const [roles, setRoles] = useState([])
   const [searchValue, setSearchValue] = useState("")
+  const [openModalDeleteNoPlan, setOpenModalDeleteNoPlan] = useState(false);
+  const [openedDelete, setOpenedDelete] = useState(false);
+  const [roleToDelete, setRoleToDelete] = useState(null)
+
 
   useEffect(() => {
     if (searchValue != "") {
@@ -64,8 +70,47 @@ export default function RolePageIndex() {
     <div style={{ fontWeight: 'bold' }}>Search</div>
   )
 
+  const handleModalDeleteNoPlan = (id) => {
+    setOpenModalDeleteNoPlan(true)
+    setNoPlanToDelete(id)
+  }
+
+  const handleModalDelete = (id) => {
+    setOpenedDelete(true)
+    setRoleToDelete(id)
+  }
+
+  const handleDelete = async () => {
+    try {
+      await axiosAuth.delete(`roles/${roleToDelete}`, getHeaderConfigAxios());
+      setOpenedDelete(false)
+      setTimeout(() => {
+        setRoles(roles.filter((roles) => roles.id !== roleToDelete));
+        showNotification({
+          title: "Success",
+          message: "Role deleted successfully.",
+          color: "teal",
+          icon: <IconAlertCircle size={16} />,
+        });
+      }, 200);
+    } catch (error) {
+      console.log(error, 'error delete user');
+    }
+  }
+
   return (
     <div>
+       <Modal
+          opened={openedDelete}
+          onClose={() => setOpenedDelete(false)}
+          title="Are you sure want to delete this?"
+          // centered
+          >
+            <div style={{ display: 'flex', justifyContent:'center', gap: '1.2rem', padding: '1rem' }}>
+              <Button onClick={() => setOpenedDelete(false)}>Cancel</Button>
+              <Button onClick={handleDelete} color="red">Delete</Button>
+            </div>
+        </Modal>
       <ScrollArea>
         
         <div
@@ -112,7 +157,7 @@ export default function RolePageIndex() {
                   <Button color="yellow" component={Link} href={`/master-data/role/${item.id}`}>
                     <IconPencil size={"1.2rem"} />
                   </Button>
-                  <Button color="red">
+                  <Button onClick={() => handleModalDelete(item.id)} color="red">
                     <IconTrash size={"1.2rem"} />
                   </Button>
                 </td>
