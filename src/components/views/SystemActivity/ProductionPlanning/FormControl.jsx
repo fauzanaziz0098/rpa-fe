@@ -115,8 +115,8 @@ import { IconAlertCircle, IconCheck, IconFaceId, IconFaceIdError } from "@tabler
       if (form.values.product != "" && form.values.qty_planning != "") {
         const product = async() => {
           const prod = (await axiosPlanning.get(`product/${form.values.product}`, getHeaderConfigAxios())).data
-          
-          setEstimation(prod.data.cycle_time)
+          const estimation = ((prod.data.cycle_time * (form.values.qty_planning ? form.values.qty_planning : 0)) / 60).toFixed(0)
+          setEstimation(estimation)
         }
         product()
       }
