@@ -112,7 +112,7 @@ import { IconFaceId, IconFaceIdError } from "@tabler/icons";
           style={{ paddingTop: "10px", paddingBottom: "10px" }}
           >
           <Grid columns={3}>
-              <Grid.Col span={1}>
+              {/* <Grid.Col span={1}>
               <Select
                   label="Client"
                   placeholder="Select Client"
@@ -122,7 +122,7 @@ import { IconFaceId, IconFaceIdError } from "@tabler/icons";
                   withAsterisk
                   {...form.getInputProps("client_id")}
               />
-              </Grid.Col>
+              </Grid.Col> */}
               <Grid.Col span={1}>
               <TextInput
                   label="Part Name"

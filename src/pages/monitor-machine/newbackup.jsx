@@ -257,11 +257,12 @@ export default function Home({headers}) {
         productionData.length == 0 ? (Math.round(qtyActualMqtt() / qtyTargetMqtt() * 100)) : (Math.round(isNaN(totalActual() / totalTarget()) ? 0 : ((totalActual() + qtyActualMqtt()) / (totalTarget() + qtyTargetMqtt())) * 100))
     )
 
+    const timeStartPlan = `${moment(activePlan.date_time_in).tz('Asia/Bangkok').format('HH')}:00`
     const timeEstimation = activePlan?.qty_planning * activePlan?.product?.cycle_time
     const estimation = moment(activePlan.date_time_in).tz('Asia/Bangkok').add(timeEstimation, "minute").format("HH:mm")
 
-    console.log(estimation, 'esti');
-    // const test = ['07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00','24:00',]
+    console.log(timeStartPlan, 'esti');
+    const test = ['07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00','24:00',]
 
     let content;
 if (isFullActive) {
@@ -706,42 +707,58 @@ return (
                         <div>
                             <div style={{ display: 'flex', marginTop: '10px', fontWeight: 'bold' }}>
                                 <div style={{ display: 'flex', marginTop: '-7px', marginLeft: '20px', gap: '70px', justifyContent: 'center', alignItems: 'center' }}>
-                                    {productionData.map((item, index) => (
+                                    {/* {productionData.map((item, index) => (
                                         <p key={index} style={index == 0 ? { width: '50px', textAlign: 'center' } : { width: '50px', textAlign: 'center'}}>{item.time_start}</p>
                                     ))}
-                                    <p style={{width: '50px', textAlign: 'center' }}>{productionData.length > 0 ? moment(productionData[productionData.length - 1]?.time_start, "HH:mm").add(1, 'hours').format('HH:mm') : moment(activePlan.date_time_in).tz('Asia/Bangkok').format("HH")+':00'}</p>
+                                    <p style={{width: '50px', textAlign: 'center' }}>{productionData.length > 0 ? moment(productionData[productionData.length - 1]?.time_start, "HH:mm").add(1, 'hours').format('HH:mm') : moment(activePlan.date_time_in).tz('Asia/Bangkok').format("HH")+':00'}</p> */}
+                                    {test.map((item, index) => (
+                                        <p key={index} style={index == 0 ? { width: '50px', textAlign: 'center' } : { width: '50px', textAlign: 'center'}}>{item}</p>
+                                    ))}
                                     <p style={{display: 'flex', width: '100px', flexWrap: 'nowrap', justifyContent: 'center' }}>Total Shift</p>
                                 </div>
                             </div>
                             <div style={{ display: 'flex', marginTop: '-16px', marginLeft: '20px', textAlign: 'center', gap: '70px' }}>
-                                {productionData.map((item, index) => {
-                                    let duration = 60
-                                    if (index == 0) {
-                                        duration = duration = 60 - moment(activePlan.date_time_in, "HH:mm").minute()
-                                    }
-                                    noPlanToday.map(row => {
-                                        if (
-                                            moment(row.time_in, 'HH:mm').isSameOrAfter(moment(item.time_start, 'HH:mm')) && moment(row.time_in, 'HH:mm').isSameOrBefore(moment(item.time, 'HH:mm')) &&
-                                            moment(row.time_out, 'HH:mm').isSameOrAfter(moment(item.time_start, 'HH:mm')) && moment(row.time_out, 'HH:mm').isSameOrBefore(moment(item.time, 'HH:mm')) 
-                                        ) {
-                                            duration -= row.total
-                                        } else if (
-                                            moment(row.time_in, 'HH:mm').isSameOrAfter(moment(item.time_start, 'HH:mm')) && moment(row.time_in, 'HH:mm').isSameOrBefore(moment(item.time, 'HH:mm')) &&
-                                            moment(row.time_out, 'HH:mm').isAfter(moment(item.time_start, 'HH:mm')) 
-                                        ) {
-                                            duration -= (moment(row.time_out, "HH:mm").diff(moment(item.time, "HH:mm"), 'minutes') -1)
-                                        } else if (
-                                            moment(row.time_in, 'HH:mm').isBefore(moment(item.time_start, "HH:mm")) && moment(row.time_out, "HH:mm").isSameOrAfter(moment(item.time_start, "HH:mm")) &&
-                                            moment(row.time_out, "HH:mm").isSameOrBefore(moment(item.time, "HH:mm"))
-                                        ) {
-                                            duration -= moment(row.time_out, "HH:mm").diff(moment(item.time_start, "HH:mm"), 'minutes')
+                                {test.map(row => (
+                                    <>
+                                        {productionData.map((item, index) => {
+                                            let duration = 60
+                                            if (index == 0) {
+                                                duration = duration = 60 - moment(activePlan.date_time_in, "HH:mm").minute()
+                                            }
+                                            noPlanToday.map(row => {
+                                                if (
+                                                    moment(row.time_in, 'HH:mm').isSameOrAfter(moment(item.time_start, 'HH:mm')) && moment(row.time_in, 'HH:mm').isSameOrBefore(moment(item.time, 'HH:mm')) &&
+                                                    moment(row.time_out, 'HH:mm').isSameOrAfter(moment(item.time_start, 'HH:mm')) && moment(row.time_out, 'HH:mm').isSameOrBefore(moment(item.time, 'HH:mm')) 
+                                                ) {
+                                                    duration -= row.total
+                                                } else if (
+                                                    moment(row.time_in, 'HH:mm').isSameOrAfter(moment(item.time_start, 'HH:mm')) && moment(row.time_in, 'HH:mm').isSameOrBefore(moment(item.time, 'HH:mm')) &&
+                                                    moment(row.time_out, 'HH:mm').isAfter(moment(item.time_start, 'HH:mm')) 
+                                                ) {
+                                                    duration -= (moment(row.time_out, "HH:mm").diff(moment(item.time, "HH:mm"), 'minutes') -1)
+                                                } else if (
+                                                    moment(row.time_in, 'HH:mm').isBefore(moment(item.time_start, "HH:mm")) && moment(row.time_out, "HH:mm").isSameOrAfter(moment(item.time_start, "HH:mm")) &&
+                                                    moment(row.time_out, "HH:mm").isSameOrBefore(moment(item.time, "HH:mm"))
+                                                ) {
+                                                    duration -= moment(row.time_out, "HH:mm").diff(moment(item.time_start, "HH:mm"), 'minutes')
+                                                }
+                                            })
+                                            return (
+                                                <p key={index} style={index == 0 ? { width: '50px', textAlign: 'center' } : { width: '50px', textAlign: 'center'}}>{duration}</p>
+                                            )
+                                        })}
+                                        { row.includes(timeStartPlan) ? (
+                                            <p style={{width: '50px', textAlign: 'center' }}>{durasiMqtt()}</p>   
+                                            ) : 
+                                            moment(row, "HH:mm").isSameOrBefore(moment(estimation, 'HH:mm')) && moment(row, "HH:mm").isSameOrAfter(moment(timeStartPlan, 'HH:mm')) ? (
+                                                <p style={{width: '50px', textAlign: 'center' }}>{60}</p>   
+                                            ) :
+                                            (
+                                            <p style={{width: '50px', textAlign: 'center' }}>{0}</p>   
+                                        )
                                         }
-                                    })
-                                    return (
-                                        <p key={index} style={index == 0 ? { width: '50px', textAlign: 'center' } : { width: '50px', textAlign: 'center'}}>{duration}</p>
-                                    )
-                                })}
-                                <p style={{width: '50px', textAlign: 'center' }}>{durasiMqtt()}</p>
+                                    </>
+                                ))}
                                 <p style={{width: '100px' }}>{totalDurasi()}</p>
                             </div>
                         </div>
@@ -752,70 +769,99 @@ return (
                             <div
                                 style={{ display: 'flex', marginTop: '10px', marginLeft: '20px', fontSize: '25px', fontWeight: 'bold', color: 'cornflowerblue' }}>
                                 <div style={{ display: 'flex', marginTop: '-20px', gap: '70px' }}>
-                                    {productionData.map((item, index) => {
-                                        let noPlanTotal = 0
-                                        noPlanToday.map(row => {
-                                            if (
-                                                moment(row.time_in, 'HH:mm').isSameOrAfter(moment(item.time_start, 'HH:mm')) && moment(row.time_in, 'HH:mm').isSameOrBefore(moment(item.time, 'HH:mm')) &&
-                                                moment(row.time_out, 'HH:mm').isSameOrAfter(moment(item.time_start, 'HH:mm')) && moment(row.time_out, 'HH:mm').isSameOrBefore(moment(item.time, 'HH:mm')) 
-                                            ) {
-                                                noPlanTotal += row.total
-                                            } else if (
-                                                moment(row.time_in, 'HH:mm').isSameOrAfter(moment(item.time_start, 'HH:mm')) && moment(row.time_in, 'HH:mm').isSameOrBefore(moment(item.time, 'HH:mm')) &&
-                                                moment(row.time_out, 'HH:mm').isAfter(moment(item.time_start, 'HH:mm')) 
-                                            ) {
-                                                noPlanTotal += (moment(row.time_out, "HH:mm").diff(moment(item.time, "HH:mm"), 'minutes') -1)
-                                            } else if (
-                                                moment(row.time_in, 'HH:mm').isBefore(moment(item.time_start, "HH:mm")) && moment(row.time_out, "HH:mm").isSameOrAfter(moment(item.time_start, "HH:mm")) &&
-                                                moment(row.time_out, "HH:mm").isSameOrBefore(moment(item.time, "HH:mm"))
-                                            ) {
-                                                noPlanTotal += moment(row.time_out, "HH:mm").diff(moment(item.time_start, "HH:mm"), 'minutes')
-                                            }
-                                        })
-                                        return (
-                                            <p key={index} style={index == 0 ?{ width: '50px', textAlign: 'center'} : { width: '50px', textAlign: 'center' }}>{Math.round((60 - noPlanTotal) * activePlan.qty_per_minute)}</p>
-                                        )
-                                    })}
-                                    <p style={{ width: '50px', textAlign: 'center' }}>{qtyTargetMqtt()}</p>
+                                {test.map(row => (
+                                    <>
+                                        {productionData.map((item, index) => {
+                                            let noPlanTotal = 0
+                                            noPlanToday.map(row => {
+                                                if (
+                                                    moment(row.time_in, 'HH:mm').isSameOrAfter(moment(item.time_start, 'HH:mm')) && moment(row.time_in, 'HH:mm').isSameOrBefore(moment(item.time, 'HH:mm')) &&
+                                                    moment(row.time_out, 'HH:mm').isSameOrAfter(moment(item.time_start, 'HH:mm')) && moment(row.time_out, 'HH:mm').isSameOrBefore(moment(item.time, 'HH:mm')) 
+                                                ) {
+                                                    noPlanTotal += row.total
+                                                } else if (
+                                                    moment(row.time_in, 'HH:mm').isSameOrAfter(moment(item.time_start, 'HH:mm')) && moment(row.time_in, 'HH:mm').isSameOrBefore(moment(item.time, 'HH:mm')) &&
+                                                    moment(row.time_out, 'HH:mm').isAfter(moment(item.time_start, 'HH:mm')) 
+                                                ) {
+                                                    noPlanTotal += (moment(row.time_out, "HH:mm").diff(moment(item.time, "HH:mm"), 'minutes') -1)
+                                                } else if (
+                                                    moment(row.time_in, 'HH:mm').isBefore(moment(item.time_start, "HH:mm")) && moment(row.time_out, "HH:mm").isSameOrAfter(moment(item.time_start, "HH:mm")) &&
+                                                    moment(row.time_out, "HH:mm").isSameOrBefore(moment(item.time, "HH:mm"))
+                                                ) {
+                                                    noPlanTotal += moment(row.time_out, "HH:mm").diff(moment(item.time_start, "HH:mm"), 'minutes')
+                                                }
+                                            })
+                                            return (
+                                                <p key={index} style={index == 0 ?{ width: '50px', textAlign: 'center'} : { width: '50px', textAlign: 'center' }}>{Math.round((60 - noPlanTotal) * activePlan.qty_per_minute)}</p>
+                                            )
+                                        })}
+                                        { row.includes(timeStartPlan) ? (
+                                            <p style={{ width: '50px', textAlign: 'center' }}>{qtyTargetMqtt()}</p>
+                                        ) : (
+                                            <p style={{ width: '50px', textAlign: 'center' }}>{0}</p>
+                                            )
+                                        }
+
+                                    </>
+                                ))}
                                     <p style={{  width: '100px' }}>{totalTarget() + qtyTargetMqtt()}</p>
                                 </div>
                             </div>
                             <div style={{ display: 'flex', fontSize: '35px', fontWeight: 'bold', color: 'gold' }}>
                                 <div style={{ display: 'flex', marginTop: '-40px', marginLeft: '20px', gap: '70px' }}>
-                                    {productionData.map((item, index) => (
-                                        <p key={index} style={index == 0 ? { width: '50px', textAlign: 'center' } : { width: '50px', textAlign: 'center' }}>{item.qty_actual}</p>
-                                    ))}
-                                    <p style={{ width: '50px', textAlign: 'center' }}>{qtyActualMqtt()}</p>
+                                {test.map(row => (
+                                    <>
+                                        {productionData.map((item, index) => (
+                                            <p key={index} style={index == 0 ? { width: '50px', textAlign: 'center' } : { width: '50px', textAlign: 'center' }}>{item.qty_actual}</p>
+                                        ))}
+                                        { row.includes(timeStartPlan) ? (
+                                            <p style={{ width: '50px', textAlign: 'center' }}>{qtyActualMqtt()}</p>
+                                            ) : (
+                                            <p style={{ width: '50px', textAlign: 'center' }}>{0}</p>
+                                        )
+                                        }
+
+                                    </>
+                                ))}
                                     <p style={{  width: '100px' }}>{mqttData1.qty_actual ? mqttData1.qty_actual : 0}</p>
                                 </div>
                             </div>
                             <div style={{ display: 'flex', fontSize: '22px', fontWeight: 'bold', color: 'firebrick' }}>
                                 <div style={{ display: 'flex', marginTop: '-40px', marginLeft: '28px', gap: '70px' }}>
-                                    {productionData.map((item,index) => {
-                                        let persentase = 0
-                                        let noPlanTotal = 0
-                                        noPlanToday.map(row => {
-                                            if (
-                                                moment(row.time_in, 'HH:mm').isSameOrAfter(moment(item.time_start, 'HH:mm')) && moment(row.time_in, 'HH:mm').isSameOrBefore(moment(item.time, 'HH:mm')) &&
-                                                moment(row.time_out, 'HH:mm').isSameOrAfter(moment(item.time_start, 'HH:mm')) && moment(row.time_out, 'HH:mm').isSameOrBefore(moment(item.time, 'HH:mm')) 
-                                            ) {
-                                                noPlanTotal += row.total
-                                            } else if (
-                                                moment(row.time_in, 'HH:mm').isSameOrAfter(moment(item.time_start, 'HH:mm')) && moment(row.time_in, 'HH:mm').isSameOrBefore(moment(item.time, 'HH:mm')) &&
-                                                moment(row.time_out, 'HH:mm').isAfter(moment(item.time_start, 'HH:mm')) 
-                                            ) {
-                                                noPlanTotal += (moment(row.time_out, "HH:mm").diff(moment(item.time, "HH:mm"), 'minutes') -1)
-                                            } else if (
-                                                moment(row.time_in, 'HH:mm').isBefore(moment(item.time_start, "HH:mm")) && moment(row.time_out, "HH:mm").isSameOrAfter(moment(item.time_start, "HH:mm")) &&
-                                                moment(row.time_out, "HH:mm").isSameOrBefore(moment(item.time, "HH:mm"))
-                                            ) {
-                                                noPlanTotal += moment(row.time_out, "HH:mm").diff(moment(item.time_start, "HH:mm"), 'minutes')
-                                            }
-                                        })
-                                        persentase = Math.round((item.qty_actual / Math.round(activePlan.qty_per_minute * (60 - noPlanTotal))) * 100)
-                                        return <p key={index} style={index == 0 ? { width: '50px', textAlign: 'center', color: `${persentase >= 100 ? 'green' : ''}`} : { width: '50px', textAlign: 'center' , color: `${persentase >= 100 ? 'green' : ''}`}}>{persentase}%</p>
-                                    })}
-                                    <p style={{ width: '50px', textAlign: 'center' , color: `${(persentaseMqtt()) >= 100 ? 'green' : ''}` }}>{persentaseMqtt()}%</p>
+                                {test.map(row => (
+                                    <>
+                                        {productionData.map((item,index) => {
+                                            let persentase = 0
+                                            let noPlanTotal = 0
+                                            noPlanToday.map(row => {
+                                                if (
+                                                    moment(row.time_in, 'HH:mm').isSameOrAfter(moment(item.time_start, 'HH:mm')) && moment(row.time_in, 'HH:mm').isSameOrBefore(moment(item.time, 'HH:mm')) &&
+                                                    moment(row.time_out, 'HH:mm').isSameOrAfter(moment(item.time_start, 'HH:mm')) && moment(row.time_out, 'HH:mm').isSameOrBefore(moment(item.time, 'HH:mm')) 
+                                                ) {
+                                                    noPlanTotal += row.total
+                                                } else if (
+                                                    moment(row.time_in, 'HH:mm').isSameOrAfter(moment(item.time_start, 'HH:mm')) && moment(row.time_in, 'HH:mm').isSameOrBefore(moment(item.time, 'HH:mm')) &&
+                                                    moment(row.time_out, 'HH:mm').isAfter(moment(item.time_start, 'HH:mm')) 
+                                                ) {
+                                                    noPlanTotal += (moment(row.time_out, "HH:mm").diff(moment(item.time, "HH:mm"), 'minutes') -1)
+                                                } else if (
+                                                    moment(row.time_in, 'HH:mm').isBefore(moment(item.time_start, "HH:mm")) && moment(row.time_out, "HH:mm").isSameOrAfter(moment(item.time_start, "HH:mm")) &&
+                                                    moment(row.time_out, "HH:mm").isSameOrBefore(moment(item.time, "HH:mm"))
+                                                ) {
+                                                    noPlanTotal += moment(row.time_out, "HH:mm").diff(moment(item.time_start, "HH:mm"), 'minutes')
+                                                }
+                                            })
+                                            persentase = Math.round((item.qty_actual / Math.round(activePlan.qty_per_minute * (60 - noPlanTotal))) * 100)
+                                            return <p key={index} style={index == 0 ? { width: '50px', textAlign: 'center', color: `${persentase >= 100 ? 'green' : ''}`} : { width: '50px', textAlign: 'center' , color: `${persentase >= 100 ? 'green' : ''}`}}>{persentase}%</p>
+                                        })}
+                                        { row.includes(timeStartPlan) ? (
+                                            <p style={{ width: '50px', textAlign: 'center' , color: `${(persentaseMqtt()) >= 100 ? 'green' : ''}` }}>{persentaseMqtt()}%</p>
+                                        ) : (
+                                            <p style={{ width: '50px', textAlign: 'center'  }}>{0}%</p>
+                                        )
+                                        }
+                                    </>
+                                ))}
                                     <p style={{  width: '100px', color: `${totalPersentase >= 100 ? 'green' : ''}` }}>{totalPersentase}%</p>
                                 </div>
                             </div>

@@ -106,7 +106,7 @@ export default function FormControl({ id }) {
         style={{ paddingTop: "10px", paddingBottom: "10px" }}
         >
         <Grid columns={3}>
-            <Grid.Col span={1}>
+            {/* <Grid.Col span={1}>
             <Select
                 label="Client"
                 placeholder="Select Client"
@@ -117,7 +117,7 @@ export default function FormControl({ id }) {
                 maxDropdownHeight={100}
                 {...form.getInputProps("client_id")}
             />
-            </Grid.Col>
+            </Grid.Col> */}
             <Grid.Col span={1}>
             <TextInput
                 label="Name"
