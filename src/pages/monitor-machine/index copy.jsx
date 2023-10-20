@@ -1,8 +1,8 @@
-import { Table, Menu, Button, Space, ActionIcon, Select, Text, rem, useMantineTheme, ScrollArea, Flex } from '@mantine/core';
+import { Table, Menu, Button, Space, ActionIcon, Select, Text, rem, useMantineTheme, ScrollArea } from '@mantine/core';
 import Image from 'next/image';
 import mht from '@/assets/mht.png';
 import robot from '@/assets/robot.png';
-import { IconCircleDot, IconSquareCheck, IconPackage, IconUsers, IconCalendar, IconChevronDown, IconLogout } from '@tabler/icons';
+import { IconCircleDot, IconSquareCheck, IconPackage, IconUsers, IconCalendar, IconChevronDown } from '@tabler/icons';
 import { useState, useEffect, useRef } from 'react';
 import axiosPlanning from "@/libs/planning/axios";
 import axiosHour from "@/libs/service_per_hour/axios";
@@ -12,8 +12,7 @@ import { useRouter } from 'next/router';
 import client from '@/libs/mqtt'
 import DownTime from '@/components/views/Dashboard/MonitorMachine/DownTime';
 import MachineCondition from '@/components/views/Dashboard/MonitorMachine/MachineCondition';
-import { deleteCookie, getCookie } from 'cookies-next';
-import axiosAuth from '@/libs/auth/axios';
+import { getCookie } from 'cookies-next';
 
 export default function Home({headers}) {
 
@@ -630,20 +629,6 @@ if (isFullActive) {
     );
 }
 
-const handleLogout = async () => {
-    try{
-        const {data} = (await axiosAuth.get('/auth/logout')).data
-    }catch(error){
-    }
-    deleteCookie('auth')
-    deleteCookie('user')
-    deleteCookie('role')
-    deleteCookie('permissions')
-    setTimeout(() => {
-        router.push('/sign-in')
-    },500)
-}
-
 return (
     <div>
         <div style={{
@@ -655,24 +640,7 @@ return (
         justifyContent: 'space-between', // Untuk mengatur horizontal ke pojok kanan
         }}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-                {/* <Image src={mht} alt="Deskripsi Gambar" width={60} height={60} style={{ marginLeft: '10px' }} /> */}
-                <Menu shadow="md" width={200}>
-            <Menu.Target>
-                <div>
-                    <Image src={mht} alt="Deskripsi Gambar" width={60} height={60} style={{ marginLeft: '10px' }} />
-                </div>
-            </Menu.Target>
-            <Menu.Dropdown>
-              <Menu.Label>
-                <Flex justify={"space-between"} align="center">
-                  Application
-                </Flex>
-              </Menu.Label>
-              <Menu.Item color="red" onClick={handleLogout} icon={<IconLogout size={14} />}>
-                Logout
-              </Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
+                <Image src={mht} alt="Deskripsi Gambar" width={60} height={60} style={{ marginLeft: '10px' }} />
                 <Image src={robot} alt="Deskripsi Gambar" width={60} height={60} style={{ marginLeft: '10px' }} />
                 <h1 style={{ marginLeft: '10px' }}>RW 05</h1>
             </div>
