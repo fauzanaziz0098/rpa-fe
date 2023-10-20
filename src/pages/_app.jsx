@@ -14,7 +14,7 @@ function MyApp({ Component, pageProps }) {
     path = path.replace('[id]', id)
   }
 
-  if (pathExcept == 'monitor-machine' || pathExcept == 'sign-in' || pathExcept == 'home' || pathExcept == '_error') {
+  if (pathExcept == 'monitor-machine' || pathExcept == 'sign-in' || pathExcept == 'home' || pathExcept == '_error' || pathExcept == 'monitor-o-e-e') {
     return (
       <>
        <Head>
