@@ -19,6 +19,7 @@ import { TimeInput } from "@mantine/dates";
 import { IconClockHour1, IconClockHour9, IconFaceId, IconFaceIdError } from "@tabler/icons";
 import dayjs from "dayjs";
 import { showNotification } from "@mantine/notifications";
+import { AxiosError } from "axios";
   
   export default function FormControl({ id }) {
     const router = useRouter();
@@ -62,7 +63,7 @@ import { showNotification } from "@mantine/notifications";
           showNotification({
             title: "Successful Submit",
             message: "Submit Success👏",
-            icon: <IconFaceIds />,
+            icon: <IconFaceId />,
             color: "teal",
         });
       } catch (error) {

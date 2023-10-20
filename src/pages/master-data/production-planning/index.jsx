@@ -224,8 +224,8 @@ export default function PlanningPageIndex({errors}) {
               />
           </Flex>
           <div style={{ display: 'flex', gap: '10px' }}>
-            <Button>
-              <Link style={{ textDecoration: 'none', color: 'white' }} href="/master-data/production-planning/create">Create</Link>
+            <Button component={Link} style={{ textDecoration: 'none', color: 'white' }} href="/master-data/production-planning/create">
+              Create
             </Button>
           </div>
         </div>
