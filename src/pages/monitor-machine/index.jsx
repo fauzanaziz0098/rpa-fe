@@ -194,8 +194,17 @@ export default function Home({headers}) {
 
     const qtyTargetMqtt = () => {
         let duration = 60
-        const timeStart = moment(productionData[productionData.length - 1]?.time_start, "HH:mm").add(1, 'hours').format('HH:mm')
-        const timeEnd = moment(productionData[productionData.length - 1]?.time_start, "HH:mm").add(1, 'hours').add(59, 'minutes').format('HH:mm')
+          // const timeStart = moment(productionData[productionData.length - 1]?.time_start, "HH:mm").add(1, 'hours').format('HH:mm')
+        // const timeEnd = moment(productionData[productionData.length - 1]?.time_start, "HH:mm").add(1, 'hours').add(59, 'minutes').format('HH:mm')
+        let timeStart, timeEnd;
+        if (productionData.length == 0) {
+            duration = 60 - moment(activePlan.date_time_in, "HH:mm").minute()
+            timeStart = moment(activePlan?.date_time_in).tz('Asia/Bangkok').format('HH:mm')
+            timeEnd = moment(activePlan.date_time_in).tz('Asia/Bangkok').add(1, 'hour').format("HH")+':00'
+        } else {
+            timeStart = moment(productionData[productionData.length - 1]?.time_start, "HH:mm").add(1, 'hours').format('HH:mm')
+            timeEnd = moment(productionData[productionData.length - 1]?.time_start, "HH:mm").add(1, 'hours').add(59, 'minutes').format('HH:mm')
+        }
         noPlanToday.map(row => {
             if (
                 moment(row.time_in, 'HH:mm').isSameOrAfter(moment(timeStart, 'HH:mm')) && moment(row.time_in, 'HH:mm').isSameOrBefore(moment(timeEnd, 'HH:mm')) &&
