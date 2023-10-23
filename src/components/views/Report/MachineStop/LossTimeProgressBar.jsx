@@ -1,15 +1,56 @@
-import { Divider, Group, Paper, Progress, Text } from "@mantine/core";
+import { Divider, Group, Modal, Paper, Progress, Text } from "@mantine/core";
 import dayjs from "dayjs";
-import React, { memo, useEffect } from "react";
+import React, { memo, useEffect, useState } from "react";
 
 import "dayjs/locale/id";
 
 dayjs.locale("id");
 
 const LossTimeProgressBar = memo(({ hours, item }) => {
+  const [opened, setOpened] = useState({
+    open: false,
+    data: null,
+  });
   return (
     <Paper withBorder p={"xl"}>
       <Text>{item?.name ?? "-"}</Text>
+      <Modal
+        opened={opened.open}
+        onClose={() =>
+          setOpened({
+            open: false,
+            data: null,
+          })
+        }
+        title="Detail"
+      >
+        {opened.data && opened.open ? (
+          <div>
+            <p>Nama Machine: {item?.name}</p>
+            <p>Oprator: {opened?.data.oprator}</p>
+            <p>Kondisi Machine: {opened?.data.type}</p>
+            <p>Waktu Machine: {opened?.data.second} detik</p>
+            <p>Durasi waktu: </p>
+            <p>
+              {dayjs(opened?.data.created_at)
+                .locale("id")
+                .format("DD MMMM YYYY, HH:mm:ss")}{" "}
+              -{" "}
+              {dayjs(opened?.data.updated_at)
+                .locale("id")
+                .format("DD MMMM YYYY, HH:mm:ss")}
+            </p>
+            {opened?.data.type == "stop" ? (
+              <p>Diakibatkan: {opened?.data.line_stop ?? "-"}</p>
+            ) : (
+              ""
+            )}
+          </div>
+        ) : (
+          ""
+        )}
+        {/* Modal content */}
+      </Modal>
       <Divider />
       <div style={{ display: "flex" }}>
         {hours.map((hour) => {
@@ -40,7 +81,17 @@ const LossTimeProgressBar = memo(({ hours, item }) => {
                     return {
                       value: Number(value.percentage),
                       color: value.color,
-                      tooltip: value.line_stop ?? "",
+                      tooltip: `${dayjs(value.created_at)
+                        .locale("id")
+                        .format("HH:mm:ss")} - ${dayjs(value.updated_at)
+                        .locale("id")
+                        .format("HH:mm:ss")}\n ${value.line_stop ?? ""}`,
+                      style: { cursor: "pointer" },
+                      onClick: () =>
+                        setOpened({
+                          open: true,
+                          data: value,
+                        }),
                     };
                   })}
               />
