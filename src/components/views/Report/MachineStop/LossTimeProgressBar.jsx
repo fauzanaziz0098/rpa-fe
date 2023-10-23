@@ -34,11 +34,11 @@ const LossTimeProgressBar = memo(({ hours, item }) => {
             <p>
               {dayjs(opened?.data.created_at)
                 .locale("id")
-                .format("DD MMMM YYYY, HH:mm:ss")}{" "}
+                .format("DD-MM-YYYY, HH:mm:ss")}{" "}
               -{" "}
               {dayjs(opened?.data.updated_at)
                 .locale("id")
-                .format("DD MMMM YYYY, HH:mm:ss")}
+                .format("DD-MM-YYYY, HH:mm:ss")}
             </p>
             {opened?.data.type == "stop" ? (
               <p>Diakibatkan: {opened?.data.line_stop ?? "-"}</p>
@@ -85,7 +85,7 @@ const LossTimeProgressBar = memo(({ hours, item }) => {
                         .locale("id")
                         .format("HH:mm:ss")} - ${dayjs(value.updated_at)
                         .locale("id")
-                        .format("HH:mm:ss")}\n ${value.line_stop ?? ""}`,
+                        .format("HH:mm:ss")} ${value.line_stop ?? ""}`,
                       style: { cursor: "pointer" },
                       onClick: () =>
                         setOpened({
