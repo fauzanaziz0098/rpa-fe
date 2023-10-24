@@ -96,19 +96,20 @@ export default function Home() {
     // quality
     const qtyActual = mqttData1.qty_actual;
 
-    const calculateQualityPercentage = () => {
-        const qtyActual = mqttData1.qty_actual;
-        const qtyPlanning = activePlan.qty_planning;
+const calculateQualityPercentage = () => {
+    const qtyActual = mqttData1.qty_actual;
+    const qtyPlanning = activePlan.qty_planning;
 
-        if (qtyPlanning === 0) {
-            return 0;
-        }
+    if (qtyPlanning === 0) {
+        return 0;
+    }
+    const qualityPercentage = Math.round((qtyActual - 0) / qtyPlanning * 100);
 
-        const qualityPercentage = (qtyActual - 0) / qtyPlanning * 100;
-        return qualityPercentage;
-    };
+    return qualityPercentage;
+};
 
-    const qualityPercentage = calculateQualityPercentage();
+const qualityPercentage = calculateQualityPercentage();
+
 
     //   perfomance
     const [timeActual, setTimeActual] = useState(0);
@@ -164,20 +165,20 @@ export default function Home() {
     //   }, [activePlan.date_time_in]);
 
     const cycleTime = activePlan.product ? activePlan.product.cycle_time : 0;
-    // console.log(cycleTime, 'adam');
-    // console.log(qtyActual, 'adam1');
-    const timePlanned = cycleTime * qtyActual ;
+    const timePlanned = cycleTime * qtyActual;
 
     const calculatePerformancePercentage = () => {
         const cycleTimeQtyActual = cycleTime * qtyActual;
         if (timeActual === 0) {
             return 0;
         }
-        const performance = (cycleTimeQtyActual / timeActual);
-        return performance;
+        const performance = cycleTimeQtyActual / timeActual;
+        const performancePercentage = Math.round(performance);
+        return performancePercentage;
     };
 
-    const performancePercentage = calculatePerformancePercentage()
+    const performancePercentage = calculatePerformancePercentage();
+
 
 
     //   availibity
@@ -201,27 +202,33 @@ export default function Home() {
     };
   }, [activePlan.date_time_in]);
   
-    const calculateAvailabilityPercentage = () => {
-        if (timeActual === 0) {
-            return 0;
-        }
+  const calculateAvailabilityPercentage = () => {
+    if (timeActual === 0) {
+        return 0;
+    }
 
-        const currentTime = moment().tz("Asia/Bangkok");
-        const dateIn = moment(activePlan.date_time_in).tz("Asia/Bangkok");
-        const timeDifference = currentTime.diff(dateIn, 'minutes');
-        console.log(timeDifference, '100');
+    const currentTime = moment().tz("Asia/Bangkok");
+    const dateIn = moment(activePlan.date_time_in).tz("Asia/Bangkok");
+    const timeDifference = currentTime.diff(dateIn, 'minutes');
+    console.log(timeDifference, '100');
 
-        const totalPlanningTime = activePlan.total_time_planning;
-        const availabilityPercentage = ((timeActual - totalPlanningTime) / timeDifference);
+    const totalPlanningTime = activePlan.total_time_planning;
+    const availabilityPercentage = Math.round((timeActual - totalPlanningTime) / timeDifference);
 
-        return availabilityPercentage;
-    };
+    return availabilityPercentage;
+};
 
-    const availabilityPercentage = calculateAvailabilityPercentage();
+const availabilityPercentage = calculateAvailabilityPercentage();
+
 
 
     // oee
     const multipliedPercentage = availabilityPercentage * performancePercentage * qualityPercentage;
+    console.log(availabilityPercentage, 'ava');
+    console.log(performancePercentage, 'perfom');
+    console.log(qualityPercentage, 'quality');
+    const roundedPercentage = Math.round(multipliedPercentage);
+
     const resultPercentage = multipliedPercentage / 1000000;
     const finallyPercentage = resultPercentage * 100;
 
@@ -314,7 +321,7 @@ export default function Home() {
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '-260px' }}>
                 <RingProgress sections={[{ value: finallyPercentage, color: 'green' }]} label={ <Text c="green" fw={700}
                     ta="center" size="xl">
-                    {multipliedPercentage.toFixed()}%
+                    {roundedPercentage.toFixed()}%
                     </Text>
                     }
                     size={500}
