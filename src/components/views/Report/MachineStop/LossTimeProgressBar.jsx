@@ -81,11 +81,18 @@ const LossTimeProgressBar = memo(({ hours, item }) => {
                     return {
                       value: Number(value.percentage),
                       color: value.color,
-                      tooltip: `${dayjs(value.created_at)
-                        .locale("id")
-                        .format("HH:mm:ss")} - ${dayjs(value.updated_at)
-                        .locale("id")
-                        .format("HH:mm:ss")} ${value.line_stop ?? ""}`,
+                      tooltip: (
+                        <Text fz="xs">
+                          {dayjs(value.created_at)
+                            .locale("id")
+                            .format("HH:mm:ss")}{" "}
+                          -{" "}
+                          {dayjs(value.updated_at)
+                            .locale("id")
+                            .format("HH:mm:ss")}
+                          <br /> {value.line_stop ?? ""}
+                        </Text>
+                      ),
                       style: { cursor: "pointer" },
                       onClick: () =>
                         setOpened({
