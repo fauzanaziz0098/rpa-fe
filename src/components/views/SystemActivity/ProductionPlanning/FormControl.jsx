@@ -97,7 +97,7 @@ import { IconAlertCircle, IconCheck, IconFaceId, IconFaceIdError } from "@tabler
           setOperators(
             data.map((item) => ({
               label: item.name,
-              value: item.id,
+              value: item.name,
             }))
           );
         } catch (error) {
@@ -117,6 +117,11 @@ import { IconAlertCircle, IconCheck, IconFaceId, IconFaceIdError } from "@tabler
           const prod = (await axiosPlanning.get(`product/${form.values.product}`, getHeaderConfigAxios())).data
           const estimation = ((prod.data.cycle_time * (form.values.qty_planning ? form.values.qty_planning : 0)) / 60).toFixed(0)
           setEstimation(estimation)
+
+          // const prod = (await axiosPlanning.get(`product/${form.values.product}`, getHeaderConfigAxios())).data
+          // const estimation = isNaN(form.values.qty_planning * prod.data.cycle_time) ? 0 : form.values.qty_planning * prod.data.cycle_time
+          // setEstimation(estimation)
+          
         }
         product()
       }
