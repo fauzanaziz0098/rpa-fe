@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 export default function BarChart() {
 
-  return (
+  return ( 
 			<>
 			  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
 			    <h2>Production Achievement</h2>

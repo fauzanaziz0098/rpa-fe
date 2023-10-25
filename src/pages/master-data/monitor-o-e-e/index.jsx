@@ -93,7 +93,7 @@ const calculateQualityPercentage = () => {
     if (qtyPlanning === 0) {
         return 0;
     }
-    const qualityPercentage = Math.round((qtyActual - 0) / qtyPlanning * 100);
+    const qualityPercentage = Math.ceil((qtyActual - 0) / qtyPlanning);
 
     return qualityPercentage;
 };
@@ -172,43 +172,91 @@ const qualityPercentage = calculateQualityPercentage();
 
 
     //   availibity
+    const [plannedAvailability, setPlannedAvailability] = useState(10);
 
-    const currentTime = moment().tz("Asia/Bangkok");
-    const dateIn = moment(activePlan.date_time_in).tz("Asia/Bangkok");
-    // const timeDifference = currentTime.diff(dateIn, 'minutes');
-    const [timeDifference, setTimeDifference] = useState(0);
+    useEffect(() => {
+        const calculatePlannedAvailability = () => {
+            const startTime = moment(activePlan.date_time_in).tz("Asia/Bangkok");
+            const currentTime = moment().tz("Asia/Bangkok");
+            const timeDifference = currentTime.diff(startTime, 'minutes');
 
-  useEffect(() => {
-    const dateIn = moment(activePlan.date_time_in).tz("Asia/Bangkok");
+            let newPlannedAvailability = 0;
 
-    const updateCurrentTime = () => {
-      const currentTime = moment().tz("Asia/Bangkok");
-      const newTimeDifference = currentTime.diff(dateIn, 'minutes');
-      setTimeDifference(newTimeDifference);
+            if (timeDifference >= 0) {
+                newPlannedAvailability = Math.floor(timeDifference / 10) * 10;
+            }
+
+            if (activePlan.shift.no_plan_machine_id) {
+                const totalNoPlan = activePlan.shift.no_plan_machine_id.reduce((total, value) => total + value.total, 0);
+                newPlannedAvailability -= totalNoPlan;
+            }
+
+            newPlannedAvailability = Math.max(newPlannedAvailability, 0);
+            setPlannedAvailability(newPlannedAvailability);
+        };
+        calculatePlannedAvailability();
+        const intervalId = setInterval(() => {
+            calculatePlannedAvailability();
+        }, 600000);
+
+        return () => {
+            clearInterval(intervalId);
+        };
+    }, [activePlan]);
+
+    const [plannedActual, setPlannedActual] = useState(0);
+    useEffect(() => {
+        const calculatePlannedActual = () => {
+            const startTime = moment(activePlan.date_time_in).tz("Asia/Bangkok");
+            const currentTime = moment().tz("Asia/Bangkok");
+            const timeDifference = currentTime.diff(startTime, 'minutes');
+
+            let newPlannedActual = 0;
+
+            if (timeDifference >= 0) {
+                newPlannedActual = Math.floor(timeDifference / 10) * 10;
+            }
+
+            if (activePlan.shift.no_plan_machine_id) {
+                const totalNoPlan = activePlan.shift.no_plan_machine_id.reduce((total, value) => total + value.total, 0);
+                newPlannedActual -= totalNoPlan;
+            }
+
+            newPlannedActual = Math.max(newPlannedActual, 0);
+            newPlannedActual -= mqttData2.TotalTime;
+            setPlannedActual(newPlannedActual);
+        };
+
+        calculatePlannedActual();
+
+        const intervalId = setInterval(() => {
+            calculatePlannedActual();
+        }, 600000);
+
+        return () => {
+            clearInterval(intervalId);
+        };
+    }, [activePlan, mqttData2.TotalTime]);
+
+    console.log(timeActual, 'timeactual');
+    const calculateAvailabilityPercentage = () => {
+        if (timeActual === 0) {
+            return 0;
+        }
+
+        const currentTime = moment().tz("Asia/Bangkok");
+        const dateIn = moment(activePlan.date_time_in).tz("Asia/Bangkok");
+        const timeDifference = currentTime.diff(dateIn, 'minutes');
+
+        const totalPlanningTime = mqttData2.TotalTime;
+        console.log(timeDifference, 'timedifference');
+        console.log(timeDifference, 'timediff');
+        const availabilityPercentage = Math.round((timeDifference - totalPlanningTime) / timeDifference);
+
+        return availabilityPercentage;
     };
-    const interval = setInterval(updateCurrentTime, 1000);
-    return () => {
-      clearInterval(interval);
-    };
-  }, [activePlan.date_time_in]);
-  
-  const calculateAvailabilityPercentage = () => {
-    if (timeActual === 0) {
-        return 0;
-    }
 
-    const currentTime = moment().tz("Asia/Bangkok");
-    const dateIn = moment(activePlan.date_time_in).tz("Asia/Bangkok");
-    const timeDifference = currentTime.diff(dateIn, 'minutes');
-    console.log(timeDifference, '100');
-
-    const totalPlanningTime = activePlan.total_time_planning;
-    const availabilityPercentage = Math.round((timeActual - totalPlanningTime) / timeDifference);
-
-    return availabilityPercentage;
-};
-
-const availabilityPercentage = calculateAvailabilityPercentage();
+    const availabilityPercentage = calculateAvailabilityPercentage();
 
 
 
@@ -287,8 +335,8 @@ const availabilityPercentage = calculateAvailabilityPercentage();
                         />
                         <Paper shadow="xs" withBorder style={{ marginLeft: '60px' }}>
                             <div style={{  textAlign: 'center' }}>
-                                <p>Availibity planned : {timeDifference} minutes</p>
-                                <p>Availibity actual : {timeActual} minutes</p>
+                                <p>Availibity planned :{plannedAvailability} minutes</p>
+                                <p>Availibity actual : {plannedActual} minutes</p>
                             </div>
                         </Paper>
                 </div>
