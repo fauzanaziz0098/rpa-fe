@@ -97,7 +97,7 @@ import { IconAlertCircle, IconCheck, IconFaceId, IconFaceIdError } from "@tabler
           setOperators(
             data.map((item) => ({
               label: item.name,
-              value: item.name,
+              value: item.id,
             }))
           );
         } catch (error) {
