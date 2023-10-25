@@ -51,7 +51,7 @@ const DownTime = ({machineId}) => {
                             <td>{mqttDataLS1[`CauseLS${row.typeId}`] == null ? '-' : mqttDataLS1[`CauseLS${row.typeId}`]}</td>
                             <td style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '20px'}}>
                                 <ActionIcon>
-                                    <IconCircleDot style={{ color: 'white', backgroundColor: `${mqttDataLS1['IsActive'] == row.typeId ? 'red' : mqttDataLS1[`CauseLS${row.typeId}`] == 0 ? 'green' : 'yellow'}`, borderRadius: '100%'}} />
+                                    <IconCircleDot style={{ color: 'white', backgroundColor: `${mqttDataLS1['IsActive'] == row.typeId ? 'red' : mqttDataLS1[`CauseLS${row.typeId}`] == 0 ? 'green' : '#dce305'}`, borderRadius: '100%'}} />
                                 </ActionIcon>
                             </td>
                         </tr>

@@ -10,5 +10,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/master-data/:path*", "/home"],
+  matcher: ["/master-data/:path*", "/system-activity/:path*", "/home"],
 };

@@ -132,7 +132,7 @@ import { IconAlertCircle, IconCheck, IconFaceId, IconFaceIdError } from "@tabler
         form.values.qty_planning = Number(form.values.qty_planning)
         form.values.dandory_time = Number(form.values.dandory_time)
           await axiosPlanning.post("planning-production", form.values, getHeaderConfigAxios());
-          router.push("/master-data/production-planning");
+          router.push("/system-activity/production-planning");
 
           showNotification({
             title: "Success",
@@ -252,7 +252,7 @@ import { IconAlertCircle, IconCheck, IconFaceId, IconFaceIdError } from "@tabler
           </Grid>
   
           <Group position="right" mt="xl">
-              <Button color="red" component={Link} href="/master-data/production-planning">
+              <Button color="red" component={Link} href="/system-activity/production-planning">
               Back
               </Button>
               <Button type="submit">Submit</Button>
