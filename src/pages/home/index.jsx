@@ -1241,7 +1241,7 @@ export default function Home({ headers }) {
                 Operator
               </p>
               <p style={{ padding: "10px", marginTop: "-16px" }}>
-                {activePlan?.user}
+                {activePlan?.user?.toLowerCase()}
               </p>
             </div>
             <div>
@@ -1255,7 +1255,7 @@ export default function Home({ headers }) {
                 Shift
               </p>
               <p style={{ padding: "10px", marginTop: "-16px" }}>
-                {activePlan?.shift?.name}
+                {activePlan?.shift?.name?.toLowerCase()}
               </p>
             </div>
             <div>
@@ -1269,7 +1269,7 @@ export default function Home({ headers }) {
                 Nama Part
               </p>
               <p style={{ padding: "10px", marginTop: "-16px" }}>
-                {activePlan?.product?.part_name}
+                {activePlan?.product?.part_name?.toLowerCase()}
               </p>
             </div>
             <div>
