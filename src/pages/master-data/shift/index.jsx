@@ -39,7 +39,6 @@ export default function ShiftPageIndex() {
       const fetchShift = async () => {
         try {
           const {data} = await axiosPlanning.get(`shift?filter.name=${searchValue}`, getHeaderConfigAxios())
-          console.log(data);
           setShift(data.data)
         } catch (error) {
           console.log(error, 'error fetch data shift');

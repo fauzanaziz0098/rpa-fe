@@ -88,6 +88,8 @@ import { showNotification } from "@mantine/notifications";
               <Grid.Col span={1}>
               <Select
                 label="Day"
+                maxDropdownHeight="100px"
+                dropdownPosition="bottom"
                 placeholder="Select Day"
                 data={['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']}
                 defaultValue="React"
