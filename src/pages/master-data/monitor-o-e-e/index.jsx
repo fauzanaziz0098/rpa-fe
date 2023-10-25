@@ -53,27 +53,16 @@ export default function Home() {
                 .subscribe(`MC${activePlan.machine.id}:PLAN:RPA`, {
                     qos: 2
                 })
-                .on("message", (topic, message) => {
-                    console.log(topic, 't');
-                    if (topic == `MC${activePlan.machine.id}:PLAN:RPA`) {
-                        setMqttData1(JSON.parse(message))
-                        console.log('message got');
-                    }
-                })
-            return () => {
-                client.unsubscribe(`MC${activePlan.machine.id}:PLAN:RPA`, {
-                    qos: 2
-                })
-            }
-        }
-        if (activePlan.length != 0) {
-            client
                 .subscribe(`MC${activePlan.machine.id}:LS:RPA`, {
                     qos: 2
                 })
                 .on("message", (topic, message) => {
                     if (topic == `MC${activePlan.machine.id}:LS:RPA`) {
                         setMqttData2(JSON.parse(message))
+                        console.log('message got');
+                    }
+                    if (topic == `MC${activePlan.machine.id}:PLAN:RPA`) {
+                        setMqttData1(JSON.parse(message))
                         console.log('message got');
                     }
                 })
@@ -91,6 +80,7 @@ export default function Home() {
     }, [])
 
     console.log(mqttData1, 'mqtt');
+    console.log(mqttData2, 'mqtt2');
     console.log(activePlan, 'acmqtt');
 
     // quality
