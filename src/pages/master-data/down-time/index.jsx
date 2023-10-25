@@ -10,7 +10,7 @@ export default function DownTimePageIndex() {
   );
 
   const handleHome = () => {
-    router.push("/monitor-machine");
+    router.push("/home");
   };
   return (
     <div>

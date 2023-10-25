@@ -6,7 +6,7 @@ const Navbar = ({ path }) => {
   const router = useRouter();
 
   const handleHome = () => {
-    router.push("/monitor-machine");
+    router.push("/home");
   };
   return (
     <div
