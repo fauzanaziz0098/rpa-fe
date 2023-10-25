@@ -90,6 +90,11 @@ export default function Home({ headers }) {
     router.push(`/report/${menuItem.replaceAll(" ", "-").toLowerCase()}`);
   };
 
+  const handleMenuItemClickActivity = (menuItem) => {
+    setActiveMenuItem(menuItem === activeMenuItem ? null : menuItem);
+    router.push(`/system-activity/${menuItem.replaceAll(" ", "-").toLowerCase()}`);
+  };
+
   // Fungsi untuk mengubah kategori aktif
   const handleCategoryClick = (category) => {
     setActiveCategory(category === activeCategory ? null : category);
@@ -625,7 +630,7 @@ export default function Home({ headers }) {
               </Menu.Target>
               <Menu.Dropdown>
                 <Menu.Item
-                  onClick={() => handleMenuItemClick("Production Planning")}
+                  onClick={() => handleMenuItemClickActivity("Production Planning")}
                   style={{
                     backgroundColor:
                       activeMenuItem === "Production Planning"
@@ -641,7 +646,7 @@ export default function Home({ headers }) {
                   </div>
                 </Menu.Item>
                 <Menu.Item
-                  onClick={() => handleMenuItemClick("WhatsApp Notification")}
+                  onClick={() => handleMenuItemClickActivity("WhatsApp Notification")}
                   style={{
                     backgroundColor:
                       activeMenuItem === "WhatsApp Notification"
