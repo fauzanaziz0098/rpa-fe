@@ -41,7 +41,7 @@ export default function MachineStopPageIndex() {
     return () => clearInterval(interval);
   }, []);
   const refach = async (params = null) => {
-    const { data } = await index(params);
+    const { data } = await index(filter.values.date ?? null);
     setItems(data.data);
   };
   useEffect(() => {
