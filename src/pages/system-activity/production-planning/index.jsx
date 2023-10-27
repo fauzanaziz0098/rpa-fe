@@ -16,7 +16,7 @@ import {
   Input,
   NumberInput,
 } from "@mantine/core";
-import { IconAlertCircle, IconPencil, IconScan, IconSearch, IconTrash, IconCalendarOff, IconReplace, IconBox, IconCheck } from "@tabler/icons";
+import { IconAlertCircle, IconPencil, IconScan, IconSearch, IconTrash, IconCalendarOff, IconReplace, IconBox, IconCheck, IconPlayerStop, IconPlayerPause } from "@tabler/icons";
 import Layout from "../../../components/Layout/App";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -51,6 +51,9 @@ export default function PlanningPageIndex({errors}) {
     isOpen: false,
     data: null,
   })
+  
+  const [stopPlanModal, setStopPlanModal] = useState(false)
+
   const [qtyReject, setQtyReject] = useState("")
 
   const filter = useForm({
@@ -59,15 +62,15 @@ export default function PlanningPageIndex({errors}) {
       qtyReject: "",
     },
   })
+  const fetchPlan = async () => {
+    try {
+      const {data} = await axiosPlanning.get(`planning-production/get-all-data?filter.machine=${searchValue}&filter.status=${filter.values.status}&filter.qtyReject=${filter.values.qtyReject}`, getHeaderConfigAxios())
+      setPlanningProductions(data.data)
+    } catch (error) {
+      console.log(error, 'error fetch data planning productions');
+    }
+  }
   useEffect(() => {
-      const fetchPlan = async () => {
-        try {
-          const {data} = await axiosPlanning.get(`planning-production/get-all-data?filter.machine=${searchValue}&filter.status=${filter.values.status}&filter.qtyReject=${filter.values.qtyReject}`, getHeaderConfigAxios())
-          setPlanningProductions(data.data)
-        } catch (error) {
-          console.log(error, 'error fetch data planning productions');
-        }
-      }
       fetchPlan()
   }, [filter.values.status, filter.values.qtyReject, searchValue])
 
@@ -146,6 +149,28 @@ export default function PlanningPageIndex({errors}) {
     }
   }
 
+  const stopPlan = async () => {
+    try {
+      await axiosPlanning.post('planning-production/stop-planning-production', {}, getHeaderConfigAxios())
+      setStopPlanModal(false)
+       showNotification({
+        title: "Success",
+        message: "Plan Stopped",
+        color: "teal",
+        icon: <IconCheck size={16} />,
+      });
+    } catch (error) {
+        showNotification({
+        title: "Failed",
+        message: (typeof error?.response?.data?.message == 'object' ? error?.response?.data?.message?.map(item => item + ', ') : error?.response?.data?.message) || "Connection Error",
+        icon: <IconAlertCircle />,
+        color: "red",
+      });
+    } finally {
+      fetchPlan()
+    }
+  }
+
   return (
     <div>
        {/* Modal Show No Plan */}
@@ -191,6 +216,14 @@ export default function PlanningPageIndex({errors}) {
           <div style={{ display: 'flex', justifyContent:'end' }}>
             <Button onClick={handleSubmitReject}>Submit</Button>
           </div>
+      </Modal>
+
+      {/* modal stop plan */}
+      <Modal size='auto' opened={stopPlanModal} onClose={() => setStopPlanModal(false)} title="Apakah Anda ingin menghentikan plan?">
+        <Flex mt="lg" justify='center' gap='5px'>
+          <Button onClick={() => setStopPlanModal(false)} color="red">No</Button>
+          <Button onClick={() => stopPlan()}>Yes</Button>
+        </Flex>
       </Modal>
       <ScrollArea>
         <div
@@ -242,6 +275,9 @@ export default function PlanningPageIndex({errors}) {
               {/* <th>Revision</th> */}
               <th>Total Hour</th>
               <th>NG Input</th>
+              {filter.values.status == "run" && (
+                <th>Action</th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -275,6 +311,13 @@ export default function PlanningPageIndex({errors}) {
                     <IconBox size={"1.2rem"}/>
                   </Button>
                 </td>
+                {filter.values.status == "run" && (
+                  <td>
+                    <Button color="red" onClick={() => setStopPlanModal(true)}>
+                      <IconPlayerPause fill="white" size={"1.2rem"}/>
+                    </Button>
+                  </td>
+                )}
               </tr>
             ))
             }
