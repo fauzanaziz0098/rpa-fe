@@ -41,7 +41,13 @@ export default function MachineStopPageIndex() {
     return () => clearInterval(interval);
   }, []);
   const refach = async (params = null) => {
-    const { data } = await index(filter.values.date ?? null);
+    const { data } = await index(
+      filter.values.date
+        ? new URLSearchParams({
+            date: dayjs(filter.values.date).format("YYYY-MM-DD"),
+          }).toString()
+        : null
+    );
     setItems(data.data);
   };
   useEffect(() => {
