@@ -40,7 +40,7 @@ export default function MachineStopPageIndex() {
 
     return () => clearInterval(interval);
   }, []);
-  const refach = async () => {
+  const refach = async (params = null) => {
     const { data } = await index(params);
     setItems(data.data);
   };
