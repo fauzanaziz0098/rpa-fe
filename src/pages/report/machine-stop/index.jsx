@@ -35,11 +35,15 @@ export default function MachineStopPageIndex() {
   };
   useEffect(() => {
     const interval = setInterval(() => {
-      getItems();
+      refach();
     }, 5000);
 
     return () => clearInterval(interval);
   }, []);
+  const refach = async () => {
+    const { data } = await index(params);
+    setItems(data.data);
+  };
   useEffect(() => {
     if (filter.values.date) {
       getItems(
