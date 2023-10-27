@@ -54,6 +54,7 @@ export default function Home({ headers }) {
       setProductionData(res.data.data);
       setActivePlan(res.data.data.planningMachineActive);
     } catch (error) {
+      setActivePlan([]);
       console.log(error, "production fetch error");
     }
   };
@@ -66,7 +67,7 @@ export default function Home({ headers }) {
       } catch (error) {
         console.log(error, "error refetch");
       }
-    }, 1000 * 60);
+    }, 1000 * 5);
   }, []);
 
   useEffect(() => {

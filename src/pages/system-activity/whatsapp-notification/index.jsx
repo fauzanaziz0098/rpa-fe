@@ -117,17 +117,17 @@ export default function NotificationWhatsappPageIndex({errors}) {
       <Modal
           opened={modalNotification.isShow}
           onClose={() => setModalNotification({isShow: false, data: null})}
-          title="Kontak Notifikasi"
+          title="Notifikasi Whatsapp"
           centered
         >
-          <div>
+          <div style={{ paddingTop: '5px', paddingBottom: '5px' }}>
             <Flex justify={'space-between'} mt="md">
-              <Text w={'100%'}>Nama Kontak:</Text>
-              <Text w={'100%'}>{modalNotification?.data?.contact_name}</Text>
+              <Text size='sm' w={'100%'}>Nama Kontak:</Text>
+              <Text size='sm' w={'100%'}>{modalNotification?.data?.contact_name}</Text>
             </Flex>
             <Flex justify={'space-between'} mt="sm">
-              <Text w={'100%'}>Nomor Kontak:</Text>
-              <Text w={'100%'}>{modalNotification?.data?.contact_number}</Text>
+              <Text size='sm' w={'100%'}>Nomor Kontak:</Text>
+              <Text size='sm' w={'100%'}>{modalNotification?.data?.contact_number}</Text>
             </Flex>
           </div>
           <Divider mt="md" size="sm" color="gray"/>

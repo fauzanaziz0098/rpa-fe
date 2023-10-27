@@ -52,7 +52,6 @@ const SignIn = () => {
                     username: form.values.username,
                     password: form.values.password,
                 });
-                console.log(data, 'dta');
                 setCookie("auth", `Bearer ${data.data.token}`, {
                     maxAge: 60 * 6 * 24,
                 });

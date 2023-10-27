@@ -45,7 +45,7 @@ const DownTime = ({machineId}) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {lineStopDatas.map((row, index) => (
+                    { machineId ? (lineStopDatas.map((row, index) => (
                         <tr key={index} style={ index == lineStopDatas?.length -1 ? { borderBottom: '1px #d4d6d9 solid' } : {}}>
                             <td>{row.name}</td>
                             <td>{mqttDataLS1[`CauseLS${row.typeId}`] == null ? '-' : mqttDataLS1[`CauseLS${row.typeId}`]}</td>
@@ -55,70 +55,9 @@ const DownTime = ({machineId}) => {
                                 </ActionIcon>
                             </td>
                         </tr>
-                    ))}
-                    {/* <tr>
-                        <td>MACHINE</td>
-                        <td>0</td>
-                        <td style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '20px'}}>
-                            <ActionIcon>
-                            <IconCircleDot style={{ color: 'white', backgroundColor: 'green', borderRadius: '100%'}} />
-                            </ActionIcon>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>MATERIAL</td>
-                        <td>20</td>
-                        <td style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '20px'}}>
-                            <ActionIcon>
-                            <IconCircleDot style={{ color: 'white', backgroundColor: 'firebrick', borderRadius: '100%'}} />
-                            </ActionIcon>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>MAN POWER</td>
-                        <td>10</td>
-                        <td style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '20px'}}>
-                            <ActionIcon>
-                            <IconCircleDot style={{ color: 'white', backgroundColor: 'gold', borderRadius: '100%'}} />
-                            </ActionIcon>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>JIG PROCESS WELDING</td>
-                        <td>5</td>
-                        <td style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '20px'}}>
-                            <ActionIcon>
-                            <IconCircleDot style={{ color: 'white', backgroundColor: 'firebrick', borderRadius: '100%'}} />
-                            </ActionIcon>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>PACKING STANDAR</td>
-                        <td>7</td>
-                        <td style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '20px'}}>
-                            <ActionIcon>
-                            <IconCircleDot style={{ color: 'white', backgroundColor: 'green', borderRadius: '100%'}} />
-                            </ActionIcon>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>GAS & WIRE WELDING</td>
-                        <td>0</td>
-                        <td style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '20px'}}>
-                            <ActionIcon>
-                            <IconCircleDot style={{ color: 'white', backgroundColor: 'green', borderRadius: '100%'}} />
-                            </ActionIcon>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>OTHERS</td>
-                        <td>5</td>
-                        <td style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '20px'}}>
-                            <ActionIcon>
-                            <IconCircleDot style={{ color: 'white', backgroundColor: 'gold', borderRadius: '100%'}} />
-                            </ActionIcon>
-                        </td>
-                    </tr> */}
+                    ))) : (
+                        ''
+                    )}
                 </tbody>
             </Table>
         </ScrollArea>
