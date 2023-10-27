@@ -34,7 +34,11 @@ export default function MachineStopPageIndex() {
     }
   };
   useEffect(() => {
-    getItems();
+    const interval = setInterval(() => {
+      getItems();
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, []);
   useEffect(() => {
     if (filter.values.date) {
