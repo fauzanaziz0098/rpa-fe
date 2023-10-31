@@ -79,9 +79,6 @@ export default function Home() {
         fetchActiveData()
     }, [])
 
-    console.log(mqttData1, 'mqtt');
-    console.log(mqttData2, 'mqtt2');
-    console.log(activePlan, 'acmqtt');
 
     // quality
     const qtyActual = mqttData1.qty_actual;
@@ -103,7 +100,6 @@ const qualityPercentage = calculateQualityPercentage();
 
     //   perfomance
     const [timeActual, setTimeActual] = useState(0);
-    console.log(timeActual, 'time');
     const [startTime, setStartTime] = useState(null);
     //   useEffect(() => {
     //     const interval = setInterval(() => {
@@ -120,7 +116,6 @@ const qualityPercentage = calculateQualityPercentage();
         const initialTimeDifferenceInMinutes = currentTime.diff(startTime, 'minutes');
         // const fixedMinutes = Math.min(initialTimeDifferenceInMinutes, 47);
         const fixedMinutes = Math.min(initialTimeDifferenceInMinutes,(moment(activePlan.date_time_in).add(1, 'hour').minute(0).diff(moment(activePlan.date_time_in), 'minute')))
-        // console.log(fixedMinutes, 'ozan');
         const additionalMinutes = fixedMinutes + Math.floor((initialTimeDifferenceInMinutes - fixedMinutes) / 60) * 60; 
       
         setTimeActual(additionalMinutes);
@@ -238,7 +233,6 @@ const qualityPercentage = calculateQualityPercentage();
         };
     }, [activePlan, mqttData2.TotalTime]);
 
-    console.log(timeActual, 'timeactual');
     const calculateAvailabilityPercentage = () => {
         if (timeActual === 0) {
             return 0;
@@ -249,8 +243,6 @@ const qualityPercentage = calculateQualityPercentage();
         const timeDifference = currentTime.diff(dateIn, 'minutes');
 
         const totalPlanningTime = mqttData2.TotalTime;
-        console.log(timeDifference, 'timedifference');
-        console.log(timeDifference, 'timediff');
         const availabilityPercentage = Math.round((timeDifference - totalPlanningTime) / timeDifference);
 
         return availabilityPercentage;
@@ -262,9 +254,6 @@ const qualityPercentage = calculateQualityPercentage();
 
     // oee
     const multipliedPercentage = availabilityPercentage * performancePercentage * qualityPercentage;
-    console.log(availabilityPercentage, 'ava');
-    console.log(performancePercentage, 'perfom');
-    console.log(qualityPercentage, 'quality');
     const roundedPercentage = Math.round(multipliedPercentage);
 
     const resultPercentage = multipliedPercentage / 1000000;

@@ -34,22 +34,8 @@ export default function MachineStopPageIndex() {
     }
   };
   useEffect(() => {
-    const interval = setInterval(() => {
-      refach();
-    }, 5000);
-
-    return () => clearInterval(interval);
+    getItems();
   }, []);
-  const refach = async (params = null) => {
-    const { data } = await index(
-      filter.values.date
-        ? new URLSearchParams({
-            date: dayjs(filter.values.date).format("YYYY-MM-DD"),
-          }).toString()
-        : null
-    );
-    setItems(data.data);
-  };
   useEffect(() => {
     if (filter.values.date) {
       getItems(
