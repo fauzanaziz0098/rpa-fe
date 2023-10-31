@@ -314,7 +314,7 @@ export default function PlanningPageIndex({errors}) {
                 {filter.values.status == "run" && (
                   <td>
                     <Button color="red" onClick={() => setStopPlanModal(true)}>
-                      <IconPlayerPause fill="white" size={"1.2rem"}/>
+                      <IconPlayerStop fill="white" size={"1.2rem"}/>
                     </Button>
                   </td>
                 )}

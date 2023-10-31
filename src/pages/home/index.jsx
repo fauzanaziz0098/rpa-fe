@@ -71,20 +71,20 @@ export default function Home({ headers }) {
   }, []);
 
   useEffect(() => {
-    if (activePlan.length != 0) {
+    if (productionData.planningMachineActive) {
       client
-        .subscribe(`MC${activePlan.machine.id}:PLAN:RPA`, { qos: 2 })
+        .subscribe(`MC${productionData.planningMachineActive.machine.id}:PLAN:RPA`, { qos: 2 })
         .on("message", (topic, message) => {
-          if (topic == `MC${activePlan.machine.id}:PLAN:RPA`) {
+          if (topic == `MC${productionData.planningMachineActive.machine.id}:PLAN:RPA`) {
             setMqttData1(JSON.parse(message));
             console.log("message got");
           }
         });
       return () => {
-        client.unsubscribe(`MC${activePlan.machine.id}:PLAN:RPA`, { qos: 2 });
+        client.unsubscribe(`MC${productionData.planningMachineActive.machine.id}:PLAN:RPA`, { qos: 2 });
       };
     }
-  }, [activePlan]);
+  }, [productionData]);
 
   const handleMenuItemClickReport = (menuItem) => {
     setActiveMenuItem(menuItem === activeMenuItem ? null : menuItem);
@@ -871,7 +871,7 @@ export default function Home({ headers }) {
             height={60}
             style={{ marginLeft: "10px" }}
           />
-          <h1 style={{ marginLeft: "10px" }}>RW 05</h1>
+          <h1 style={{ marginLeft: "10px" }}>{activePlan?.machine?.name}</h1>
         </div>
         <div style={{ display: "flex" }}>
           <div
@@ -959,22 +959,211 @@ export default function Home({ headers }) {
               <p style={{ marginBottom: "33px" }}>:</p>
               <p>:</p>
             </div>
-            {activePlan.length == 0 ? (
+            {!productionData.planningMachineActive ? (
               <div>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    margin: "10px",
-                    backgroundColor: "#99c2a1",
-                    height: "75px",
-                    minWidth: "1190px",
-                  }}
-                >
-                  No Active Plan
+              <div
+                style={{
+                  backgroundColor: "gainsboro",
+                  marginLeft: "10px",
+                  height: "75px",
+                  minWidth: "1190px",
+                }}
+              >
+                <div>
+                  <div
+                    style={{
+                      display: "flex",
+                      marginTop: "10px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        marginTop: "-7px",
+                        marginLeft: "20px",
+                        gap: "70px",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      {productionData?.all?.map((value, key) => {
+                        return (
+                          <p
+                            key={key}
+                            style={{ width: "50px", textAlign: "center" }}
+                          >
+                            {value.time}
+                          </p>
+                        );
+                      })}
+                      <p
+                        style={{
+                          display: "flex",
+                          width: "100px",
+                          flexWrap: "nowrap",
+                          justifyContent: "center",
+                        }}
+                      >
+                        Total Shift
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      marginTop: "-16px",
+                      marginLeft: "20px",
+                      textAlign: "center",
+                      gap: "70px",
+                    }}
+                  >
+                    {productionData?.all?.map((value, key) => {
+                      return (
+                        <p
+                          key={key}
+                          style={{ width: "50px", textAlign: "center" }}
+                        >
+                          {value.duration}
+                        </p>
+                      );
+                    })}
+                    <p style={{ width: "100px" }}>
+                      {productionData?.all?.reduce(
+                        (total, value) => total + value.duration,
+                        0
+                      )}
+                    </p>
+                  </div>
                 </div>
               </div>
+              <div
+                style={{
+                  backgroundColor: "lightcyan",
+                  marginTop: "-15px",
+                  marginLeft: "10px",
+                  marginTop: "10px",
+                  height: "140px",
+                  textAlign: "center",
+                }}
+              >
+                <div>
+                  <div
+                    style={{
+                      display: "flex",
+                      marginTop: "10px",
+                      marginLeft: "20px",
+                      fontSize: "25px",
+                      fontWeight: "bold",
+                      color: "cornflowerblue",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        marginTop: "-20px",
+                        gap: "70px",
+                      }}
+                    >
+                      {productionData?.all?.map((value, key) => {
+                        return (
+                          <p
+                            key={key}
+                            style={{ width: "50px", textAlign: "center" }}
+                          >
+                            {value.target}
+                          </p>
+                        );
+                      })}
+
+                      <p style={{ width: "100px" }}>
+                        {productionData?.all?.reduce(
+                          (total, value) => total + value.target,
+                          0
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      fontSize: "35px",
+                      fontWeight: "bold",
+                      color: "gold",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        marginTop: "-40px",
+                        marginLeft: "20px",
+                        gap: "70px",
+                      }}
+                    >
+                      {productionData?.all?.map((value, key) => {
+                        return (
+                          <p
+                            key={key}
+                            style={{ width: "50px", textAlign: "center" }}
+                          >
+                            {value.time.split(":")[0] == new Date().getHours()
+                              ? 0 -
+                                productionData.all.reduce(
+                                  (total, value) => total + value.actual,
+                                  0
+                                )
+                              : value.actual}
+                          </p>
+                        );
+                      })}
+
+                      <p style={{ width: "100px" }}>
+                        {Number(0)}
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      fontSize: "22px",
+                      fontWeight: "bold",
+                      color: "firebrick",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        marginTop: "-40px",
+                        marginLeft: "28px",
+                        gap: "70px",
+                      }}
+                    >
+                      {productionData?.all?.map((value, key) => {
+                        return (
+                          <p
+                            key={key}
+                            style={{
+                              width: "50px",
+                              textAlign: "center",
+                            }}
+                          >
+                            0%
+                          </p>
+                        );
+                      })}
+
+                      <p
+                        style={{
+                          width: "100px",
+                        }}
+                      >
+                        0%
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
             ) : (
               <div>
                 <div

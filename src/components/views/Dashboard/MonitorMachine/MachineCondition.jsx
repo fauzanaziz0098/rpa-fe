@@ -110,50 +110,50 @@ const MachineCondition = ({activePlan, machineId}) => {
                         <tr>
                             <td width={"50%"}>{openModal?.data?.conditionMachine?.name}</td>
                             <td style={{ display: 'flex', gap: '10px' }}>
-                                <Button disabled={moment().diff(moment(activePlan.created_at), 'minutes') < 15 ? false : true} onClick={() => handleUpdateStatus(0)} style={{ opacity: `${moment().diff(moment(activePlan.created_at), 'minutes') < 15 ? '1' : '0.7'}`, background: 'lime', borderRadius: '2px' , width: '70px', height: '35px', boxShadow: `inset 5px 5px 5px green, inset -5px -5px 5px green`}}></Button>
-                                <Button disabled={moment().diff(moment(activePlan.created_at), 'minutes') < 15 ? false : true} onClick={() => handleUpdateStatus(1)} style={{ opacity: `${moment().diff(moment(activePlan.created_at), 'minutes') < 15 ? '1' : '0.7'}`, background: 'gold', borderRadius: '2px' , width: '70px', height: '35px', boxShadow: `inset 5px 5px 5px  #6c6e00, inset -5px -5px 5px #6c6e00`}}></Button>
-                                <Button disabled={moment().diff(moment(activePlan.created_at), 'minutes') < 15 ? false : true} onClick={() => handleUpdateStatus(2)} style={{ opacity: `${moment().diff(moment(activePlan.created_at), 'minutes') < 15 ? '1' : '0.7'}`, background: 'firebrick', borderRadius: '2px' , width: '70px', height: '35px', boxShadow: `inset 5px 5px 5px #400400, inset -5px -5px 5px #400400`}}></Button>
+                                <Button disabled={moment().diff(moment(activePlan?.created_at), 'minutes') < 15 ? false : true} onClick={() => handleUpdateStatus(0)} style={{ opacity: `${moment().diff(moment(activePlan?.created_at), 'minutes') < 15 ? '1' : '0.7'}`, background: 'lime', borderRadius: '2px' , width: '70px', height: '35px', boxShadow: `inset 5px 5px 5px green, inset -5px -5px 5px green`}}></Button>
+                                <Button disabled={moment().diff(moment(activePlan?.created_at), 'minutes') < 15 ? false : true} onClick={() => handleUpdateStatus(1)} style={{ opacity: `${moment().diff(moment(activePlan?.created_at), 'minutes') < 15 ? '1' : '0.7'}`, background: 'gold', borderRadius: '2px' , width: '70px', height: '35px', boxShadow: `inset 5px 5px 5px  #6c6e00, inset -5px -5px 5px #6c6e00`}}></Button>
+                                <Button disabled={moment().diff(moment(activePlan?.created_at), 'minutes') < 15 ? false : true} onClick={() => handleUpdateStatus(2)} style={{ opacity: `${moment().diff(moment(activePlan?.created_at), 'minutes') < 15 ? '1' : '0.7'}`, background: 'firebrick', borderRadius: '2px' , width: '70px', height: '35px', boxShadow: `inset 5px 5px 5px #400400, inset -5px -5px 5px #400400`}}></Button>
                             </td>
                         </tr>
                     </tbody>
                 </Table>
             </div>
         </Modal>
-
-        <div style={{ marginTop: '-16px' }}>
-            <p style={{ backgroundColor: 'gainsboro', padding: '10px' }}>Kondisi Mesin</p>
-        </div>
-        <div
-            style={{ backgroundColor: 'lavender', height: '266px', marginTop: '-16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
-        >
-            <ScrollArea>
-
-            {conditionMachineProductionDatas.map((row, index) => (
-                <div
-                    onClick={() => handleModalOpen(row)}
-                    key={index}
-                    style={{ cursor: 'pointer', marginTop: `${index != 0 ? '10px' : '0'}`, backgroundColor: 'lavender', borderRadius: '10px', height: '50px', width: '400px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '2px solid grey'}}>
-                    <p style={{ fontSize: '1.1rem', textAlign: 'center', marginLeft: '20px' }}>{row?.conditionMachine?.name}</p>
-                    <div style={{ backgroundColor: `${row?.status == 0 ? 'lime' : row?.status == 1 ? 'gold' : 'firebrick'}`, width: '70px', height: '35px', marginRight: '20px', boxShadow: `inset 5px 5px 5px  ${row?.status == 0 ? 'green' : row?.status == 1 ? '#6c6e00' : '#400400'}, inset -5px -5px 5px  ${row?.status == 0 ? 'green' : row?.status == 1 ? '#6c6e00' : '#400400'}`  }}></div>
+        {activePlan ? (
+            <>
+                <div style={{ marginTop: '-16px' }}>
+                    <p style={{ backgroundColor: 'gainsboro', padding: '10px' }}>Kondisi Mesin</p>
                 </div>
-            ))}
-            </ScrollArea>
-            {/* <div
-                style={{ backgroundColor: 'lavender', borderRadius: '10px', height: '50px', width: '400px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '10px', border: '2px solid grey'}}>
-                <p style={{ fontSize: '1.1rem', textAlign: 'center', marginLeft: '20px' }}>Zero Set Position Jig</p>
-                <div style={{ backgroundColor: 'gold', width: '70px', height: '35px', marginRight: '20px', boxShadow: 'inset 5px 5px 5px #6c6e00, inset -5px -5px 5px #6c6e00'  }}></div>
-            </div>
-            <div
-                style={{ backgroundColor: 'lavender', borderRadius: '10px', height: '50px', width: '400px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '10px', border: '2px solid grey'}}>
-                <p style={{ fontSize: '1.1rem', textAlign: 'center', marginLeft: '20px' }}>CO2 Gas</p>
-                <div style={{ backgroundColor: 'lime', width: '70px', height: '35px', marginRight: '20px', boxShadow: 'inset 5px 5px 5px green, inset -5px -5px 5px green'  }}></div>
-            </div>
-            <div
-                style={{ backgroundColor: 'lavender', borderRadius: '10px', height: '50px', width: '400px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '10px', border: '2px solid grey'}}>
-                <p style={{ fontSize: '1.1rem', textAlign: 'center', marginLeft: '20px' }}>Welding Jig</p>
-                <div style={{ backgroundColor: 'firebrick', width: '70px', height: '35px', marginRight: '20px', boxShadow: 'inset 5px 5px 5px #400400, inset -5px -5px 5px #400400'  }}></div>
-            </div> */}
-        </div>
+                <div
+                    style={{ backgroundColor: 'lavender', height: '266px', marginTop: '-16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+                >
+                    <ScrollArea>
+
+                    {conditionMachineProductionDatas.map((row, index) => (
+                        <div
+                            onClick={() => handleModalOpen(row)}
+                            key={index}
+                            style={{ cursor: 'pointer', marginTop: `${index != 0 ? '10px' : '0'}`, backgroundColor: 'lavender', borderRadius: '10px', height: '50px', width: '400px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '2px solid grey'}}>
+                            <p style={{ fontSize: '1.1rem', textAlign: 'center', marginLeft: '20px' }}>{row?.conditionMachine?.name}</p>
+                            <div style={{ backgroundColor: `${row?.status == 0 ? 'lime' : row?.status == 1 ? 'gold' : 'firebrick'}`, width: '70px', height: '35px', marginRight: '20px', boxShadow: `inset 5px 5px 5px  ${row?.status == 0 ? 'green' : row?.status == 1 ? '#6c6e00' : '#400400'}, inset -5px -5px 5px  ${row?.status == 0 ? 'green' : row?.status == 1 ? '#6c6e00' : '#400400'}`  }}></div>
+                        </div>
+                    ))}
+                    </ScrollArea>
+                </div>
+            </>
+        ) : (
+            <>
+               <div style={{ marginTop: '-16px' }}>
+                    <p style={{ backgroundColor: 'gainsboro', padding: '10px' }}>Kondisi Mesin</p>
+                </div>
+                <div
+                    style={{ backgroundColor: 'lavender', height: '266px', marginTop: '-16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+                >
+                    <ScrollArea>
+                    </ScrollArea>
+                </div>
+            </>
+        )}
     </div>
     )
 }
