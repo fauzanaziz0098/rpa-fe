@@ -230,12 +230,14 @@ const quality = calculateQuality();
             }
 
             newPlannedAvailability = Math.max(newPlannedAvailability, 0);
-            setPlannedAvailability(newPlannedAvailability + 10);
+            console.log(newPlannedAvailability + 10);
+            setPlannedAvailability(newPlannedAvailability + 10, 'inter');
         };
         calculatePlannedAvailability();
         const intervalId = setInterval(() => {
             calculatePlannedAvailability();
-        }, 600000);
+            // console.log(calculateAvailability, 'inter');
+        }, 1000);
 
         return () => {
             clearInterval(intervalId);
@@ -417,7 +419,7 @@ const quality = calculateQuality();
                 </div>
             </div>
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '-260px' }}>
-                <RingProgress sections={[{ value: finallyPercentage, color: 'green' }]} label={ <Text c="green" fw={700}
+                <RingProgress sections={[{ value: roundedPercentage, color: 'green' }]} label={ <Text c="green" fw={700}
                     ta="center" size="xl">
                     {roundedPercentage.toFixed()}%
                     </Text>
