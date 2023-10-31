@@ -101,6 +101,20 @@ const calculateQualityPercentage = () => {
 
 const qualityPercentage = calculateQualityPercentage();
 
+const calculateQuality = () => {
+    const qtyActual = mqttData1.qty_actual;
+    const qtyPlanning = activePlan.qty_planning;
+
+    if (qtyPlanning === 0) {
+        return 0;
+    }
+    const qualityPercentage = ((qtyActual - 0) / qtyPlanning);
+
+    return qualityPercentage;
+};
+
+const quality = calculateQuality();
+
 
     //   perfomance
     const [timeActual, setTimeActual] = useState(0);
@@ -168,6 +182,19 @@ const qualityPercentage = calculateQualityPercentage();
 
     const performancePercentage = calculatePerformancePercentage();
 
+    const calculatePerformance = () => {
+        const cycleTimeQtyActual = cycleTime * qtyActual;
+        if (timeActual === 0) {
+            return 0;
+        }
+        const performance = cycleTimeQtyActual / timeActual;
+        const performancePercentage = performance;
+        return performancePercentage;
+    };
+
+    const performance = calculatePerformance();
+    console.log(performance, 'per');
+
 
 
     //   availibity
@@ -212,10 +239,12 @@ const qualityPercentage = calculateQualityPercentage();
             
             let newPlannedActual = 0;
             
-            if (timeDifference >= 0) {
-                newPlannedActual = Math.floor(timeDifference / 10) * 10;
-            }
-            console.log(timeDifference, 'timediffrence');
+            // if (timeDifference >= 0) {
+            //     // newPlannedActual = Math.floor(timeDifference / 10) * 10;
+            //     console.log(newPlannedActual, 'timediffrence');
+            // }
+            
+            newPlannedActual = timeActual;
 
             if (activePlan.shift.no_plan_machine_id) {
                 const totalNoPlan = activePlan.shift.no_plan_machine_id.reduce((total, value) => total + value.total, 0);
@@ -248,7 +277,10 @@ const qualityPercentage = calculateQualityPercentage();
         const timeDifference = currentTime.diff(dateIn, 'minutes');
 
         const totalPlanningTime = mqttData2.TotalTime;
-        const availabilityPercentage = Math.round((timeDifference - totalPlanningTime) / timeDifference);
+        const availabilityPercentage = Math.round((timeDifference - totalPlanningTime) / timeDifference * 100);
+        const availability = ((timeDifference - totalPlanningTime) / timeDifference );
+        console.log(availability);
+
 
         return availabilityPercentage;
     };
@@ -258,7 +290,9 @@ const qualityPercentage = calculateQualityPercentage();
 
 
     // oee
-    const multipliedPercentage = availabilityPercentage * performancePercentage * qualityPercentage;
+    // const multipliedPercentage = availabilityPercentage * performance * quality;
+    const multipliedPercentage = Math.round(availabilityPercentage * performance * quality);
+
     const roundedPercentage = Math.round(multipliedPercentage);
 
     const resultPercentage = multipliedPercentage / 1000000;
