@@ -86,15 +86,19 @@ export default function Home() {
 
     // quality
     const qtyActual = mqttData1.qty_actual;
+    const qtyOk  = mqttData1.qty_actual - 0;
 
 const calculateQualityPercentage = () => {
     const qtyActual = mqttData1.qty_actual;
+    const qtyOk = mqttData1.qty_actual - 0;
     const qtyPlanning = activePlan.qty_planning;
 
     if (qtyPlanning === 0) {
         return 0;
     }
-    const qualityPercentage = Math.ceil((qtyActual - 0) / qtyPlanning);
+    // const qualityPercentage = Math.ceil((qtyActual - 0) / qtyPlanning);
+    const qualityPercentage = Math.round( qtyActual/ qtyOk * 100);
+
 
     return qualityPercentage;
 };
@@ -385,7 +389,8 @@ const quality = calculateQuality();
                         <Paper shadow="xs" withBorder style={{ marginLeft: '60px' }}>
                             <div style={{  textAlign: 'center' }}>
                                 <p>Availibity planned :{plannedAvailability} minutes</p>
-                                <p>Availibity actual : {plannedActual} minutes</p>
+                                {/* <p>Availibity actual : {plannedActual} minutes</p> */}
+                                <p>Availibity actual : {timeActual} minutes</p>
                             </div>
                         </Paper>
                 </div>
@@ -440,8 +445,8 @@ const quality = calculateQuality();
                             />
                             <Paper shadow="xs" withBorder style={{ marginRight: '10px' }}>
                                 <div style={{  textAlign: 'center' }}>
-                                    <p>Qty planned : 0 minutes</p>
-                                    <p>Qty actual : {qtyActual} minutes</p>
+                                    <p>Total Production : {qtyActual} Pcs</p>
+                                    <p>Total Product OK : {qtyOk} Pcs</p>
                                 </div>
                             </Paper>
                     </div>
