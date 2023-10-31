@@ -125,9 +125,9 @@ const qualityPercentage = calculateQualityPercentage();
         setTimeActual(additionalMinutes);
       
         const interval = setInterval(() => {
-          setTimeActual((prevTimeActual) => prevTimeActual + 60);
-        }, 3600000);
-      
+            setTimeActual((prevTimeActual) => prevTimeActual + 1);
+          }, 60000);
+                
         return () => {
           clearInterval(interval);
         };
