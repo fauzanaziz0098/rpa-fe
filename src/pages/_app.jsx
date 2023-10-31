@@ -19,7 +19,8 @@ function MyApp({ Component, pageProps }) {
     pathExcept == "sign-in" ||
     pathExcept == "home" ||
     pathExcept == "_error" ||
-    pathExcept == "monitor-o-e-e"
+    pathExcept == "monitor-o-e-e" ||
+    pathExcept == "achievement-oee"
   ) {
     return (
       <>
