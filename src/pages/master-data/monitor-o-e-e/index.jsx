@@ -218,20 +218,20 @@ const quality = calculateQuality();
             const currentTime = moment().tz("Asia/Bangkok");
             const timeDifference = currentTime.diff(startTime, 'minutes');
 
-            let newPlannedAvailability = 0;
+            // let newPlannedAvailability = 0;
 
-            if (timeDifference >= 0) {
-                newPlannedAvailability = Math.floor(timeDifference / 10) * 10;
-            }
+            // if (timeDifference >= 0) {
+            //     newPlannedAvailability = Math.floor(timeDifference / 10) * 10;
+            // }
 
-            if (activePlan.shift.no_plan_machine_id) {
-                const totalNoPlan = activePlan.shift.no_plan_machine_id.reduce((total, value) => total + value.total, 0);
-                newPlannedAvailability -= totalNoPlan;
-            }
+            // if (activePlan.shift.no_plan_machine_id) {
+            //     const totalNoPlan = activePlan.shift.no_plan_machine_id.reduce((total, value) => total + value.total, 0);
+            //     newPlannedAvailability -= totalNoPlan;
+            // }
 
-            newPlannedAvailability = Math.max(newPlannedAvailability, 0);
-            console.log(newPlannedAvailability + 10);
-            setPlannedAvailability(newPlannedAvailability);
+            // newPlannedAvailability = Math.max(newPlannedAvailability, 0);
+            // console.log(newPlannedAvailability + 10);
+            setPlannedAvailability(timeDifference);
         };
         calculatePlannedAvailability();
         const intervalId = setInterval(() => {
@@ -396,7 +396,7 @@ const quality = calculateQuality();
                         />
                         <Paper shadow="xs" withBorder style={{ marginLeft: '60px' }}>
                             <div style={{  textAlign: 'center' }}>
-                                <p>Availibity planned :{timeActual} minutes</p>
+                                <p>Availibity planned :{plannedAvailability} minutes</p>
                                 {/* <p>Availibity actual : {plannedActual} minutes</p> */}
                                 <p>Availibity actual : {timeActual} minutes</p>
                             </div>
