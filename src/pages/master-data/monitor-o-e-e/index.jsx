@@ -37,6 +37,10 @@ export default function Home() {
     const [activePlan, setActivePlan] = useState([])
     const [noPlanToday, setNoPlanToday] = useState([])
 
+    console.log(mqttData1, 'mqdata1');
+    console.log(mqttData2, 'mqdata2');
+
+    console.log(activePlan, 'activeplan');
 
     const fetchActiveData = async () => {
         try {
@@ -79,31 +83,50 @@ export default function Home() {
         fetchActiveData()
     }, [])
 
-    console.log(mqttData1, 'mqtt');
-    console.log(mqttData2, 'mqtt2');
-    console.log(activePlan, 'acmqtt');
 
     // quality
     const qtyActual = mqttData1.qty_actual;
+    const qtyOk  = mqttData1.qty_actual - 0;
 
 const calculateQualityPercentage = () => {
     const qtyActual = mqttData1.qty_actual;
+    const qtyOk = mqttData1.qty_actual - 0;
     const qtyPlanning = activePlan.qty_planning;
 
     if (qtyPlanning === 0) {
         return 0;
     }
-    const qualityPercentage = Math.ceil((qtyActual - 0) / qtyPlanning);
+    // const qualityPercentage = Math.ceil((qtyActual - 0) / qtyPlanning);
+    const qualityPercentage = Math.round( qtyActual/ qtyOk * 100);
+
+    if (isNaN(qualityPercentage)) {
+        return 0;
+    }
+
 
     return qualityPercentage;
 };
 
 const qualityPercentage = calculateQualityPercentage();
 
+const calculateQuality = () => {
+    const qtyActual = mqttData1.qty_actual;
+    const qtyPlanning = activePlan.qty_planning;
+
+    if (qtyPlanning === 0) {
+        return 0;
+    }
+    const qualityPercentage = (qtyActual/ qtyOk);
+    console.log(qualityPercentage, 'qua');
+
+    return qualityPercentage;
+};
+
+const quality = calculateQuality();
+
 
     //   perfomance
     const [timeActual, setTimeActual] = useState(0);
-    console.log(timeActual, 'time');
     const [startTime, setStartTime] = useState(null);
     //   useEffect(() => {
     //     const interval = setInterval(() => {
@@ -120,15 +143,14 @@ const qualityPercentage = calculateQualityPercentage();
         const initialTimeDifferenceInMinutes = currentTime.diff(startTime, 'minutes');
         // const fixedMinutes = Math.min(initialTimeDifferenceInMinutes, 47);
         const fixedMinutes = Math.min(initialTimeDifferenceInMinutes,(moment(activePlan.date_time_in).add(1, 'hour').minute(0).diff(moment(activePlan.date_time_in), 'minute')))
-        // console.log(fixedMinutes, 'ozan');
         const additionalMinutes = fixedMinutes + Math.floor((initialTimeDifferenceInMinutes - fixedMinutes) / 60) * 60; 
       
         setTimeActual(additionalMinutes);
       
         const interval = setInterval(() => {
-          setTimeActual((prevTimeActual) => prevTimeActual + 60);
-        }, 3600000);
-      
+            setTimeActual((prevTimeActual) => prevTimeActual + 1);
+          }, 60000);
+                
         return () => {
           clearInterval(interval);
         };
@@ -155,19 +177,35 @@ const qualityPercentage = calculateQualityPercentage();
     //   }, [activePlan.date_time_in]);
 
     const cycleTime = activePlan.product ? activePlan.product.cycle_time : 0;
-    const timePlanned = cycleTime * qtyActual;
+    const timePlanned = Math.round(cycleTime * qtyActual / 60);
 
     const calculatePerformancePercentage = () => {
-        const cycleTimeQtyActual = cycleTime * qtyActual;
+        // const cycleTimeQtyActual = cycleTime * qtyActual;
         if (timeActual === 0) {
             return 0;
         }
-        const performance = cycleTimeQtyActual / timeActual;
+        const performance = timePlanned / timeActual * 100;
+        console.log(timeActual, 'timeactual');
+        console.log(timePlanned, 'timeplanned');
+        console.log(performance, 'per');
         const performancePercentage = Math.round(performance);
         return performancePercentage;
     };
 
     const performancePercentage = calculatePerformancePercentage();
+
+    const calculatePerformance = () => {
+        const cycleTimeQtyActual = cycleTime * qtyActual;
+        if (timeActual === 0) {
+            return 0;
+        }
+        const performance = timePlanned / timeActual;
+        const performancePercentage = performance;
+        return performancePercentage;
+    };
+
+    const performance = calculatePerformance();
+    console.log(performance, 'per');
 
 
 
@@ -192,12 +230,14 @@ const qualityPercentage = calculateQualityPercentage();
             }
 
             newPlannedAvailability = Math.max(newPlannedAvailability, 0);
-            setPlannedAvailability(newPlannedAvailability);
+            console.log(newPlannedAvailability + 10);
+            setPlannedAvailability(newPlannedAvailability + 10, 'inter');
         };
         calculatePlannedAvailability();
         const intervalId = setInterval(() => {
             calculatePlannedAvailability();
-        }, 600000);
+            // console.log(calculateAvailability, 'inter');
+        }, 1000);
 
         return () => {
             clearInterval(intervalId);
@@ -210,12 +250,15 @@ const qualityPercentage = calculateQualityPercentage();
             const startTime = moment(activePlan.date_time_in).tz("Asia/Bangkok");
             const currentTime = moment().tz("Asia/Bangkok");
             const timeDifference = currentTime.diff(startTime, 'minutes');
-
+            
             let newPlannedActual = 0;
-
-            if (timeDifference >= 0) {
-                newPlannedActual = Math.floor(timeDifference / 10) * 10;
-            }
+            
+            // if (timeDifference >= 0) {
+            //     // newPlannedActual = Math.floor(timeDifference / 10) * 10;
+            //     console.log(newPlannedActual, 'timediffrence');
+            // }
+            
+            newPlannedActual = timeActual;
 
             if (activePlan.shift.no_plan_machine_id) {
                 const totalNoPlan = activePlan.shift.no_plan_machine_id.reduce((total, value) => total + value.total, 0);
@@ -238,7 +281,6 @@ const qualityPercentage = calculateQualityPercentage();
         };
     }, [activePlan, mqttData2.TotalTime]);
 
-    console.log(timeActual, 'timeactual');
     const calculateAvailabilityPercentage = () => {
         if (timeActual === 0) {
             return 0;
@@ -249,22 +291,41 @@ const qualityPercentage = calculateQualityPercentage();
         const timeDifference = currentTime.diff(dateIn, 'minutes');
 
         const totalPlanningTime = mqttData2.TotalTime;
-        console.log(timeDifference, 'timedifference');
-        console.log(timeDifference, 'timediff');
-        const availabilityPercentage = Math.round((timeDifference - totalPlanningTime) / timeDifference);
+        // const availabilityPercentage = Math.round((timeDifference - totalPlanningTime) / timeDifference * 100);
+        const availabilityPercentage = Math.round(timeActual / plannedAvailability * 100);
+
+
 
         return availabilityPercentage;
     };
 
     const availabilityPercentage = calculateAvailabilityPercentage();
 
+    const calculateAvailability = () => {
+        if (timeActual === 0) {
+            return 0;
+        }
+
+        const currentTime = moment().tz("Asia/Bangkok");
+        const dateIn = moment(activePlan.date_time_in).tz("Asia/Bangkok");
+        const timeDifference = currentTime.diff(dateIn, 'minutes');
+
+        const totalPlanningTime = mqttData2.TotalTime;
+        const availability = (timeActual / plannedAvailability );
+        console.log(availability, 'ava');
+
+
+        return availability;
+    };
+
+    const availability = calculateAvailability();
+
 
 
     // oee
-    const multipliedPercentage = availabilityPercentage * performancePercentage * qualityPercentage;
-    console.log(availabilityPercentage, 'ava');
-    console.log(performancePercentage, 'perfom');
-    console.log(qualityPercentage, 'quality');
+    // const multipliedPercentage = availabilityPercentage * performance * quality;
+    const multipliedPercentage = availability * performance * quality * 100;
+
     const roundedPercentage = Math.round(multipliedPercentage);
 
     const resultPercentage = multipliedPercentage / 1000000;
@@ -336,7 +397,8 @@ const qualityPercentage = calculateQualityPercentage();
                         <Paper shadow="xs" withBorder style={{ marginLeft: '60px' }}>
                             <div style={{  textAlign: 'center' }}>
                                 <p>Availibity planned :{plannedAvailability} minutes</p>
-                                <p>Availibity actual : {plannedActual} minutes</p>
+                                {/* <p>Availibity actual : {plannedActual} minutes</p> */}
+                                <p>Availibity actual : {timeActual} minutes</p>
                             </div>
                         </Paper>
                 </div>
@@ -357,7 +419,7 @@ const qualityPercentage = calculateQualityPercentage();
                 </div>
             </div>
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '-260px' }}>
-                <RingProgress sections={[{ value: finallyPercentage, color: 'green' }]} label={ <Text c="green" fw={700}
+                <RingProgress sections={[{ value: roundedPercentage, color: 'green' }]} label={ <Text c="green" fw={700}
                     ta="center" size="xl">
                     {roundedPercentage.toFixed()}%
                     </Text>
@@ -372,8 +434,8 @@ const qualityPercentage = calculateQualityPercentage();
                         <Image alt="" src={table} width={300} />
                         <div
                             style={{ display: 'flex', fontSize: '50px', fontWeight: 'bold', color: 'skyblue', justifyContent: 'space-between', marginTop: '-130px' }}>
-                            <p style={{ marginLeft: '30px' }}>75%</p>
-                            <p style={{ marginRight: '10px' }}>100%</p>
+                            <p style={{ marginLeft: '30px' }}>-%</p>
+                            <p style={{ marginRight: '10px' }}>-%</p>
                         </div>
                     </div>
                 </div>
@@ -391,8 +453,8 @@ const qualityPercentage = calculateQualityPercentage();
                             />
                             <Paper shadow="xs" withBorder style={{ marginRight: '10px' }}>
                                 <div style={{  textAlign: 'center' }}>
-                                    <p>Qty planned : 0 minutes</p>
-                                    <p>Qty actual : {qtyActual} minutes</p>
+                                    <p>Total Production : {qtyActual} Pcs</p>
+                                    <p>Total Product OK : {qtyOk} Pcs</p>
                                 </div>
                             </Paper>
                     </div>

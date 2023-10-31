@@ -64,8 +64,6 @@ export default function Home() {
         fetchActiveData()
     },[])
 
-    console.log(mqttData1, 'mqtt');
-    console.log(activePlan, 'acmqtt');
 
     // quality
     const qtyActual = mqttData1.qty_actual;
@@ -86,7 +84,6 @@ export default function Home() {
 
     //   perfomance
       const [timeActual, setTimeActual] = useState(0);
-      console.log(timeActual, 'time');
       const updateActualTime = () => {
         const currentTime = moment().tz("Asia/Bangkok");
         const dateIn = moment(activePlan.date_time_in).tz("Asia/Bangkok");
