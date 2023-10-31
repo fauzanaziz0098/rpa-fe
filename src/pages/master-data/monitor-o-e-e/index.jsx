@@ -37,6 +37,10 @@ export default function Home() {
     const [activePlan, setActivePlan] = useState([])
     const [noPlanToday, setNoPlanToday] = useState([])
 
+    console.log(mqttData1, 'mqdata1');
+    console.log(mqttData2, 'mqdata2');
+
+    console.log(activePlan, 'activeplan');
 
     const fetchActiveData = async () => {
         try {
@@ -150,7 +154,7 @@ const qualityPercentage = calculateQualityPercentage();
     //   }, [activePlan.date_time_in]);
 
     const cycleTime = activePlan.product ? activePlan.product.cycle_time : 0;
-    const timePlanned = cycleTime * qtyActual;
+    const timePlanned = cycleTime * qtyActual / 60;
 
     const calculatePerformancePercentage = () => {
         const cycleTimeQtyActual = cycleTime * qtyActual;
@@ -205,12 +209,13 @@ const qualityPercentage = calculateQualityPercentage();
             const startTime = moment(activePlan.date_time_in).tz("Asia/Bangkok");
             const currentTime = moment().tz("Asia/Bangkok");
             const timeDifference = currentTime.diff(startTime, 'minutes');
-
+            
             let newPlannedActual = 0;
-
+            
             if (timeDifference >= 0) {
                 newPlannedActual = Math.floor(timeDifference / 10) * 10;
             }
+            console.log(timeDifference, 'timediffrence');
 
             if (activePlan.shift.no_plan_machine_id) {
                 const totalNoPlan = activePlan.shift.no_plan_machine_id.reduce((total, value) => total + value.total, 0);
