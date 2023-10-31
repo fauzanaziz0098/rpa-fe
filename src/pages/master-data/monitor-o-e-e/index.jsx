@@ -145,7 +145,7 @@ const quality = calculateQuality();
         const fixedMinutes = Math.min(initialTimeDifferenceInMinutes,(moment(activePlan.date_time_in).add(1, 'hour').minute(0).diff(moment(activePlan.date_time_in), 'minute')))
         const additionalMinutes = fixedMinutes + Math.floor((initialTimeDifferenceInMinutes - fixedMinutes) / 60) * 60; 
       
-        setTimeActual(additionalMinutes);
+        setTimeActual(initialTimeDifferenceInMinutes);
       
         const interval = setInterval(() => {
             setTimeActual((prevTimeActual) => prevTimeActual + 1);
@@ -259,15 +259,17 @@ const quality = calculateQuality();
             // }
             
             newPlannedActual = timeActual;
-
+let noPlnaTempry=0
             if (activePlan.shift.no_plan_machine_id) {
-                const totalNoPlan = activePlan.shift.no_plan_machine_id.reduce((total, value) => total + value.total, 0);
-                newPlannedActual -= totalNoPlan;
+                console.log(activePlan.shift.no_plan_machine_id, 'total');
+                const totalNoPlan = activePlan.shift.no_plan_machine_id.reduce((total, value) => total ?? 0 + value.total, 0);
+                noPlnaTempry = totalNoPlan ?? 0;
             }
 
             newPlannedActual = Math.max(newPlannedActual, 0);
             newPlannedActual -= mqttData2.TotalTime;
-            setPlannedActual(newPlannedActual);
+            console.log(mqttData2, 'total time', timeDifference, newPlannedActual);
+            setPlannedActual(timeDifference-mqttData2.TotalTime -noPlnaTempry ?? 0);
         };
 
         calculatePlannedActual();
@@ -292,8 +294,13 @@ const quality = calculateQuality();
 
         const totalPlanningTime = mqttData2.TotalTime;
         // const availabilityPercentage = Math.round((timeDifference - totalPlanningTime) / timeDifference * 100);
-        const availabilityPercentage = Math.round(timeActual / plannedAvailability * 100);
-
+        let noPlnaTempry=0
+        if (activePlan.shift.no_plan_machine_id) {
+            console.log(activePlan.shift.no_plan_machine_id, 'total');
+            const totalNoPlan = activePlan.shift.no_plan_machine_id.reduce((total, value) => total ?? 0 + value.total, 0);
+            noPlnaTempry = totalNoPlan ?? 0;
+        }
+        const availabilityPercentage = Math.round((timeDifference - totalPlanningTime - noPlnaTempry) / plannedAvailability * 100);
 
 
         return availabilityPercentage;
@@ -310,8 +317,17 @@ const quality = calculateQuality();
         const dateIn = moment(activePlan.date_time_in).tz("Asia/Bangkok");
         const timeDifference = currentTime.diff(dateIn, 'minutes');
 
+        let noPlnaTempry=0
+        if (activePlan.shift.no_plan_machine_id) {
+            console.log(activePlan.shift.no_plan_machine_id, 'total');
+            const totalNoPlan = activePlan.shift.no_plan_machine_id.reduce((total, value) => total ?? 0 + value.total, 0);
+            noPlnaTempry = totalNoPlan ?? 0;
+        }
+        // const availabilityPercentage = Math.round((timeDifference - totalPlanningTime - noPlnaTempry) / plannedAvailability * 100);
+
+
         const totalPlanningTime = mqttData2.TotalTime;
-        const availability = (timeActual / plannedAvailability );
+        const availability = ((timeDifference - totalPlanningTime - noPlnaTempry) / plannedAvailability );
         console.log(availability, 'ava');
 
 
@@ -321,6 +337,7 @@ const quality = calculateQuality();
     const availability = calculateAvailability();
 
 
+    console.log(availability, '==', performance, '===', quality, '==');
 
     // oee
     // const multipliedPercentage = availabilityPercentage * performance * quality;
@@ -397,8 +414,8 @@ const quality = calculateQuality();
                         <Paper shadow="xs" withBorder style={{ marginLeft: '60px' }}>
                             <div style={{  textAlign: 'center' }}>
                                 <p>Availibity planned :{plannedAvailability} minutes</p>
-                                {/* <p>Availibity actual : {plannedActual} minutes</p> */}
-                                <p>Availibity actual : {timeActual} minutes</p>
+                                <p>Availibity actual : {plannedActual} minutes</p>
+                                {/* <p>Availibity actual : {timeActual} minutes</p> */}
                             </div>
                         </Paper>
                 </div>
