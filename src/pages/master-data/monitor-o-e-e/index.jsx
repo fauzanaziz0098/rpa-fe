@@ -99,6 +99,10 @@ const calculateQualityPercentage = () => {
     // const qualityPercentage = Math.ceil((qtyActual - 0) / qtyPlanning);
     const qualityPercentage = Math.round( qtyActual/ qtyOk * 100);
 
+    if (isNaN(qualityPercentage)) {
+        return 0;
+    }
+
 
     return qualityPercentage;
 };
@@ -112,7 +116,7 @@ const calculateQuality = () => {
     if (qtyPlanning === 0) {
         return 0;
     }
-    const qualityPercentage = ((qtyActual - 0) / qtyPlanning) / 100;
+    const qualityPercentage = (qtyActual/ qtyOk);
     console.log(qualityPercentage, 'qua');
 
     return qualityPercentage;
@@ -195,7 +199,7 @@ const quality = calculateQuality();
         if (timeActual === 0) {
             return 0;
         }
-        const performance = cycleTimeQtyActual / timeActual / 100;
+        const performance = timePlanned / timeActual;
         const performancePercentage = performance;
         return performancePercentage;
     };
@@ -305,7 +309,7 @@ const quality = calculateQuality();
         const timeDifference = currentTime.diff(dateIn, 'minutes');
 
         const totalPlanningTime = mqttData2.TotalTime;
-        const availability = ((timeDifference - totalPlanningTime) / timeDifference );
+        const availability = (timeActual / plannedAvailability );
         console.log(availability, 'ava');
 
 
