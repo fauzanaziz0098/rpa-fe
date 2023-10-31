@@ -285,7 +285,9 @@ const quality = calculateQuality();
         const timeDifference = currentTime.diff(dateIn, 'minutes');
 
         const totalPlanningTime = mqttData2.TotalTime;
-        const availabilityPercentage = Math.round((timeDifference - totalPlanningTime) / timeDifference * 100);
+        // const availabilityPercentage = Math.round((timeDifference - totalPlanningTime) / timeDifference * 100);
+        const availabilityPercentage = Math.round(timeActual / plannedAvailability * 100);
+
 
 
         return availabilityPercentage;
