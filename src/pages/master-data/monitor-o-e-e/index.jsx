@@ -172,11 +172,14 @@ const quality = calculateQuality();
     const timePlanned = Math.round(cycleTime * qtyActual / 60);
 
     const calculatePerformancePercentage = () => {
-        const cycleTimeQtyActual = cycleTime * qtyActual;
+        // const cycleTimeQtyActual = cycleTime * qtyActual;
         if (timeActual === 0) {
             return 0;
         }
-        const performance = cycleTimeQtyActual / timeActual;
+        const performance = timePlanned / timeActual * 100;
+        console.log(timeActual, 'timeactual');
+        console.log(timePlanned, 'timeplanned');
+        console.log(performance, 'per');
         const performancePercentage = Math.round(performance);
         return performancePercentage;
     };
