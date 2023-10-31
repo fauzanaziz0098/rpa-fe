@@ -191,7 +191,7 @@ const qualityPercentage = calculateQualityPercentage();
             }
 
             newPlannedAvailability = Math.max(newPlannedAvailability, 0);
-            setPlannedAvailability(newPlannedAvailability);
+            setPlannedAvailability(newPlannedAvailability + 10);
         };
         calculatePlannedAvailability();
         const intervalId = setInterval(() => {
