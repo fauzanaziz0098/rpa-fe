@@ -400,8 +400,8 @@ const quality = calculateQuality();
                         <Image alt="" src={table} width={300} />
                         <div
                             style={{ display: 'flex', fontSize: '50px', fontWeight: 'bold', color: 'skyblue', justifyContent: 'space-between', marginTop: '-130px' }}>
-                            <p style={{ marginLeft: '30px' }}>75%</p>
-                            <p style={{ marginRight: '10px' }}>100%</p>
+                            <p style={{ marginLeft: '30px' }}>-%</p>
+                            <p style={{ marginRight: '10px' }}>-%</p>
                         </div>
                     </div>
                 </div>
