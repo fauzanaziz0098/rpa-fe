@@ -154,7 +154,7 @@ const qualityPercentage = calculateQualityPercentage();
     //   }, [activePlan.date_time_in]);
 
     const cycleTime = activePlan.product ? activePlan.product.cycle_time : 0;
-    const timePlanned = cycleTime * qtyActual / 60;
+    const timePlanned = Math.round(cycleTime * qtyActual / 60);
 
     const calculatePerformancePercentage = () => {
         const cycleTimeQtyActual = cycleTime * qtyActual;
