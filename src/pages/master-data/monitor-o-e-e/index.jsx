@@ -210,7 +210,7 @@ const quality = calculateQuality();
 
 
     //   availibity
-    const [plannedAvailability, setPlannedAvailability] = useState(10);
+    const [plannedAvailability, setPlannedAvailability] = useState(0);
 
     useEffect(() => {
         const calculatePlannedAvailability = () => {
@@ -231,7 +231,7 @@ const quality = calculateQuality();
 
             newPlannedAvailability = Math.max(newPlannedAvailability, 0);
             console.log(newPlannedAvailability + 10);
-            setPlannedAvailability(newPlannedAvailability + 10, 'inter');
+            setPlannedAvailability(newPlannedAvailability);
         };
         calculatePlannedAvailability();
         const intervalId = setInterval(() => {
@@ -396,7 +396,7 @@ const quality = calculateQuality();
                         />
                         <Paper shadow="xs" withBorder style={{ marginLeft: '60px' }}>
                             <div style={{  textAlign: 'center' }}>
-                                <p>Availibity planned :{plannedAvailability} minutes</p>
+                                <p>Availibity planned :{timeActual} minutes</p>
                                 {/* <p>Availibity actual : {plannedActual} minutes</p> */}
                                 <p>Availibity actual : {timeActual} minutes</p>
                             </div>
