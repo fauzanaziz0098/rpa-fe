@@ -108,7 +108,8 @@ const calculateQuality = () => {
     if (qtyPlanning === 0) {
         return 0;
     }
-    const qualityPercentage = ((qtyActual - 0) / qtyPlanning);
+    const qualityPercentage = ((qtyActual - 0) / qtyPlanning) / 100;
+    console.log(qualityPercentage, 'qua');
 
     return qualityPercentage;
 };
@@ -187,7 +188,7 @@ const quality = calculateQuality();
         if (timeActual === 0) {
             return 0;
         }
-        const performance = cycleTimeQtyActual / timeActual;
+        const performance = cycleTimeQtyActual / timeActual / 100;
         const performancePercentage = performance;
         return performancePercentage;
     };
@@ -278,8 +279,6 @@ const quality = calculateQuality();
 
         const totalPlanningTime = mqttData2.TotalTime;
         const availabilityPercentage = Math.round((timeDifference - totalPlanningTime) / timeDifference * 100);
-        const availability = ((timeDifference - totalPlanningTime) / timeDifference );
-        console.log(availability);
 
 
         return availabilityPercentage;
@@ -287,11 +286,30 @@ const quality = calculateQuality();
 
     const availabilityPercentage = calculateAvailabilityPercentage();
 
+    const calculateAvailability = () => {
+        if (timeActual === 0) {
+            return 0;
+        }
+
+        const currentTime = moment().tz("Asia/Bangkok");
+        const dateIn = moment(activePlan.date_time_in).tz("Asia/Bangkok");
+        const timeDifference = currentTime.diff(dateIn, 'minutes');
+
+        const totalPlanningTime = mqttData2.TotalTime;
+        const availability = ((timeDifference - totalPlanningTime) / timeDifference );
+        console.log(availability, 'ava');
+
+
+        return availability;
+    };
+
+    const availability = calculateAvailability();
+
 
 
     // oee
     // const multipliedPercentage = availabilityPercentage * performance * quality;
-    const multipliedPercentage = Math.round(availabilityPercentage * performance * quality);
+    const multipliedPercentage = availability * performance * quality * 100;
 
     const roundedPercentage = Math.round(multipliedPercentage);
 
