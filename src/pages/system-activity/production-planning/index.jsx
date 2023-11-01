@@ -52,7 +52,10 @@ export default function PlanningPageIndex({errors}) {
     data: null,
   })
   
-  const [stopPlanModal, setStopPlanModal] = useState(false)
+  const [stopPlanModal, setStopPlanModal] = useState({
+    isOpen: false,
+    data: null
+  })
 
   const [qtyReject, setQtyReject] = useState("")
 
@@ -151,8 +154,8 @@ export default function PlanningPageIndex({errors}) {
 
   const stopPlan = async () => {
     try {
-      await axiosPlanning.post('planning-production/stop-planning-production', {}, getHeaderConfigAxios())
-      setStopPlanModal(false)
+      await axiosPlanning.post('planning-production/stop-planning-production', {machine: stopPlanModal?.data?.machine?.id}, getHeaderConfigAxios())
+      setStopPlanModal({isOpen: false, data: null})
        showNotification({
         title: "Success",
         message: "Plan Stopped",
@@ -219,9 +222,9 @@ export default function PlanningPageIndex({errors}) {
       </Modal>
 
       {/* modal stop plan */}
-      <Modal size='auto' opened={stopPlanModal} onClose={() => setStopPlanModal(false)} title="Apakah Anda ingin menghentikan plan?">
+      <Modal size='auto' opened={stopPlanModal.isOpen} onClose={() => setStopPlanModal({isOpen: false, data: null})} title="Apakah Anda ingin menghentikan plan?">
         <Flex mt="lg" justify='center' gap='5px'>
-          <Button onClick={() => setStopPlanModal(false)} color="red">No</Button>
+          <Button onClick={() => setStopPlanModal({isOpen: false, data: null})} color="red">No</Button>
           <Button onClick={() => stopPlan()}>Yes</Button>
         </Flex>
       </Modal>
@@ -313,7 +316,7 @@ export default function PlanningPageIndex({errors}) {
                 </td>
                 {filter.values.status == "run" && (
                   <td>
-                    <Button color="red" onClick={() => setStopPlanModal(true)}>
+                    <Button color="red" onClick={() => setStopPlanModal({isOpen: true, data: item})}>
                       <IconPlayerStop fill="white" size={"1.2rem"}/>
                     </Button>
                   </td>

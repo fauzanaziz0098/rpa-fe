@@ -47,10 +47,13 @@ export default function Home({ headers }) {
   const isDashboardVisible = !isFullActive;
   const [activePlan, setActivePlan] = useState([]);
   const [productionData, setProductionData] = useState([]);
+  const [machines, setMachines] = useState([])
+  const [machinePlan, setMachinePlan] = useState(null)
+  
 
-  const fetchData = async () => {
+  const fetchData = async (machineId) => {
     try {
-      const res = await axiosHour.get(`production/data-active-new`, headers);
+      const res = await axiosHour.get(`production/data-active-new/${machineId}`, headers);
       setProductionData(res.data.data);
       setActivePlan(res.data.data.planningMachineActive);
     } catch (error) {
@@ -58,17 +61,45 @@ export default function Home({ headers }) {
       console.log(error, "production fetch error");
     }
   };
+  const fetchMachines = async () => {
+    try {
+      const res = await axiosPlanning.get('machine', headers)
+      const machines = res.data.data.map(item => {
+        return {
+          label: item.name,
+          value: item.id
+        }
+      })
+      setMachines(machines)
+    } catch (error) {
+      console.log(error, 'machines')
+    }
+  }
   useEffect(() => {
-    fetchData();
-    setInterval(async () => {
-      try {
-        console.log("re-fetch");
-        fetchData();
-      } catch (error) {
-        console.log(error, "error refetch");
+    fetchMachines();
+  }, [])
+
+  useEffect(() => {
+    if (machines.length > 0) {
+      fetchData(machines[0].value);
+      setMachinePlan(machines[0].value)
+    }
+  }, [machines])
+
+  useEffect(() => {
+    fetchData(machinePlan);
+    const interval = setInterval(async () => {
+      if (machinePlan) {
+        try {
+          console.log("re-fetch");
+          fetchData(machinePlan);
+        } catch (error) {
+          console.log(error, "error refetch");
+        }
       }
-    }, 1000 * 60);
-  }, []);
+    }, 1000 * 10);
+    return () => clearInterval(interval);
+  }, [machinePlan]);
 
   useEffect(() => {
     if (productionData.planningMachineActive) {
@@ -871,7 +902,14 @@ export default function Home({ headers }) {
             height={60}
             style={{ marginLeft: "10px" }}
           />
-          <h1 style={{ marginLeft: "10px" }}>{activePlan?.machine?.name}</h1>
+          {/* <h1 style={{ marginLeft: "10px" }}>{activePlan?.machine?.name}</h1> */}
+          <Select
+            style={{ marginLeft: "10px"  }}
+            placeholder="Pilih Mesin"
+            value={machinePlan}
+            data={machines}
+            onChange={(e) => setMachinePlan(e)}
+          />
         </div>
         <div style={{ display: "flex" }}>
           <div
@@ -1108,7 +1146,7 @@ export default function Home({ headers }) {
                                   {value.time.split(":")[0] == new Date().getHours()
                                     ? 0 -
                                       productionData.all.reduce(
-                                        (total, value) => total + value.actual,
+                                        (total, value) => total ? total : 0 + value.actual,
                                         0
                                       )
                                     : value.actual}
@@ -1313,9 +1351,9 @@ export default function Home({ headers }) {
                                   style={{ width: "50px", textAlign: "center" }}
                                 >
                                   {value.time.split(":")[0] == new Date().getHours()
-                                    ? mqttData1.qty_actual -
+                                    ? Number(mqttData1.qty_actual) -
                                       productionData.all.reduce(
-                                        (total, value) => total + value.actual,
+                                        (total, value) => total ? total : 0 + value.actual,
                                         0
                                       )
                                     : value.actual}
@@ -1358,7 +1396,7 @@ export default function Home({ headers }) {
                                             ((mqttData1.qty_actual -
                                               productionData.all.reduce(
                                                 (total, value) =>
-                                                  total + value.actual,
+                                                  total ? total : 0 + value.actual,
                                                 0
                                               )) /
                                               value.target) *
@@ -1374,7 +1412,7 @@ export default function Home({ headers }) {
                                     ? Math.round(
                                         ((mqttData1.qty_actual -
                                           productionData.all.reduce(
-                                            (total, value) => total + value.actual,
+                                            (total, value) => total ? total : 0 + value.actual,
                                             0
                                           )) /
                                           (value.target ? value.target : 0.1)) *
@@ -1406,7 +1444,7 @@ export default function Home({ headers }) {
                               {Math.round(
                                 (Number(mqttData1.qty_actual) /
                                   productionData?.all?.reduce(
-                                    (total, value) => total + (value.target ? value.target : 0.1),
+                                    (total, value) => (total ? total : 0) + (value.target),
                                     0
                                   )) *
                                   100
