@@ -33,16 +33,36 @@ export default function MachineStopPageIndex() {
       setLoadingState(false);
     }
   };
+  const refetch = async (params = null) => {
+    try {
+      const { data } = await index(params);
+      setItems(data.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   useEffect(() => {
-    getItems();
+    filter.setFieldValue("date", new Date());
   }, []);
   useEffect(() => {
+    // console.log(filter.values.date, "date");
     if (filter.values.date) {
       getItems(
         new URLSearchParams({
           date: dayjs(filter.values.date).format("YYYY-MM-DD"),
         }).toString()
       );
+      const interval = setInterval(() => {
+        if (filter.values.date) {
+          refetch(
+            new URLSearchParams({
+              date: dayjs(filter.values.date).format("YYYY-MM-DD"),
+            }).toString()
+          );
+        }
+      }, 5000); // Set interval ke 10 detik
+
+      return () => clearInterval(interval);
     }
   }, [filter.values.date]);
   return (
@@ -51,6 +71,7 @@ export default function MachineStopPageIndex() {
       <Grid columns={12} my={"md"}>
         <Grid.Col span={4}>
           <DatePicker
+            clearable={false}
             {...filter.getInputProps("date")}
             label={"Date"}
             placeholder={"choose a date"}

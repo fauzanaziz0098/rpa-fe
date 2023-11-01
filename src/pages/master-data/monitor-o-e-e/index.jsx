@@ -35,17 +35,23 @@ export default function Home() {
     const [mqttData2, setMqttData2] = useState([])
 
     const [activePlan, setActivePlan] = useState([])
+    const [shift, setShift] = useState([])
     const [noPlanToday, setNoPlanToday] = useState([])
 
     console.log(mqttData1, 'mqdata1');
     console.log(mqttData2, 'mqdata2');
 
     console.log(activePlan, 'activeplan');
+    console.log(noPlanToday, 'hsgnoplan');
+    console.log(shift, 'shift');
+
 
     const fetchActiveData = async () => {
         try {
             const res1 = await axiosPlanning.get('planning-production', getHeaderConfigAxios())
             setActivePlan(res1.data.data)
+            const res2 = await axiosPlanning.get('report-shift', getHeaderConfigAxios())
+            setShift(res2.data.data)
         } catch (error) {
             console.log(error, 'error fetch data');
         }
@@ -63,7 +69,7 @@ export default function Home() {
                 .on("message", (topic, message) => {
                     if (topic == `MC${activePlan.machine.id}:LS:RPA`) {
                         setMqttData2(JSON.parse(message))
-                        console.log('message got');
+                        console.log(message, 'message got');
                     }
                     if (topic == `MC${activePlan.machine.id}:PLAN:RPA`) {
                         setMqttData1(JSON.parse(message))
@@ -78,6 +84,34 @@ export default function Home() {
         }
     }, [activePlan])
 
+    useEffect(() => {
+        if (activePlan) {
+            try {
+                const fetchNoPlan = async () => {
+                    const res2 = await axiosPlanning.get('no-plan-machine', getHeaderConfigAxios())
+                    console.log(res2.data.data, moment().format('dddd').toLowerCase(), 'hahah');
+                    const noPlanTdy = res2.data.data.filter(item => {
+                        console.log(item, 'hahah');
+                        if (item.day == moment().format('dddd').toLowerCase()) {
+                            const timeInNoPlan = moment(item.time_in, 'HH:mm:ss')
+                            const timeOutNoPlan = moment(item.time_out, 'HH:mm:ss')
+                            const timeNow = moment(moment().format('HH:mm:ss'), 'HH:mm:ss')
+                            const timeStart = moment(moment(activePlan?.date_time_in).format('HH:mm:ss'), 'HH:mm:ss')
+        
+                            // if (timeInNoPlan.isBetween(timeStart, timeNow) && timeOutNoPlan.isBetween(timeStart, timeNow) ) {
+                                return item
+                            // }
+                        }
+                    })
+                    console.log(noPlanTdy,'notoday');
+                    setNoPlanToday(noPlanTdy)
+                }
+                fetchNoPlan()
+            } catch (error) {
+                console.log(error, 'error fetch noplan');
+            }
+        }
+    }, [activePlan])
 
     useEffect(() => {
         fetchActiveData()
@@ -145,7 +179,7 @@ const quality = calculateQuality();
         const fixedMinutes = Math.min(initialTimeDifferenceInMinutes,(moment(activePlan.date_time_in).add(1, 'hour').minute(0).diff(moment(activePlan.date_time_in), 'minute')))
         const additionalMinutes = fixedMinutes + Math.floor((initialTimeDifferenceInMinutes - fixedMinutes) / 60) * 60; 
       
-        setTimeActual(additionalMinutes);
+        setTimeActual(initialTimeDifferenceInMinutes);
       
         const interval = setInterval(() => {
             setTimeActual((prevTimeActual) => prevTimeActual + 1);
@@ -210,7 +244,7 @@ const quality = calculateQuality();
 
 
     //   availibity
-    const [plannedAvailability, setPlannedAvailability] = useState(10);
+    const [plannedAvailability, setPlannedAvailability] = useState(0);
 
     useEffect(() => {
         const calculatePlannedAvailability = () => {
@@ -218,26 +252,29 @@ const quality = calculateQuality();
             const currentTime = moment().tz("Asia/Bangkok");
             const timeDifference = currentTime.diff(startTime, 'minutes');
 
-            let newPlannedAvailability = 0;
+            // let newPlannedAvailability = 0;
 
-            if (timeDifference >= 0) {
-                newPlannedAvailability = Math.floor(timeDifference / 10) * 10;
-            }
+            // if (timeDifference >= 0) {
+            //     newPlannedAvailability = Math.floor(timeDifference / 10) * 10;
+            // }
 
-            if (activePlan.shift.no_plan_machine_id) {
-                const totalNoPlan = activePlan.shift.no_plan_machine_id.reduce((total, value) => total + value.total, 0);
-                newPlannedAvailability -= totalNoPlan;
-            }
+            // if (activePlan.shift.no_plan_machine_id) {
+            //     const totalNoPlan = activePlan.shift.no_plan_machine_id.reduce((total, value) => total + value.total, 0);
+            //     newPlannedAvailability -= totalNoPlan;
+            // }
 
-            newPlannedAvailability = Math.max(newPlannedAvailability, 0);
-            console.log(newPlannedAvailability + 10);
-            setPlannedAvailability(newPlannedAvailability + 10, 'inter');
+            // newPlannedAvailability = Math.max(newPlannedAvailability, 0);
+            // console.log(newPlannedAvailability + 10);
+            setPlannedAvailability(timeDifference);
         };
         calculatePlannedAvailability();
         const intervalId = setInterval(() => {
-            calculatePlannedAvailability();
-            // console.log(calculateAvailability, 'inter');
-        }, 1000);
+            setPlannedAvailability((prevTimeActual) => prevTimeActual + 1);
+          }, 60000);
+        // const intervalId = setInterval(() => {
+        //     calculatePlannedAvailability();
+        //     // console.log(calculateAvailability, 'inter');
+        // }, 1000);
 
         return () => {
             clearInterval(intervalId);
@@ -259,22 +296,42 @@ const quality = calculateQuality();
             // }
             
             newPlannedActual = timeActual;
-
-            if (activePlan.shift.no_plan_machine_id) {
-                const totalNoPlan = activePlan.shift.no_plan_machine_id.reduce((total, value) => total + value.total, 0);
-                newPlannedActual -= totalNoPlan;
+            let noPlnaTempry = 0
+            console.log(noPlanToday, 'notempo');
+            if (noPlanToday.length > 0) {
+                noPlanToday.map(item => {
+                    if (
+                        moment(item.time_in, 'HH:mm:ss').isSameOrAfter(moment(moment(activePlan.date_time_in).format('HH:mm:ss'), 'HH:mm:ss')) && 
+                        moment(item.time_in, 'HH:mm:ss').isSameOrBefore(moment(moment().format('HH:mm:ss'), 'HH:mm:ss'))
+                    ) {
+                        if (item.time_out) {
+                            noPlnaTempry += (item.total ?? 0) / 2;
+                        } 
+                        // else {
+                            // noPlnaTempry += item.total ?? 0;
+                        // }
+                        console.log(noPlnaTempry, 'hsgh8');
+                    }
+                })
             }
-
+            console.log(noPlnaTempry, 'notempo', noPlanToday);
             newPlannedActual = Math.max(newPlannedActual, 0);
             newPlannedActual -= mqttData2.TotalTime;
-            setPlannedActual(newPlannedActual);
+            console.log(noPlnaTempry, 'no');
+            setPlannedActual(timeDifference-mqttData2.TotalTime - noPlnaTempry ?? 0);
+            console.log(timeDifference, mqttData2.TotalTime, activePlan.shift.no_plan_machine_id, 'ava1');
         };
 
-        calculatePlannedActual();
+        
 
+        calculatePlannedActual();
         const intervalId = setInterval(() => {
-            calculatePlannedActual();
-        }, 600000);
+            calculatePlannedActual((prevTimeActual) => prevTimeActual + 1);
+          }, 60000);
+
+        // const intervalId = setInterval(() => {
+        //     calculatePlannedActual();
+        // }, 600000);
 
         return () => {
             clearInterval(intervalId);
@@ -292,8 +349,13 @@ const quality = calculateQuality();
 
         const totalPlanningTime = mqttData2.TotalTime;
         // const availabilityPercentage = Math.round((timeDifference - totalPlanningTime) / timeDifference * 100);
-        const availabilityPercentage = Math.round(timeActual / plannedAvailability * 100);
-
+        let noPlnaTempry=0
+        if (activePlan.shift.no_plan_machine_id) {
+            console.log(activePlan.shift.no_plan_machine_id, 'total');
+            const totalNoPlan = activePlan.shift.no_plan_machine_id.reduce((total, value) => total ?? 0 + value.total, 0);
+            noPlnaTempry = totalNoPlan ?? 0;
+        }
+        const availabilityPercentage = Math.round((timeDifference - totalPlanningTime - noPlnaTempry) / plannedAvailability * 100);
 
 
         return availabilityPercentage;
@@ -310,8 +372,17 @@ const quality = calculateQuality();
         const dateIn = moment(activePlan.date_time_in).tz("Asia/Bangkok");
         const timeDifference = currentTime.diff(dateIn, 'minutes');
 
+        let noPlnaTempry=0
+        if (activePlan.shift.no_plan_machine_id) {
+            console.log(activePlan.shift.no_plan_machine_id, 'total');
+            const totalNoPlan = activePlan.shift.no_plan_machine_id.reduce((total, value) => total ?? 0 + value.total, 0);
+            noPlnaTempry = totalNoPlan ?? 0;
+        }
+        // const availabilityPercentage = Math.round((timeDifference - totalPlanningTime - noPlnaTempry) / plannedAvailability * 100);
+
+
         const totalPlanningTime = mqttData2.TotalTime;
-        const availability = (timeActual / plannedAvailability );
+        const availability = ((timeDifference - totalPlanningTime - noPlnaTempry) / plannedAvailability );
         console.log(availability, 'ava');
 
 
@@ -321,6 +392,7 @@ const quality = calculateQuality();
     const availability = calculateAvailability();
 
 
+    console.log(availability, '==', performance, '===', quality, '==');
 
     // oee
     // const multipliedPercentage = availabilityPercentage * performance * quality;
@@ -397,8 +469,8 @@ const quality = calculateQuality();
                         <Paper shadow="xs" withBorder style={{ marginLeft: '60px' }}>
                             <div style={{  textAlign: 'center' }}>
                                 <p>Availibity planned :{plannedAvailability} minutes</p>
-                                {/* <p>Availibity actual : {plannedActual} minutes</p> */}
-                                <p>Availibity actual : {timeActual} minutes</p>
+                                <p>Availibity actual : {plannedActual} minutes</p>
+                                {/* <p>Availibity actual : {timeActual} minutes</p> */}
                             </div>
                         </Paper>
                 </div>
