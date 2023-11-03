@@ -29,6 +29,8 @@ import {
     useState
 } from 'react';
 import * as moment from 'moment-timezone';
+import axios from 'axios';
+import { match } from 'assert';
 
 export default function Home() {
     const [mqttData1, setMqttData1] = useState([])
@@ -37,6 +39,8 @@ export default function Home() {
     const [activePlan, setActivePlan] = useState([])
     const [shift, setShift] = useState([])
     const [noPlanToday, setNoPlanToday] = useState([])
+    const [shiftName, setShiftName] = useState("");
+
 
     console.log(mqttData1, 'mqdata1');
     console.log(mqttData2, 'mqdata2');
@@ -50,12 +54,24 @@ export default function Home() {
         try {
             const res1 = await axiosPlanning.get('planning-production', getHeaderConfigAxios())
             setActivePlan(res1.data.data)
-            const res2 = await axiosPlanning.get('report-shift', getHeaderConfigAxios())
+            const res2 = await axios.get(`http://192.168.0.215:5000/api/report-shift/report/${res1.data.data.machine.name}`, getHeaderConfigAxios())
+            console.log(res2.data.data[0], 'ui');
             setShift(res2.data.data)
         } catch (error) {
             console.log(error, 'error fetch data');
         }
     }
+    
+      useEffect(() => {
+        fetchActiveData();
+        const intervalId = setInterval(() => {
+          fetchActiveData();
+        }, 5000);
+        
+        return () => {
+            clearInterval(intervalId);
+        };
+      }, []);
 
     useEffect(() => {
         if (activePlan.length != 0) {
@@ -117,6 +133,16 @@ export default function Home() {
         fetchActiveData()
     }, [])
 
+    useEffect(() => {
+        if (activePlan && shift.length > 0) {
+            const matchingShift = shift.find(s => s.planning_id === activePlan.id);
+            if (matchingShift && activePlan.active_plan) {
+                setShiftName(matchingShift.operator_name);
+            }
+        }
+    }, [activePlan, shift]);
+    console.log(shiftName, 'shift');
+
 
     // quality
     const qtyActual = mqttData1.qty_actual;
@@ -126,7 +152,6 @@ const calculateQualityPercentage = () => {
     const qtyActual = mqttData1.qty_actual;
     const qtyOk = mqttData1.qty_actual - 0;
     const qtyPlanning = activePlan.qty_planning;
-
     if (qtyPlanning === 0) {
         return 0;
     }
@@ -162,14 +187,6 @@ const quality = calculateQuality();
     //   perfomance
     const [timeActual, setTimeActual] = useState(0);
     const [startTime, setStartTime] = useState(null);
-    //   useEffect(() => {
-    //     const interval = setInterval(() => {
-    //       setTimeActual((prevTimeActual) => prevTimeActual + 60);
-    //     }, 3600000); // 3600000 milidetik (1 jam)
-    //     return () => {
-    //       clearInterval(interval);
-    //     };
-    //   }, []);
 
     useEffect(() => {
         const startTime = moment(activePlan.date_time_in).tz("Asia/Bangkok");
@@ -211,6 +228,7 @@ const quality = calculateQuality();
     //   }, [activePlan.date_time_in]);
 
     const cycleTime = activePlan.product ? activePlan.product.cycle_time : 0;
+    console.log(cycleTime, qtyActual, 'cy');
     const timePlanned = Math.round(cycleTime * qtyActual / 60);
 
     const calculatePerformancePercentage = () => {
@@ -299,25 +317,37 @@ const quality = calculateQuality();
             let noPlnaTempry = 0
             console.log(noPlanToday, 'notempo');
             if (noPlanToday.length > 0) {
+                newPlannedActual = timeDifference / 2;
                 noPlanToday.map(item => {
                     if (
                         moment(item.time_in, 'HH:mm:ss').isSameOrAfter(moment(moment(activePlan.date_time_in).format('HH:mm:ss'), 'HH:mm:ss')) && 
                         moment(item.time_in, 'HH:mm:ss').isSameOrBefore(moment(moment().format('HH:mm:ss'), 'HH:mm:ss'))
                     ) {
-                        if (item.time_out) {
-                            noPlnaTempry += (item.total ?? 0) / 2;
-                        } 
+                        // console.log(item.total, 'no1131');
+                        if (moment(moment().format('HH:mm:ss'), 'HH:mm:ss').isSameOrAfter(moment(item.time_in, 'HH:mm:ss'))) {
+                            console.log('masuk');
+                            noPlnaTempry += (item.total ?? 0 ) / 2
+                        }
+                        if (moment(moment().format('HH:mm:ss'), 'HH:mm:ss').isSameOrAfter(moment(item.time_out, 'HH:mm:ss'))) {
+                            console.log('masuk');
+                            noPlnaTempry += (item.total ?? 0 ) / 2
+                        }
+                        // if (item.time_out) {
+                        //     // Jika ada time_out, hitung setengah dari total saat time_in
+                        //     noPlnaTempry += (item.total ?? 0) / 2;
+                        // }
                         // else {
-                            // noPlnaTempry += item.total ?? 0;
+                        //     // Jika tidak ada time_out, hitung seluruh total
+                        //     noPlnaTempry += item.total ?? 0;
                         // }
                         console.log(noPlnaTempry, 'hsgh8');
                     }
                 })
             }
-            console.log(noPlnaTempry, 'notempo', noPlanToday);
+            console.log(noPlnaTempry, 'notempo');
             newPlannedActual = Math.max(newPlannedActual, 0);
             newPlannedActual -= mqttData2.TotalTime;
-            console.log(noPlnaTempry, 'no');
+            console.log(timeDifference, mqttData2.TotalTime, noPlnaTempry, 'no');
             setPlannedActual(timeDifference-mqttData2.TotalTime - noPlnaTempry ?? 0);
             console.log(timeDifference, mqttData2.TotalTime, activePlan.shift.no_plan_machine_id, 'ava1');
         };
@@ -400,12 +430,13 @@ const quality = calculateQuality();
 
     const roundedPercentage = Math.round(multipliedPercentage);
 
-    const resultPercentage = multipliedPercentage / 1000000;
-    const finallyPercentage = resultPercentage * 100;
+    //shift
+    console.log(moment(shift[0]?.created_at, 'YYYY-MM-DD').format('DD-MM-YYYY'), 'shift12');
+    const nameShift0 = shift[0]?.shift || '-';
+    const nameShift1 = shift[1]?.shift || '-';
 
-
-
-
+    const oeeReport0 = isNaN(Math.round((shift[0]?.oee)* 100)) ? '-' : Math.round((shift[0]?.oee)* 100);
+    const oeeReport1 = isNaN(Math.round((shift[1]?.oee)* 100)) ? '-' : Math.round((shift[1]?.oee)* 100);
 
     const router = useRouter()
     const changePage = () => {
@@ -505,9 +536,14 @@ const quality = calculateQuality();
                     <div>
                         <Image alt="" src={table} width={300} />
                         <div
-                            style={{ display: 'flex', fontSize: '50px', fontWeight: 'bold', color: 'skyblue', justifyContent: 'space-between', marginTop: '-130px' }}>
-                            <p style={{ marginLeft: '30px' }}>-%</p>
-                            <p style={{ marginRight: '10px' }}>-%</p>
+                            style={{ display: 'flex', fontSize: '35px', fontWeight: 'bold', justifyContent: 'space-between', marginTop: '-175px' }}>
+                            <p style={{ marginLeft: '15px' }}>{nameShift0}</p>
+                            <p style={{ marginRight: '13px' }}>{nameShift1}</p>
+                        </div>
+                        <div
+                            style={{ display: 'flex', fontSize: '50px', fontWeight: 'bold', color: 'skyblue', justifyContent: 'space-between', marginTop: '-70px' }}>
+                            <p style={{ marginLeft: '35px' }}>{oeeReport0}%</p>
+                            <p style={{ marginRight: '35px' }}>{oeeReport1}%</p>
                         </div>
                     </div>
                 </div>
