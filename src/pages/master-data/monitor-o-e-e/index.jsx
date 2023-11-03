@@ -41,27 +41,19 @@ export default function Home() {
     const [noPlanToday, setNoPlanToday] = useState([])
     const [shiftName, setShiftName] = useState("");
 
-
-    console.log(mqttData1, 'mqdata1');
-    console.log(mqttData2, 'mqdata2');
-
-    console.log(activePlan, 'activeplan');
-    console.log(noPlanToday, 'hsgnoplan');
-    console.log(shift, 'shift');
-
+    console.log(mqttData2, 'mqdata');
 
     const fetchActiveData = async () => {
         try {
             const res1 = await axiosPlanning.get('planning-production', getHeaderConfigAxios())
             setActivePlan(res1.data.data)
             const res2 = await axios.get(`http://192.168.0.215:5000/api/report-shift/report/${res1.data.data.machine.name}`, getHeaderConfigAxios())
-            console.log(res2.data.data[0], 'ui');
             setShift(res2.data.data)
         } catch (error) {
             console.log(error, 'error fetch data');
         }
     }
-    
+    console.log(mqttData1, 'activeplan');
       useEffect(() => {
         fetchActiveData();
         const intervalId = setInterval(() => {
@@ -85,11 +77,9 @@ export default function Home() {
                 .on("message", (topic, message) => {
                     if (topic == `MC${activePlan.machine.id}:LS:RPA`) {
                         setMqttData2(JSON.parse(message))
-                        console.log(message, 'message got');
                     }
                     if (topic == `MC${activePlan.machine.id}:PLAN:RPA`) {
                         setMqttData1(JSON.parse(message))
-                        console.log('message got');
                     }
                 })
             return () => {
@@ -105,9 +95,7 @@ export default function Home() {
             try {
                 const fetchNoPlan = async () => {
                     const res2 = await axiosPlanning.get('no-plan-machine', getHeaderConfigAxios())
-                    console.log(res2.data.data, moment().format('dddd').toLowerCase(), 'hahah');
                     const noPlanTdy = res2.data.data.filter(item => {
-                        console.log(item, 'hahah');
                         if (item.day == moment().format('dddd').toLowerCase()) {
                             const timeInNoPlan = moment(item.time_in, 'HH:mm:ss')
                             const timeOutNoPlan = moment(item.time_out, 'HH:mm:ss')
@@ -119,7 +107,6 @@ export default function Home() {
                             // }
                         }
                     })
-                    console.log(noPlanTdy,'notoday');
                     setNoPlanToday(noPlanTdy)
                 }
                 fetchNoPlan()
@@ -141,7 +128,6 @@ export default function Home() {
             }
         }
     }, [activePlan, shift]);
-    console.log(shiftName, 'shift');
 
 
     // quality
@@ -188,24 +174,24 @@ const quality = calculateQuality();
     const [timeActual, setTimeActual] = useState(0);
     const [startTime, setStartTime] = useState(null);
 
-    useEffect(() => {
-        const startTime = moment(activePlan.date_time_in).tz("Asia/Bangkok");
-        const currentTime = moment().tz("Asia/Bangkok");
-        const initialTimeDifferenceInMinutes = currentTime.diff(startTime, 'minutes');
-        // const fixedMinutes = Math.min(initialTimeDifferenceInMinutes, 47);
-        const fixedMinutes = Math.min(initialTimeDifferenceInMinutes,(moment(activePlan.date_time_in).add(1, 'hour').minute(0).diff(moment(activePlan.date_time_in), 'minute')))
-        const additionalMinutes = fixedMinutes + Math.floor((initialTimeDifferenceInMinutes - fixedMinutes) / 60) * 60; 
+    // useEffect(() => {
+    //     const startTime = moment(activePlan.date_time_in).tz("Asia/Bangkok");
+    //     const currentTime = moment().tz("Asia/Bangkok");
+    //     const initialTimeDifferenceInMinutes = currentTime.diff(startTime, 'minutes');
+    //     // const fixedMinutes = Math.min(initialTimeDifferenceInMinutes, 47);
+    //     const fixedMinutes = Math.min(initialTimeDifferenceInMinutes,(moment(activePlan.date_time_in).add(1, 'hour').minute(0).diff(moment(activePlan.date_time_in), 'minute')))
+    //     const additionalMinutes = fixedMinutes + Math.floor((initialTimeDifferenceInMinutes - fixedMinutes) / 60) * 60; 
       
-        setTimeActual(initialTimeDifferenceInMinutes);
+    //     setTimeActual(initialTimeDifferenceInMinutes);
       
-        const interval = setInterval(() => {
-            setTimeActual((prevTimeActual) => prevTimeActual + 1);
-          }, 60000);
+    //     const interval = setInterval(() => {
+    //         setTimeActual((prevTimeActual) => prevTimeActual + 1);
+    //       }, 60000);
                 
-        return () => {
-          clearInterval(interval);
-        };
-      }, [activePlan.date_time_in]);
+    //     return () => {
+    //       clearInterval(interval);
+    //     };
+    //   }, [activePlan.date_time_in]);
       
       
 
@@ -228,7 +214,6 @@ const quality = calculateQuality();
     //   }, [activePlan.date_time_in]);
 
     const cycleTime = activePlan.product ? activePlan.product.cycle_time : 0;
-    console.log(cycleTime, qtyActual, 'cy');
     const timePlanned = Math.round(cycleTime * qtyActual / 60);
 
     const calculatePerformancePercentage = () => {
@@ -237,9 +222,6 @@ const quality = calculateQuality();
             return 0;
         }
         const performance = timePlanned / timeActual * 100;
-        console.log(timeActual, 'timeactual');
-        console.log(timePlanned, 'timeplanned');
-        console.log(performance, 'per');
         const performancePercentage = Math.round(performance);
         return performancePercentage;
     };
@@ -257,7 +239,6 @@ const quality = calculateQuality();
     };
 
     const performance = calculatePerformance();
-    console.log(performance, 'per');
 
 
 
@@ -265,6 +246,18 @@ const quality = calculateQuality();
     const [plannedAvailability, setPlannedAvailability] = useState(0);
 
     useEffect(() => {
+        //time actual
+        const startTime = moment(activePlan.date_time_in).tz("Asia/Bangkok");
+        const currentTime = moment().tz("Asia/Bangkok");
+        const initialTimeDifferenceInMinutes = currentTime.diff(startTime, 'minutes');
+        // const fixedMinutes = Math.min(initialTimeDifferenceInMinutes, 47);
+        const fixedMinutes = Math.min(initialTimeDifferenceInMinutes,(moment(activePlan.date_time_in).add(1, 'hour').minute(0).diff(moment(activePlan.date_time_in), 'minute')))
+        const additionalMinutes = fixedMinutes + Math.floor((initialTimeDifferenceInMinutes - fixedMinutes) / 60) * 60; 
+      
+        setTimeActual(initialTimeDifferenceInMinutes);
+      
+
+        // availability actual
         const calculatePlannedAvailability = () => {
             const startTime = moment(activePlan.date_time_in).tz("Asia/Bangkok");
             const currentTime = moment().tz("Asia/Bangkok");
@@ -282,16 +275,15 @@ const quality = calculateQuality();
             // }
 
             // newPlannedAvailability = Math.max(newPlannedAvailability, 0);
-            // console.log(newPlannedAvailability + 10);
             setPlannedAvailability(timeDifference);
         };
         calculatePlannedAvailability();
         const intervalId = setInterval(() => {
             setPlannedAvailability((prevTimeActual) => prevTimeActual + 1);
-          }, 60000);
+            setTimeActual((prevTimeActual) => prevTimeActual + 1);
+        }, 60000);
         // const intervalId = setInterval(() => {
         //     calculatePlannedAvailability();
-        //     // console.log(calculateAvailability, 'inter');
         // }, 1000);
 
         return () => {
@@ -310,12 +302,10 @@ const quality = calculateQuality();
             
             // if (timeDifference >= 0) {
             //     // newPlannedActual = Math.floor(timeDifference / 10) * 10;
-            //     console.log(newPlannedActual, 'timediffrence');
             // }
             
             newPlannedActual = timeActual;
             let noPlnaTempry = 0
-            console.log(noPlanToday, 'notempo');
             if (noPlanToday.length > 0) {
                 newPlannedActual = timeDifference / 2;
                 noPlanToday.map(item => {
@@ -325,11 +315,9 @@ const quality = calculateQuality();
                     ) {
                         // console.log(item.total, 'no1131');
                         if (moment(moment().format('HH:mm:ss'), 'HH:mm:ss').isSameOrAfter(moment(item.time_in, 'HH:mm:ss'))) {
-                            console.log('masuk');
                             noPlnaTempry += (item.total ?? 0 ) / 2
                         }
                         if (moment(moment().format('HH:mm:ss'), 'HH:mm:ss').isSameOrAfter(moment(item.time_out, 'HH:mm:ss'))) {
-                            console.log('masuk');
                             noPlnaTempry += (item.total ?? 0 ) / 2
                         }
                         // if (item.time_out) {
@@ -340,16 +328,12 @@ const quality = calculateQuality();
                         //     // Jika tidak ada time_out, hitung seluruh total
                         //     noPlnaTempry += item.total ?? 0;
                         // }
-                        console.log(noPlnaTempry, 'hsgh8');
                     }
                 })
             }
-            console.log(noPlnaTempry, 'notempo');
             newPlannedActual = Math.max(newPlannedActual, 0);
             newPlannedActual -= mqttData2.TotalTime;
-            console.log(timeDifference, mqttData2.TotalTime, noPlnaTempry, 'no');
             setPlannedActual(timeDifference-mqttData2.TotalTime - noPlnaTempry ?? 0);
-            console.log(timeDifference, mqttData2.TotalTime, activePlan.shift.no_plan_machine_id, 'ava1');
         };
 
         
@@ -381,7 +365,6 @@ const quality = calculateQuality();
         // const availabilityPercentage = Math.round((timeDifference - totalPlanningTime) / timeDifference * 100);
         let noPlnaTempry=0
         if (activePlan.shift.no_plan_machine_id) {
-            console.log(activePlan.shift.no_plan_machine_id, 'total');
             const totalNoPlan = activePlan.shift.no_plan_machine_id.reduce((total, value) => total ?? 0 + value.total, 0);
             noPlnaTempry = totalNoPlan ?? 0;
         }
@@ -404,7 +387,6 @@ const quality = calculateQuality();
 
         let noPlnaTempry=0
         if (activePlan.shift.no_plan_machine_id) {
-            console.log(activePlan.shift.no_plan_machine_id, 'total');
             const totalNoPlan = activePlan.shift.no_plan_machine_id.reduce((total, value) => total ?? 0 + value.total, 0);
             noPlnaTempry = totalNoPlan ?? 0;
         }
@@ -413,16 +395,12 @@ const quality = calculateQuality();
 
         const totalPlanningTime = mqttData2.TotalTime;
         const availability = ((timeDifference - totalPlanningTime - noPlnaTempry) / plannedAvailability );
-        console.log(availability, 'ava');
 
 
         return availability;
     };
 
     const availability = calculateAvailability();
-
-
-    console.log(availability, '==', performance, '===', quality, '==');
 
     // oee
     // const multipliedPercentage = availabilityPercentage * performance * quality;

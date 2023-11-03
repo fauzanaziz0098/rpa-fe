@@ -9,6 +9,7 @@ import {
   rem,
   useMantineTheme,
   ScrollArea,
+  Center,
 } from "@mantine/core";
 import Image from "next/image";
 import mht from "@/assets/mht.png";
@@ -54,6 +55,7 @@ export default function Home({ headers }) {
   const fetchData = async (machineId) => {
     try {
       const res = await axiosHour.get(`production/data-active-new/${machineId}`, headers);
+      console.log(res.data.data, 'data');
       setProductionData(res.data.data);
       setActivePlan(res.data.data.planningMachineActive);
     } catch (error) {
@@ -100,6 +102,8 @@ export default function Home({ headers }) {
     }, 1000 * 10);
     return () => clearInterval(interval);
   }, [machinePlan]);
+
+  console.log(mqttData1, 'data');
 
   useEffect(() => {
     if (productionData.planningMachineActive) {
@@ -910,6 +914,34 @@ export default function Home({ headers }) {
             data={machines}
             onChange={(e) => setMachinePlan(e)}
           />
+          {/* <Button
+          style={{
+            width: "210px",
+            backgroundColor: "peru",
+          }}
+          pr={12}
+        ></Button> */}
+        {/* <div style={{ height: '35px', display: 'table-column', justifyContent: 'center', textAlign: 'center', alignItems: "center", marginLeft: '25px'}}>
+        <div
+            style={{
+              backgroundColor: "red",
+              width: "100px",
+              height: "35px",
+              borderRadius: "5px",
+            }}
+          ></div>
+          <p style={{ marginTop: '2px' }}>Run</p>
+        </div> */}
+        <div
+          style={{ height: '35px', display: 'table-column', justifyContent: 'center', textAlign: 'center', alignItems: "center", marginLeft: '25px'}}>
+          <div style={{
+      backgroundColor: mqttData1 && mqttData1.mc_run && mqttData1.mc_run[0] ? "green" : mqttData1 && mqttData1.mc_stop && mqttData1.mc_stop[0] ? "red" : "transparent",
+      width: "100px",
+      height: "35px",
+      borderRadius: "5px",
+    }}></div>
+          <p style={{ marginTop: '2px' }}>{mqttData1 && mqttData1.mc_run && mqttData1.mc_run[0] ? "Run" : mqttData1 && mqttData1.mc_stop && mqttData1.mc_stop[0] ? "Stop" : ""}</p>
+        </div>
         </div>
         <div style={{ display: "flex" }}>
           <div
@@ -1402,8 +1434,8 @@ export default function Home({ headers }) {
                                               value.target) *
                                               100
                                           )
-                                        : value.percentage) >= 100
-                                        ? "green"
+                                        : value.percentage) == 100
+                                        ? "#303030"
                                         : ""
                                     }`,
                                   }}
@@ -1435,8 +1467,8 @@ export default function Home({ headers }) {
                                         0
                                       )) *
                                       100
-                                  ) >= 100
-                                    ? "green"
+                                  ) == 100
+                                    ? "#303030"
                                     : ""
                                 }`,
                               }}
