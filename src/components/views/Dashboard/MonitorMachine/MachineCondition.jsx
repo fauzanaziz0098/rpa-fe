@@ -56,7 +56,7 @@ const MachineCondition = ({activePlan, machineId}) => {
     }, [mqttConditionMachine])
     const fetchConditionMachine = async () => {
         try {
-            const res = await axiosPlanning.get('condition-machine-production', getHeaderConfigAxios()).then(item => item.data)
+            const res = await axiosPlanning.get(`condition-machine-production/${machineId}`, getHeaderConfigAxios()).then(item => item.data)
             setConditionMachineProductionDatas(res.data)
         } catch (error) {
             console.log(error, 'error fetch condition machine');
@@ -122,7 +122,7 @@ const MachineCondition = ({activePlan, machineId}) => {
         {activePlan ? (
             <>
                 <div style={{ marginTop: '-16px' }}>
-                    <p style={{ backgroundColor: 'gainsboro', padding: '10px' }}>Kondisi Mesin</p>
+                    <p style={{ backgroundColor: 'gainsboro', padding: '10px' }}>Cek Awal Mesin</p>
                 </div>
                 <div
                     style={{ backgroundColor: 'lavender', height: '266px', marginTop: '-16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
