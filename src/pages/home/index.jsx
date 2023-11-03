@@ -1178,7 +1178,7 @@ export default function Home({ headers }) {
                                   {value.time.split(":")[0] == new Date().getHours()
                                     ? 0 -
                                       productionData.all.reduce(
-                                        (total, value) => total ? total : 0 + value.actual,
+                                        (total, value) => (total ? total : 0) + value.actual,
                                         0
                                       )
                                     : value.actual}
@@ -1385,7 +1385,7 @@ export default function Home({ headers }) {
                                   {value.time.split(":")[0] == new Date().getHours()
                                     ? Number(mqttData1.qty_actual) -
                                       productionData.all.reduce(
-                                        (total, value) => total ? total : 0 + value.actual,
+                                        (total, value) => (total ? total : 0) + value.actual,
                                         0
                                       )
                                     : value.actual}
@@ -1428,7 +1428,7 @@ export default function Home({ headers }) {
                                             ((mqttData1.qty_actual -
                                               productionData.all.reduce(
                                                 (total, value) =>
-                                                  total ? total : 0 + value.actual,
+                                                  (total ? total : 0) + value.actual,
                                                 0
                                               )) /
                                               value.target) *
@@ -1444,7 +1444,7 @@ export default function Home({ headers }) {
                                     ? Math.round(
                                         ((mqttData1.qty_actual -
                                           productionData.all.reduce(
-                                            (total, value) => total ? total : 0 + value.actual,
+                                            (total, value) => (total ? total : 0) + value.actual,
                                             0
                                           )) /
                                           (value.target ? value.target : 0.1)) *
