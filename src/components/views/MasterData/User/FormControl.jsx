@@ -32,6 +32,7 @@ import { IconFaceId, IconFaceIdError } from "@tabler/icons";
         email: "",
         password: "",
         role: "",
+        card_number: "",
       },
     });
   
@@ -64,6 +65,7 @@ import { IconFaceId, IconFaceIdError } from "@tabler/icons";
                       name: data.name,
                       email: data.email,
                       role: data.role.id,
+                      card_number: data.card_number,
                     })
                 } catch (error) {
                     console.log(error, 'error fetch users data');
@@ -154,6 +156,12 @@ import { IconFaceId, IconFaceIdError } from "@tabler/icons";
               />
               </Grid.Col>
               <Grid.Col span={1}>
+              <TextInput
+                  label="Card Number"
+                  placeholder="Card Number"
+                  withAsterisk
+                  {...form.getInputProps("card_number")}
+              />
               </Grid.Col>
           </Grid>
   

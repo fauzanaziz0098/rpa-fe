@@ -15,13 +15,15 @@ import {
   Flex,
   Input,
   NumberInput,
+  Grid,
 } from "@mantine/core";
-import { IconAlertCircle, IconPencil, IconScan, IconSearch, IconTrash, IconCalendarOff, IconReplace, IconBox, IconCheck, IconPlayerStop, IconPlayerPause } from "@tabler/icons";
+import { IconAlertCircle, IconPencil, IconScan, IconSearch, IconTrash, IconCalendarOff, IconReplace, IconBox, IconCheck, IconPlayerStop, IconPlayerPause, IconUser } from "@tabler/icons";
 import Layout from "../../../components/Layout/App";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useEffect } from "react";
 import axiosPlanning from '@/libs/planning/axios'
+import axiosAuth from '@/libs/auth/axios'
 import { showNotification } from "@mantine/notifications";
 import {getHeaderConfigAxios} from '@/utils/getHeaderConfigAxios'
 import Link from "next/link";
@@ -46,6 +48,7 @@ export default function PlanningPageIndex({errors}) {
 
   const [openNoPlan, setOpenNoPlan] = useState(false);
   const [noPlans, setNoPlans] = useState([])
+  const [operators, setOperators] = useState([]);
 
   const [openReject, setOpenReject] = useState({
     isOpen: false,
@@ -56,6 +59,13 @@ export default function PlanningPageIndex({errors}) {
     isOpen: false,
     data: null
   })
+  
+  const [operatorModal, setOperatorModal] = useState({
+    isOpen: false,
+    data: null
+  })
+
+  const [addOperator, setAddOperator] = useState(false)
 
   const [qtyReject, setQtyReject] = useState("")
 
@@ -63,6 +73,14 @@ export default function PlanningPageIndex({errors}) {
     initialValues: {
       status: "",
       qtyReject: "",
+    },
+  })
+
+  const form = useForm({
+    initialValues: {
+      operator: "",
+      planning_production: "",
+      machine: "",
     },
   })
   const fetchPlan = async () => {
@@ -73,6 +91,23 @@ export default function PlanningPageIndex({errors}) {
       console.log(error, 'error fetch data planning productions');
     }
   }
+  const fetchDataOperators = async () => {
+    try {
+      const { data } = (await axiosAuth.get("users", getHeaderConfigAxios()))
+        .data;
+      setOperators(
+        data.map((item) => ({
+          label: item.name,
+          value: item.name,
+        }))
+      );
+    } catch (error) {
+      console.log(error, "error fetch data products");
+    }
+  };
+  useEffect(() => {
+    fetchDataOperators();
+  }, [])
   useEffect(() => {
       fetchPlan()
   }, [filter.values.status, filter.values.qtyReject, searchValue])
@@ -174,6 +209,31 @@ export default function PlanningPageIndex({errors}) {
     }
   }
 
+  const handleSubmitOperator = async () => {
+      try {
+          await axiosPlanning.post("presence", form.values, getHeaderConfigAxios());
+          showNotification({
+            title: "Success",
+            message: "Add Operator Success👏",
+            icon: <IconCheck />,
+            color: "teal",
+          });
+      fetchPlan()
+      setOperatorModal({isOpen: false, data: null})
+      setAddOperator(false)
+      } catch (error) {
+        if (error) {
+            showNotification({
+                title: "Failed",
+                message: (typeof error?.response?.data?.message == 'object' ? error?.response?.data?.message?.map(item => item + ', ') : error?.response?.data?.message) || "Connection Error",
+                icon: <IconAlertCircle />,
+                color: "red",
+            });
+
+        }
+    }
+  };
+
   return (
     <div>
        {/* Modal Show No Plan */}
@@ -228,6 +288,45 @@ export default function PlanningPageIndex({errors}) {
           <Button onClick={() => stopPlan()}>Yes</Button>
         </Flex>
       </Modal>
+      
+      {/* Modal Operator */}
+      <Modal opened={operatorModal.isOpen} onClose={() => setOperatorModal({isOpen: false, data: null})}>
+        <div style={{ marginTop: '-20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>Operator</div>
+          <Button onClick={() => setAddOperator(true)}>Add</Button>
+        </div>
+            <>
+          {operatorModal?.data?.presence?.length > 0 ? (
+              <ul style={{ marginBottom: '100px' }}>
+                {operatorModal.data.presence.map(item => (
+                  <li>
+                    {item.operator}
+                  </li>
+                ))}
+              </ul>
+              ) : (
+                ''
+              )}
+              {addOperator && (
+                <Flex direction='column' gap='md'>
+                  <Select
+                      label="Pilih Operator"
+                      placeholder="Operator"
+                      data={operators}
+                      searchable
+                      clearable
+                      withAsterisk
+                      onChange={e => form.setValues({operator: e, planning_production: operatorModal?.data?.id, machine: operatorModal?.data?.machine?.id})}
+                      // {...form.getInputProps("operator")}
+                  />
+
+                  <Button onClick={() => handleSubmitOperator()}>Submit</Button>
+                </Flex>
+              )}
+            </>
+         
+
+      </Modal>
       <ScrollArea>
         <div
           style={{
@@ -278,9 +377,7 @@ export default function PlanningPageIndex({errors}) {
               {/* <th>Revision</th> */}
               <th>Total Hour</th>
               <th>NG Input</th>
-              {filter.values.status == "run" && (
-                <th>Action</th>
-              )}
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -314,13 +411,16 @@ export default function PlanningPageIndex({errors}) {
                     <IconBox size={"1.2rem"}/>
                   </Button>
                 </td>
-                {filter.values.status == "run" && (
-                  <td>
-                    <Button color="red" onClick={() => setStopPlanModal({isOpen: true, data: item})}>
-                      <IconPlayerStop fill="white" size={"1.2rem"}/>
-                    </Button>
-                  </td>
-                )}
+                <td>
+                  <Button style={{ marginRight: '5px' }} onClick={() => setOperatorModal({isOpen: true, data: item})}>
+                    <IconUser size={"1.2rem"}/>
+                  </Button>
+                  {filter.values.status == "run" && (
+                      <Button color="red" onClick={() => setStopPlanModal({isOpen: true, data: item})}>
+                        <IconPlayerStop fill="white" size={"1.2rem"}/>
+                      </Button>
+                  )}
+                </td>
               </tr>
             ))
             }

@@ -55,7 +55,6 @@ export default function Home({ headers }) {
   const fetchData = async (machineId) => {
     try {
       const res = await axiosHour.get(`production/data-active-new/${machineId}`, headers);
-      console.log(res.data.data, 'data');
       setProductionData(res.data.data);
       setActivePlan(res.data.data.planningMachineActive);
     } catch (error) {
@@ -103,23 +102,21 @@ export default function Home({ headers }) {
     return () => clearInterval(interval);
   }, [machinePlan]);
 
-  console.log(mqttData1, 'data');
-
   useEffect(() => {
-    if (productionData.planningMachineActive) {
+    if (machinePlan) {
       client
-        .subscribe(`MC${productionData.planningMachineActive.machine.id}:PLAN:RPA`, { qos: 2 })
+        .subscribe(`MC${machinePlan}:PLAN:RPA`, { qos: 2 })
         .on("message", (topic, message) => {
-          if (topic == `MC${productionData.planningMachineActive.machine.id}:PLAN:RPA`) {
+          if (topic == `MC${machinePlan}:PLAN:RPA`) {
             setMqttData1(JSON.parse(message));
             console.log("message got");
           }
         });
       return () => {
-        client.unsubscribe(`MC${productionData.planningMachineActive.machine.id}:PLAN:RPA`, { qos: 2 });
+        client.unsubscribe(`MC${machinePlan}:PLAN:RPA`, { qos: 2 });
       };
     }
-  }, [productionData]);
+  }, [machinePlan]);
 
   const handleMenuItemClickReport = (menuItem) => {
     setActiveMenuItem(menuItem === activeMenuItem ? null : menuItem);
@@ -1508,7 +1505,7 @@ export default function Home({ headers }) {
                 Operator
               </p>
               <p style={{ padding: "10px", marginTop: "-16px" }}>
-                {activePlan?.user?.toLowerCase()}
+                {mqttData1?.operatorId ? String(mqttData1.operatorId).toLowerCase() : ''}
               </p>
             </div>
             <div>

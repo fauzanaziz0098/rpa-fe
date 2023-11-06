@@ -127,7 +127,7 @@ const SignIn = () => {
                             <Title order={4} align={"center"}>
                                 RPA
                             </Title>
-                            <Text size={"sm"}>website RPA</Text>
+                            <Text size={"sm"}>RACHMAT PERDANA ADIMETAL</Text>
                         </Flex>
                         <Flex gap={"md"} direction={"column"}>
                             <TextInput
