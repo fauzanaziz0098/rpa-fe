@@ -128,7 +128,7 @@ import { IconFaceId, IconFaceIdError } from "@tabler/icons";
           </Grid>
   
           <Group position="right" mt="xl">
-              <Button color="red" component={Link} href="/master-data/user">
+              <Button color="red" component={Link} href="/master-data/down-time">
               Back
               </Button>
               <Button type="submit">Submit</Button>

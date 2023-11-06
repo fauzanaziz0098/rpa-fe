@@ -51,6 +51,17 @@ export default function Home({ headers }) {
   const [machines, setMachines] = useState([])
   const [machinePlan, setMachinePlan] = useState(null)
   
+  useEffect(() => {
+    let interval = setInterval(() => {
+        var el = document.getElementById('cellcontent')
+        el.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+            inline: 'center',
+        })
+    }, 10000)
+    return () => clearInterval(interval)
+}, [])
 
   const fetchData = async (machineId) => {
     try {
@@ -1265,6 +1276,7 @@ export default function Home({ headers }) {
                               return (
                                 <p
                                   key={key}
+                                  id={value.time.split(":")[0] == new Date().getHours() ? 'cellcontent' : ''}
                                   style={value.time.split(":")[0] == new Date().getHours() ? { width: "50px", textAlign: "center", background: '#60c942', height: '70%', marginBottom: '0', paddingBlock: '8px' } : { width: "50px", textAlign: "center" }}
                                 >
                                   {value.time}
