@@ -41,7 +41,10 @@ export default function Home() {
     const [noPlanToday, setNoPlanToday] = useState([])
     const [shiftName, setShiftName] = useState("");
 
-    console.log(mqttData2, 'mqdata');
+    console.log(activePlan, 'active');
+    console.log(shift, 'shift');
+    console.log(mqttData1, 'mqdata1');
+    console.log(mqttData2, 'mqdata2');
 
     const fetchActiveData = async () => {
         try {
@@ -156,18 +159,23 @@ const qualityPercentage = calculateQualityPercentage();
 
 const calculateQuality = () => {
     const qtyActual = mqttData1.qty_actual;
+    const qtyOk = mqttData1.qty_actual - 0;
     const qtyPlanning = activePlan.qty_planning;
 
     if (qtyPlanning === 0) {
         return 0;
     }
     const qualityPercentage = (qtyActual/ qtyOk);
-    console.log(qualityPercentage, 'qua');
 
+    if (isNaN(qualityPercentage)) {
+        return 0;
+    }
+    
     return qualityPercentage;
 };
 
 const quality = calculateQuality();
+console.log(qualityPercentage, 'qua');
 
 
     //   perfomance
@@ -334,6 +342,7 @@ const quality = calculateQuality();
             newPlannedActual = Math.max(newPlannedActual, 0);
             newPlannedActual -= mqttData2.TotalTime;
             setPlannedActual(timeDifference-mqttData2.TotalTime - noPlnaTempry ?? 0);
+            console.log(noPlnaTempry, 'noplan');
         };
 
         
@@ -405,6 +414,7 @@ const quality = calculateQuality();
     // oee
     // const multipliedPercentage = availabilityPercentage * performance * quality;
     const multipliedPercentage = availability * performance * quality * 100;
+    console.log(availability, performance, quality, 'data');
 
     const roundedPercentage = Math.round(multipliedPercentage);
 
@@ -412,6 +422,7 @@ const quality = calculateQuality();
     console.log(moment(shift[0]?.created_at, 'YYYY-MM-DD').format('DD-MM-YYYY'), 'shift12');
     const nameShift0 = shift[0]?.shift || '-';
     const nameShift1 = shift[1]?.shift || '-';
+    const createAt = moment(shift[0]?.created_at, 'YYYY-MM-DD').format('DD-MM-YYYY');
 
     const oeeReport0 = isNaN(Math.round((shift[0]?.oee)* 100)) ? '-' : Math.round((shift[0]?.oee)* 100);
     const oeeReport1 = isNaN(Math.round((shift[1]?.oee)* 100)) ? '-' : Math.round((shift[1]?.oee)* 100);
@@ -513,8 +524,11 @@ const quality = calculateQuality();
                 <div style={{ height: '220px',width: '300px', marginLeft: '100px' }}>
                     <div>
                         <Image alt="" src={table} width={300} />
+                        <div style={{ fontWeight: 'bold', marginTop: '-190px', textAlign: 'center' }}>
+                            <p>{createAt}</p>
+                        </div>
                         <div
-                            style={{ display: 'flex', fontSize: '35px', fontWeight: 'bold', justifyContent: 'space-between', marginTop: '-175px' }}>
+                            style={{ display: 'flex', fontSize: '35px', fontWeight: 'bold', justifyContent: 'space-between', marginTop: '-35px' }}>
                             <p style={{ marginLeft: '15px' }}>{nameShift0}</p>
                             <p style={{ marginRight: '13px' }}>{nameShift1}</p>
                         </div>
