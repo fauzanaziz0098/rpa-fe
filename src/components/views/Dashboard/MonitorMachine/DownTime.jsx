@@ -35,7 +35,7 @@ const DownTime = ({machineId}) => {
         fetchLineStop()
     },[])
     return (
-        <ScrollArea style={{ width: '650px', border: '10px solid skyblue', textAlign: 'center', maxHeight: '304px', height: '304px', marginLeft: '25px'}}>
+        <ScrollArea style={{ width: '55%', border: '10px solid skyblue', textAlign: 'center', maxHeight: '304px', height: '304px', marginLeft: '25px'}}>
             <Table highlightOnHover withColumnBorders>
                 <thead style={{ backgroundColor: 'gainsboro', textAlign: 'center' }}>
                     <tr>

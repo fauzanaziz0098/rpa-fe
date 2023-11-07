@@ -96,7 +96,7 @@ const MachineCondition = ({activePlan, machineId}) => {
 
     return (
         <div
-        style={{ width: '480px', border: '10px solid skyblue', textAlign: 'center', height: '304px', marginLeft: '25px' }}>
+        style={{ width: '37%', border: '10px solid skyblue', textAlign: 'center', height: '304px', marginLeft: '25px' }}>
         <Modal size={"40%"} opened={openModal.isOpen} withCloseButton={false} onClose={() => setOpenModal({isOpen: false})} centered>
             <div style={{ display: 'flex', alignItems: 'center' }}>
                 <Table>

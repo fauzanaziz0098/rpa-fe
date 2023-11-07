@@ -372,7 +372,7 @@ export default function Home({ headers }) {
                   <div
                     style={{ display: "flex", gap: "5px", aligItems: "center" }}
                   >
-                    <IconPackage color={theme.colors.blue[6]} stroke={1.5} />
+                    <IconPackage color={theme.colors.cyan[6]} stroke={1.5} />
                     Monitor Pencapaian per jam
                   </div>
                 </Menu.Item>
@@ -387,7 +387,7 @@ export default function Home({ headers }) {
                     style={{ display: "flex", gap: "5px", aligItems: "center" }}
                   >
                     <IconSquareCheck
-                      color={theme.colors.pink[6]}
+                      color={theme.colors.cyan[6]}
                       stroke={1.5}
                     />
                     Monitor O E E
@@ -430,7 +430,7 @@ export default function Home({ headers }) {
                       alignItems: "center",
                     }}
                   >
-                    <IconPackage color={theme.colors.blue[6]} stroke={1.5} />
+                    <IconPackage color={theme.colors.cyan[6]} stroke={1.5} />
                     User
                   </div>
                 </Menu.Item>
@@ -449,7 +449,7 @@ export default function Home({ headers }) {
                     }}
                   >
                     <IconSquareCheck
-                      color={theme.colors.pink[6]}
+                      color={theme.colors.cyan[6]}
                       stroke={1.5}
                     />
                     Customer
@@ -487,7 +487,7 @@ export default function Home({ headers }) {
                       alignItems: "center",
                     }}
                   >
-                    <IconCalendar color={theme.colors.violet[6]} stroke={1.5} />
+                    <IconCalendar color={theme.colors.cyan[6]} stroke={1.5} />
                     Permission
                   </div>
                 </Menu.Item>
@@ -507,7 +507,7 @@ export default function Home({ headers }) {
                       alignItems: "center",
                     }}
                   >
-                    <IconPackage color={theme.colors.blue[6]} stroke={1.5} />
+                    <IconPackage color={theme.colors.cyan[6]} stroke={1.5} />
                     Machine Production
                   </div>
                 </Menu.Item>
@@ -526,7 +526,7 @@ export default function Home({ headers }) {
                     }}
                   >
                     <IconSquareCheck
-                      color={theme.colors.pink[6]}
+                      color={theme.colors.cyan[6]}
                       stroke={1.5}
                     />
                     Product
@@ -566,7 +566,7 @@ export default function Home({ headers }) {
                       alignItems: "center",
                     }}
                   >
-                    <IconCalendar color={theme.colors.violet[6]} stroke={1.5} />
+                    <IconCalendar color={theme.colors.cyan[6]} stroke={1.5} />
                     Down Time
                   </div>
                 </Menu.Item>
@@ -586,7 +586,7 @@ export default function Home({ headers }) {
                       alignItems: "center",
                     }}
                   >
-                    <IconPackage color={theme.colors.blue[6]} stroke={1.5} />
+                    <IconPackage color={theme.colors.cyan[6]} stroke={1.5} />
                     Product Category
                   </div>
                 </Menu.Item>
@@ -607,7 +607,7 @@ export default function Home({ headers }) {
                     }}
                   >
                     <IconSquareCheck
-                      color={theme.colors.pink[6]}
+                      color={theme.colors.cyan[6]}
                       stroke={1.5}
                     />
                     Machine Category
@@ -647,7 +647,7 @@ export default function Home({ headers }) {
                       alignItems: "center",
                     }}
                   >
-                    <IconCalendar color={theme.colors.violet[6]} stroke={1.5} />
+                    <IconCalendar color={theme.colors.cyan[6]} stroke={1.5} />
                     Shift
                   </div>
                 </Menu.Item>
@@ -688,7 +688,7 @@ export default function Home({ headers }) {
                   <div
                     style={{ display: "flex", gap: "5px", aligItems: "center" }}
                   >
-                    <IconPackage color={theme.colors.blue[6]} stroke={1.5} />
+                    <IconPackage color={theme.colors.cyan[6]} stroke={1.5} />
                     Production Planning
                   </div>
                 </Menu.Item>
@@ -705,7 +705,7 @@ export default function Home({ headers }) {
                     style={{ display: "flex", gap: "5px", aligItems: "center" }}
                   >
                     <IconSquareCheck
-                      color={theme.colors.pink[6]}
+                      color={theme.colors.cyan[6]}
                       stroke={1.5}
                     />
                     WhatsApp Notification
@@ -762,7 +762,7 @@ export default function Home({ headers }) {
                   <div
                     style={{ display: "flex", gap: "5px", aligItems: "center" }}
                   >
-                    <IconAlarmSnooze color={"red"} stroke={1.5} />
+                    <IconAlarmSnooze color={theme.colors.cyan[6]} stroke={1.5} />
                     Machine Stop
                   </div>
                 </Menu.Item>
@@ -778,7 +778,7 @@ export default function Home({ headers }) {
                   <div
                     style={{ display: "flex", gap: "5px", aligItems: "center" }}
                   >
-                    <IconPackage color={theme.colors.blue[6]} stroke={1.5} />
+                    <IconPackage color={theme.colors.cyan[6]} stroke={1.5} />
                     Acheivement Report
                   </div>
                 </Menu.Item>
@@ -793,7 +793,7 @@ export default function Home({ headers }) {
                     style={{ display: "flex", gap: "5px", aligItems: "center" }}
                   >
                     <IconSquareCheck
-                      color={theme.colors.pink[6]}
+                      color={theme.colors.cyan[6]}
                       stroke={1.5}
                     />
                     OEE Report
@@ -829,7 +829,7 @@ export default function Home({ headers }) {
                   <div
                     style={{ display: "flex", gap: "5px", aligItems: "center" }}
                   >
-                    <IconCalendar color={theme.colors.violet[6]} stroke={1.5} />
+                    <IconCalendar color={theme.colors.cyan[6]} stroke={1.5} />
                     Production Montly Report
                   </div>
                 </Menu.Item>
@@ -845,7 +845,7 @@ export default function Home({ headers }) {
                   <div
                     style={{ display: "flex", gap: "5px", aligItems: "center" }}
                   >
-                    <IconPackage color={theme.colors.blue[6]} stroke={1.5} />
+                    <IconPackage color={theme.colors.cyan[6]} stroke={1.5} />
                     Planning Daily Report
                   </div>
                 </Menu.Item>
@@ -862,7 +862,7 @@ export default function Home({ headers }) {
                     style={{ display: "flex", gap: "5px", aligItems: "center" }}
                   >
                     <IconSquareCheck
-                      color={theme.colors.pink[6]}
+                      color={theme.colors.cyan[6]}
                       stroke={1.5}
                     />
                     Planning Montly Report
@@ -1005,13 +1005,13 @@ export default function Home({ headers }) {
           justifyContent: "space-between",
         }}
       >
-          <div style={{ display: "flex" }}>
+          <div style={{ display: "flex", maxWidth: '100%' }}>
             <div
               style={{
                 textAlign: "center",
                 backgroundColor: "lavender",
                 height: "225px",
-                width: "120px",
+                width: "10%",
                 marginTop: "10px",
               }}
             >
@@ -1019,7 +1019,7 @@ export default function Home({ headers }) {
                 style={{
                   textAlign: "center",
                   backgroundColor: "lavender",
-                  width: "120px",
+                  // width: "120px",
                   marginTop: "-7px",
                 }}
               >
@@ -1247,7 +1247,7 @@ export default function Home({ headers }) {
                 </ScrollArea>
               </div>
             ) : (
-              <div style={{ marginLeft: "10px", minWidth: '88vw', width: '88vw', display: 'flex', flexWrap: 'nowrap' }}>
+              <div style={{ marginLeft: "10px", minWidth: '89%', width: '89%', display: 'flex', flexWrap: 'nowrap' }}>
                 <ScrollArea offsetScrollbars>
                   <div>
                     <div
@@ -1506,10 +1506,10 @@ export default function Home({ headers }) {
           </div>
       </div>
       <ScrollArea>
-        <div style={{ display: "flex" }}>
+        <div style={{ display: "flex", maxWidth: '100%' }}>
           <div
             style={{
-              width: "100px",
+              width: "8.2%",
               border: "10px solid skyblue",
               textAlign: "center",
               minHeight: "304px",
