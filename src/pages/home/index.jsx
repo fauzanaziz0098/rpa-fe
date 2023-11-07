@@ -54,11 +54,13 @@ export default function Home({ headers }) {
   useEffect(() => {
     let interval = setInterval(() => {
         var el = document.getElementById('cellcontent')
-        el.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center',
-            inline: 'center',
-        })
+        if (el) {
+          el.scrollIntoView({
+              behavior: 'smooth',
+              block: 'center',
+              inline: 'center',
+          })
+        }
     }, 10000)
     return () => clearInterval(interval)
 }, [])
@@ -120,6 +122,7 @@ export default function Home({ headers }) {
         .on("message", (topic, message) => {
           if (topic == `MC${machinePlan}:PLAN:RPA`) {
             setMqttData1(JSON.parse(message));
+            console.log(JSON.parse(message), topic, 'test');
             console.log("message got");
           }
         });
@@ -1517,7 +1520,7 @@ export default function Home({ headers }) {
                 Operator
               </p>
               <p style={{ padding: "10px", marginTop: "-16px" }}>
-                {mqttData1?.operatorId ? String(mqttData1.operatorId).toLowerCase() : ''}
+                {activePlan && mqttData1?.OperatorId ? String(mqttData1.OperatorId).toLowerCase() : activePlan?.user}
               </p>
             </div>
             <div>
