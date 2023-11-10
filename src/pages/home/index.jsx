@@ -1453,13 +1453,15 @@ export default function Home({ headers }) {
                                   }}
                                 >
                                   {value.time.split(":")[0] == new Date().getHours()
-                                    ? Math.round(
+                                    ? value.target == 0 
+                                    ? '-' 
+                                    : Math.round(
                                         ((mqttData1.qty_actual -
                                           productionData.all.reduce(
                                             (total, value) => (total ? total : 0) + value.actual,
                                             0
                                           )) /
-                                          (value.target ? value.target : 0.1)) *
+                                          (value.target)) *
                                           100
                                       )
                                     : value.percentage}
