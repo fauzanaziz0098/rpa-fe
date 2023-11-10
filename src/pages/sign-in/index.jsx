@@ -53,7 +53,7 @@ const SignIn = () => {
                     password: form.values.password,
                 });
                 setCookie("auth", `Bearer ${data.data.token}`, {
-                    maxAge: 60000 * 24,
+                    maxAge: 60 * 6 * 24,
                 });
                 setCookie(
                     "user",
@@ -64,14 +64,14 @@ const SignIn = () => {
                         image: data.data.image,
                     },
                     {
-                        maxAge: 60000 * 24,
+                    maxAge: 60 * 6 * 24,
                     }
                 );
                 setCookie("role", data.data.role.name, {
-                    maxAge: 60000 * 24,
+                    maxAge: 60 * 6 * 24,
                 });
                 setCookie("permissions", data.data.role.permissions.map((permission) => permission.name).toString(), {
-                    maxAge: 60000 * 24,
+                    maxAge: 60 * 6 * 24,
                 });
                 showNotification({
                     title: "Successful Login",
