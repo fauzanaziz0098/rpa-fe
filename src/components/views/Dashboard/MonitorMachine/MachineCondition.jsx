@@ -57,7 +57,8 @@ const MachineCondition = ({activePlan, machineId}) => {
     const fetchConditionMachine = async () => {
         try {
             const res = await axiosPlanning.get(`condition-machine-production/${machineId}`, getHeaderConfigAxios()).then(item => item.data)
-            setConditionMachineProductionDatas(res.data)
+            const resSort = res?.data?.sort((a,b) => a.id - b.id)
+            setConditionMachineProductionDatas(resSort)
         } catch (error) {
             console.log(error, 'error fetch condition machine');
         }
