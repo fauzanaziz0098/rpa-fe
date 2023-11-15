@@ -431,7 +431,7 @@ export default function Home() {
     const nameShift1 = shiftToday?.[1]?.shift || '-';
     const createAt = moment(activePlan?.created_at).format('DD-MM-YYYY');
 
-    const oeeReport0 = (shiftToday.length == 0 ? roundedPercentage : isNaN(Math.round((shiftToday?.[0]?.oee)* 100)) ? '-' : Math.round((shiftToday?.[0]?.oee)* 100) + roundedPercentage);
+    const oeeReport0 = (shiftToday.length == 0 ? roundedPercentage : isNaN(Math.round((shiftToday?.[0]?.oee)* 100)) ? '-' : Math.round((shiftToday?.[0]?.oee)* 100) + roundedPercentage) / (shiftToday.length > 0 ? shiftToday.length : 1);
     const oeeReport1 = shiftToday.length == 1 && shiftToday.length != 0 && shiftToday?.find(item => item.shift != activePlan?.shift?.name) == true ? roundedPercentage : "-";
     console.log(shiftToday.length != 0 && shiftToday?.find(item => item.shift != activePlan?.shift?.name) == true , 'gokil');
 
