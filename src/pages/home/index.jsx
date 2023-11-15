@@ -949,8 +949,13 @@ export default function Home({ headers }) {
             width: "100px",
             height: "35px",
             borderRadius: "5px",
-          }}></div>
-          <p style={{ marginTop: '2px' }}>{mqttData1 && mqttData1.mc_run && mqttData1.mc_run[0] ? "Run" : mqttData1 && mqttData1.mc_stop && mqttData1.mc_stop[0] ? "Stop" : ""}</p>
+            position: 'relative',
+            display: 'flex', 
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}>
+            <p style={{ position: 'absolute', color: 'white', fontFamily: 'sans-serif' }}>{mqttData1 && mqttData1.mc_run && mqttData1.mc_run[0] ? "Run" : mqttData1 && mqttData1.mc_stop && mqttData1.mc_stop[0] ? "Stop" : ""}</p>
+          </div>
         </div>
         </div>
         <div style={{ display: "flex" }}>
@@ -1294,7 +1299,7 @@ export default function Home({ headers }) {
                             return (
                               <p
                                 key={key}
-                                style={value.time.split(":")[0] == new Date().getHours() ? { width: "50px", textAlign: "center", background: '#60c942', paddingBottom: '14px'} : { width: "50px", textAlign: "center"}}
+                                style={value.time.split(":")[0] == new Date().getHours() ? { width: "50px", textAlign: "center", background: '#60c942', paddingBottom: '0.79rem'} : { width: "50px", textAlign: "center"}}
                               >
                                 {value.duration}
                               </p>

@@ -123,7 +123,7 @@ const MachineCondition = ({activePlan, machineId}) => {
         {activePlan ? (
             <>
                 <div style={{ marginTop: '-16px' }}>
-                    <p style={{ backgroundColor: 'gainsboro', padding: '10px' }}>Cek Awal Mesin</p>
+                    <p style={{ backgroundColor: 'gainsboro', padding: '10px', fontWeight: 'bold', color: '#495057', fontSize: '16px', fontFamily: 'sans-serif' }}>Cek Mesin Start</p>
                 </div>
                 <div
                     style={{ backgroundColor: 'lavender', height: '266px', marginTop: '-16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}

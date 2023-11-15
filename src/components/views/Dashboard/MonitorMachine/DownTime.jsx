@@ -39,17 +39,17 @@ const DownTime = ({machineId}) => {
             <Table highlightOnHover withColumnBorders>
                 <thead style={{ backgroundColor: 'gainsboro', textAlign: 'center' }}>
                     <tr>
-                        <th style={{ textAlign: 'center' }}>Down Time</th>
-                        <th style={{ textAlign: 'center' }}>Durasi</th>
-                        <th style={{ textAlign: 'center' }}>Status</th>
+                        <th style={{ textAlign: 'center', fontSize: '1.1vw' }}>Down Time</th>
+                        <th style={{ textAlign: 'center', fontSize: '1.1vw' }}>Durasi</th>
+                        <th style={{ textAlign: 'center', fontSize: '1.1vw' }}>Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     { machineId ? (lineStopDatas.map((row, index) => (
                         <tr key={index} style={ index == lineStopDatas?.length -1 ? { borderBottom: '1px #d4d6d9 solid' } : {}}>
-                            <td>{row.name}</td>
-                            <td>{mqttDataLS1[`CauseLS${row.typeId}`] == null ? '-' : mqttDataLS1[`CauseLS${row.typeId}`]}</td>
-                            <td style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '20px'}}>
+                            <td style={{ textAlign: 'left', fontSize: '1vw', paddingInline: '50px' }}>{row.name}</td>
+                            <td style={{ fontSize: '0.99vw' }}>{mqttDataLS1[`CauseLS${row.typeId}`] == null ? '-' : mqttDataLS1[`CauseLS${row.typeId}`]}</td>
+                            <td style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '20px', fontSize: '1.1rem'}}>
                                 <ActionIcon>
                                     <IconCircleDot style={{ color: 'white', backgroundColor: `${mqttDataLS1['IsActive'] == row.typeId ? 'red' : mqttDataLS1[`CauseLS${row.typeId}`] == 0 ? 'green' : '#dce305'}`, borderRadius: '100%'}} />
                                 </ActionIcon>
