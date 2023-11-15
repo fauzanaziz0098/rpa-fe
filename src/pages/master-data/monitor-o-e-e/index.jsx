@@ -40,6 +40,7 @@ export default function Home() {
     const [shift, setShift] = useState([])
     const [noPlanToday, setNoPlanToday] = useState([])
     const [shiftName, setShiftName] = useState("");
+    const [shiftToday, setShiftToday] = useState([])
 
     console.log(activePlan, 'active');
     console.log(shift, 'shift');
@@ -50,13 +51,13 @@ export default function Home() {
         try {
             const res1 = await axiosPlanning.get('planning-production', getHeaderConfigAxios())
             setActivePlan(res1.data.data)
-            const res2 = await axios.get(`http://192.168.0.215:5000/api/report-shift/report/${res1.data.data.machine.name}`, getHeaderConfigAxios())
+            const res2 = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_PLANNING_SERVICE}/report-shift/report`, getHeaderConfigAxios())
             setShift(res2.data.data)
+            console.log(res2.data.data, 'res2');
         } catch (error) {
             console.log(error, 'error fetch data');
         }
     }
-    console.log(mqttData1, 'activeplan');
       useEffect(() => {
         fetchActiveData();
         const intervalId = setInterval(() => {
@@ -133,109 +134,95 @@ export default function Home() {
     }, [activePlan, shift]);
 
 
-    // quality
+    // quality ring
     const qtyActual = mqttData1.qty_actual;
     const qtyOk  = mqttData1.qty_actual - 0;
 
-const calculateQualityPercentage = () => {
-    const qtyActual = mqttData1.qty_actual;
-    const qtyOk = mqttData1.qty_actual - 0;
-    const qtyPlanning = activePlan.qty_planning;
-    if (qtyPlanning === 0) {
-        return 0;
-    }
-    // const qualityPercentage = Math.ceil((qtyActual - 0) / qtyPlanning);
-    const qualityPercentage = Math.round( qtyActual/ qtyOk * 100);
+    const calculateQualityPercentage = () => {
+        let qtyActualShift = 0
+        let qtyNGShift = 0
+        if (shiftToday.length > 0) {
+            qtyActualShift = shiftToday.filter(item => item?.shift?.includes(activePlan?.shift?.name))?.reduce((a,b) => Number(a) + Number(b.qty_actual) ,0)
+        }
+        const qtyActual = mqttData1.qty_actual + qtyActualShift;
+        const qtyOk = (mqttData1.qty_actual + qtyActualShift) - (0 + qtyNGShift);
+        const qtyPlanning = activePlan.qty_planning;
+        if (qtyPlanning === 0) {
+            return 0;
+        }
+        // const qualityPercentage = Math.ceil((qtyActual - 0) / qtyPlanning);
+        const qualityPercentage = Math.round( qtyActual/ qtyOk * 100);
 
-    if (isNaN(qualityPercentage)) {
-        return 0;
-    }
+        if (isNaN(qualityPercentage)) {
+            return 0;
+        }
 
 
-    return qualityPercentage;
-};
+        return qualityPercentage;
+    };
 
-const qualityPercentage = calculateQualityPercentage();
+    const qualityPercentage = calculateQualityPercentage();
 
-const calculateQuality = () => {
-    const qtyActual = mqttData1.qty_actual;
-    const qtyOk = mqttData1.qty_actual - 0;
-    const qtyPlanning = activePlan.qty_planning;
+    // quality untuk oee
+    const calculateQuality = () => {
+        let qtyActualShift = 0
+        let qtyNGShift = 0
+        if (shiftToday.length > 0) {
+            qtyActualShift = shiftToday.filter(item => item?.shift?.includes(activePlan?.shift?.name))?.reduce((a,b) => Number(a) + Number(b.qty_actual) ,0)
+        }
+        const qtyActual = mqttData1.qty_actual + qtyActualShift;
+        const qtyOk = (mqttData1.qty_actual + qtyActualShift) - (0 + qtyNGShift);
+        const qtyPlanning = activePlan.qty_planning;
 
-    if (qtyPlanning === 0) {
-        return 0;
-    }
-    const qualityPercentage = (qtyActual/ qtyOk);
+        if (qtyPlanning === 0) {
+            return 0;
+        }
+        const qualityPercentage = (qtyActual/ qtyOk);
 
-    if (isNaN(qualityPercentage)) {
-        return 0;
-    }
-    
-    return qualityPercentage;
-};
+        if (isNaN(qualityPercentage)) {
+            return 0;
+        }
+        
+        return qualityPercentage;
+    };
 
-const quality = calculateQuality();
-console.log(qualityPercentage, 'qua');
+    const quality = calculateQuality();
+    console.log(qualityPercentage, 'qua');
 
 
     //   perfomance
     const [timeActual, setTimeActual] = useState(0);
     const [startTime, setStartTime] = useState(null);
 
-    // useEffect(() => {
-    //     const startTime = moment(activePlan.date_time_in).tz("Asia/Bangkok");
-    //     const currentTime = moment().tz("Asia/Bangkok");
-    //     const initialTimeDifferenceInMinutes = currentTime.diff(startTime, 'minutes');
-    //     // const fixedMinutes = Math.min(initialTimeDifferenceInMinutes, 47);
-    //     const fixedMinutes = Math.min(initialTimeDifferenceInMinutes,(moment(activePlan.date_time_in).add(1, 'hour').minute(0).diff(moment(activePlan.date_time_in), 'minute')))
-    //     const additionalMinutes = fixedMinutes + Math.floor((initialTimeDifferenceInMinutes - fixedMinutes) / 60) * 60; 
-      
-    //     setTimeActual(initialTimeDifferenceInMinutes);
-      
-    //     const interval = setInterval(() => {
-    //         setTimeActual((prevTimeActual) => prevTimeActual + 1);
-    //       }, 60000);
-                
-    //     return () => {
-    //       clearInterval(interval);
-    //     };
-    //   }, [activePlan.date_time_in]);
-      
-      
-
-    
-    // useEffect(() => {
-    //     const startTime = moment(activePlan.date_time_in).tz("Asia/Bangkok");
-    //     const currentTime = moment().tz("Asia/Bangkok");
-    //     const initialTimeDifferenceInHours = currentTime.diff(startTime, 'hours');
-    //     const initialTimeDifferenceInMinutes = initialTimeDifferenceInHours * 60;
-        
-    //     setTimeActual(initialTimeDifferenceInMinutes);
-      
-    //     const interval = setInterval(() => {
-    //       setTimeActual((prevTimeActual) => prevTimeActual + 60);
-    //     }, 3600000); // Setiap 1 jam
-      
-    //     return () => {
-    //       clearInterval(interval);
-    //     };
-    //   }, [activePlan.date_time_in]);
-
     const cycleTime = activePlan.product ? activePlan.product.cycle_time : 0;
-    const timePlanned = Math.round(cycleTime * qtyActual / 60);
+    let timePlanned = Math.round(cycleTime * qtyActual / 60);
+    if (shiftToday.length > 0) {
+        shiftToday?.filter(item => item.shift.includes(activePlan?.shift?.name))?.map(item => {
+            const reportShiftTimePlanned = item.product_cycle_time * item.qty_actual / 60
+            timePlanned += Number(reportShiftTimePlanned)
+        })
+    }
 
+    //perfomance ring
     const calculatePerformancePercentage = () => {
         // const cycleTimeQtyActual = cycleTime * qtyActual;
         if (timeActual === 0) {
             return 0;
         }
-        const performance = timePlanned / timeActual * 100;
+        let noPlnaTempry=0
+        if (activePlan.shift.no_plan_machine_id) {
+            const totalNoPlan = activePlan.shift.no_plan_machine_id.reduce((total, value) => total ?? 0 + value.total, 0);
+            noPlnaTempry = totalNoPlan ?? 0;
+        }
+        const performance = timePlanned / (timeActual - noPlnaTempry) * 100;
+        console.log(cycleTime,qtyActual , timeActual, noPlnaTempry, 'perfomance');
         const performancePercentage = Math.round(performance);
         return performancePercentage;
     };
 
     const performancePercentage = calculatePerformancePercentage();
 
+    //perfomance 
     const calculatePerformance = () => {
         const cycleTimeQtyActual = cycleTime * qtyActual;
         if (timeActual === 0) {
@@ -257,11 +244,13 @@ console.log(qualityPercentage, 'qua');
         //time actual
         const startTime = moment(activePlan.date_time_in).tz("Asia/Bangkok");
         const currentTime = moment().tz("Asia/Bangkok");
-        const initialTimeDifferenceInMinutes = currentTime.diff(startTime, 'minutes');
+        let initialTimeDifferenceInMinutes = currentTime.diff(startTime, 'minutes');
         // const fixedMinutes = Math.min(initialTimeDifferenceInMinutes, 47);
         const fixedMinutes = Math.min(initialTimeDifferenceInMinutes,(moment(activePlan.date_time_in).add(1, 'hour').minute(0).diff(moment(activePlan.date_time_in), 'minute')))
         const additionalMinutes = fixedMinutes + Math.floor((initialTimeDifferenceInMinutes - fixedMinutes) / 60) * 60; 
-      
+        if (shiftToday.length > 0) {
+            initialTimeDifferenceInMinutes += shiftToday?.filter(item => item.shift.includes(activePlan?.shift?.name))?.reduce((a, b) => Number(a) + Number(b.total_planning) , 0)
+        }
         setTimeActual(initialTimeDifferenceInMinutes);
       
 
@@ -269,8 +258,10 @@ console.log(qualityPercentage, 'qua');
         const calculatePlannedAvailability = () => {
             const startTime = moment(activePlan.date_time_in).tz("Asia/Bangkok");
             const currentTime = moment().tz("Asia/Bangkok");
-            const timeDifference = currentTime.diff(startTime, 'minutes');
-
+            let timeDifference = currentTime.diff(startTime, 'minutes');
+            if (shiftToday.length > 0) {
+                timeDifference += shiftToday?.filter(item => item.shift.includes(activePlan?.shift?.name))?.reduce((a, b) => Number(a) + Number(b.total_planning) ,0)
+            }
             // let newPlannedAvailability = 0;
 
             // if (timeDifference >= 0) {
@@ -297,15 +288,18 @@ console.log(qualityPercentage, 'qua');
         return () => {
             clearInterval(intervalId);
         };
-    }, [activePlan]);
+    }, [activePlan, shiftToday]);
 
     const [plannedActual, setPlannedActual] = useState(0);
     useEffect(() => {
         const calculatePlannedActual = () => {
             const startTime = moment(activePlan.date_time_in).tz("Asia/Bangkok");
             const currentTime = moment().tz("Asia/Bangkok");
-            const timeDifference = currentTime.diff(startTime, 'minutes');
-            
+            let timeDifference = currentTime.diff(startTime, 'minutes');
+            if (shiftToday.length > 0) {
+                timeDifference = Number(timeDifference) + shiftToday?.filter(item => item.shift.includes(activePlan?.shift?.name))?.reduce((a, b) => Number(a) + Number(b.total_planning) ,0)
+            }
+
             let newPlannedActual = 0;
             
             // if (timeDifference >= 0) {
@@ -341,7 +335,7 @@ console.log(qualityPercentage, 'qua');
             }
             newPlannedActual = Math.max(newPlannedActual, 0);
             newPlannedActual -= mqttData2.TotalTime;
-            setPlannedActual(timeDifference-mqttData2.TotalTime - noPlnaTempry ?? 0);
+            setPlannedActual(timeDifference - mqttData2.TotalTime - noPlnaTempry ?? 0);
             console.log(noPlnaTempry, 'noplan');
         };
 
@@ -368,7 +362,7 @@ console.log(qualityPercentage, 'qua');
 
         const currentTime = moment().tz("Asia/Bangkok");
         const dateIn = moment(activePlan.date_time_in).tz("Asia/Bangkok");
-        const timeDifference = currentTime.diff(dateIn, 'minutes');
+        let timeDifference = currentTime.diff(dateIn, 'minutes');
 
         const totalPlanningTime = mqttData2.TotalTime;
         // const availabilityPercentage = Math.round((timeDifference - totalPlanningTime) / timeDifference * 100);
@@ -377,7 +371,13 @@ console.log(qualityPercentage, 'qua');
             const totalNoPlan = activePlan.shift.no_plan_machine_id.reduce((total, value) => total ?? 0 + value.total, 0);
             noPlnaTempry = totalNoPlan ?? 0;
         }
-        const availabilityPercentage = Math.round((timeDifference - totalPlanningTime - noPlnaTempry) / plannedAvailability * 100);
+        if (shiftToday.length > 0) {
+            noPlnaTempry += shiftToday?.filter(item => item.shift.includes(activePlan?.shift?.name))?.reduce((a, b ) => Number(a) + Number(b.no_plan),0)
+            timeDifference += shiftToday?.filter(item => item.shift.includes(activePlan?.shift?.name))?.reduce((a, b) =>  Number(a) + Number(b.total_planning) ,0)
+        }
+        console.log(noPlnaTempry, 'tpo');
+        const availabilityPercentage = Math.round((timeDifference - totalPlanningTime - noPlnaTempry) / (plannedAvailability - noPlnaTempry) * 100);
+        console.log(timeDifference, totalPlanningTime, noPlnaTempry, plannedActual, noPlnaTempry, 'pop');
 
 
         return availabilityPercentage;
@@ -392,18 +392,22 @@ console.log(qualityPercentage, 'qua');
 
         const currentTime = moment().tz("Asia/Bangkok");
         const dateIn = moment(activePlan.date_time_in).tz("Asia/Bangkok");
-        const timeDifference = currentTime.diff(dateIn, 'minutes');
+        let timeDifference = currentTime.diff(dateIn, 'minutes');
 
         let noPlnaTempry=0
         if (activePlan.shift.no_plan_machine_id) {
             const totalNoPlan = activePlan.shift.no_plan_machine_id.reduce((total, value) => total ?? 0 + value.total, 0);
             noPlnaTempry = totalNoPlan ?? 0;
         }
+        if (shiftToday.length > 0) {
+            noPlnaTempry += shiftToday?.filter(item => item.shift.includes(activePlan?.shift?.name))?.reduce((a, b ) => Number(a) + Number(b.no_plan),0)
+            timeDifference += shiftToday?.filter(item => item.shift.includes(activePlan?.shift?.name))?.reduce((a, b) =>  Number(a) + Number(b.total_planning) ,0)
+        }
         // const availabilityPercentage = Math.round((timeDifference - totalPlanningTime - noPlnaTempry) / plannedAvailability * 100);
 
 
         const totalPlanningTime = mqttData2.TotalTime;
-        const availability = ((timeDifference - totalPlanningTime - noPlnaTempry) / plannedAvailability );
+        const availability = ((timeDifference - totalPlanningTime - noPlnaTempry) / (plannedAvailability - noPlnaTempry) );
 
 
         return availability;
@@ -418,14 +422,18 @@ console.log(qualityPercentage, 'qua');
 
     const roundedPercentage = Math.round(multipliedPercentage);
 
+    useEffect(() => {
+        setShiftToday(shift.filter(item => moment(item.created_at).format('YYYY-MM-DD') == moment(activePlan?.created_at).format('YYYY-MM-DD')))
+    }, [shift])
     //shift
-    console.log(moment(shift[0]?.created_at, 'YYYY-MM-DD').format('DD-MM-YYYY'), 'shift12');
-    const nameShift0 = shift[0]?.shift || '-';
-    const nameShift1 = shift[1]?.shift || '-';
-    const createAt = moment(shift[0]?.created_at, 'YYYY-MM-DD').format('DD-MM-YYYY');
+    console.log(shiftToday, 'today');
+    const nameShift0 = shiftToday?.[0]?.shift || '-';
+    const nameShift1 = shiftToday?.[1]?.shift || '-';
+    const createAt = moment(activePlan?.created_at).format('DD-MM-YYYY');
 
-    const oeeReport0 = isNaN(Math.round((shift[0]?.oee)* 100)) ? '-' : Math.round((shift[0]?.oee)* 100);
-    const oeeReport1 = isNaN(Math.round((shift[1]?.oee)* 100)) ? '-' : Math.round((shift[1]?.oee)* 100);
+    const oeeReport0 = (shiftToday.length == 0 ? roundedPercentage : isNaN(Math.round((shiftToday?.[0]?.oee)* 100)) ? '-' : Math.round((shiftToday?.[0]?.oee)* 100) + roundedPercentage);
+    const oeeReport1 = shiftToday.length == 1 && shiftToday.length != 0 && shiftToday?.find(item => item.shift != activePlan?.shift?.name) == true ? roundedPercentage : "-";
+    console.log(shiftToday.length != 0 && shiftToday?.find(item => item.shift != activePlan?.shift?.name) == true , 'gokil');
 
     const router = useRouter()
     const changePage = () => {
@@ -468,55 +476,55 @@ console.log(qualityPercentage, 'qua');
                     </Menu.Dropdown>
                 </Menu>
                 <div style={{ flex: '1' }}>
-                    <p style={{ textAlign: 'left', marginLeft: '30px' }}>AVAILABILITY</p>
+                    <p style={{ textAlign: 'left', marginLeft: '130px' }}>AVAILABILITY</p>
                 </div>
                 <div style={{ flex: '1' }}>
-                    <p style={{ textAlign: 'right', marginRight: '50px' }}>PERFORMANCE</p>
+                    <p style={{ textAlign: 'right', marginRight: '180px' }}>PERFORMANCE</p>
                 </div>
             </div>
             <div style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '20px', marginTop: '-60px' }}>
                 <h1>O E E</h1>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '-60px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '-70px' }}>
                 <div>
-                    <RingProgress style={{ marginLeft: '60px' }} sections={[{ value: availabilityPercentage, color: 'green'
-                        }]} label={ <Text c="green" fw={700} ta="center" size="xl">
+                    <RingProgress roundCaps thickness={20} style={{ marginLeft: '130px' }} sections={[{ value: availabilityPercentage, color: 'green'
+                        }]} label={ <Text c="green" fw={700} ta="center" size={30}>
                         {availabilityPercentage.toFixed(0)}%
                         </Text>
                         }
-                        size={200}
+                        size={250}
                         />
-                        <Paper shadow="xs" withBorder style={{ marginLeft: '60px' }}>
+                        <Paper shadow="xs" withBorder style={{ marginLeft: '130px' }}>
                             <div style={{  textAlign: 'center' }}>
-                                <p>Availibity planned :{plannedAvailability} minutes</p>
-                                <p>Availibity actual : {plannedActual} minutes</p>
+                                <p>Availibity planned :{Math.round(plannedAvailability)} minutes</p>
+                                <p>Availibity actual : {Math.round(plannedActual)} minutes</p>
                                 {/* <p>Availibity actual : {timeActual} minutes</p> */}
                             </div>
                         </Paper>
                 </div>
                 <div>
-                    <RingProgress style={{ marginRight: '10px' }} sections={[{ value: performancePercentage, color: 'green'
-                        }]} label={ <Text c="green" fw={700} ta="center" size="xl">
+                    <RingProgress roundCaps thickness={20} style={{ marginRight: '120px' }} sections={[{ value: performancePercentage, color: 'green'
+                        }]} label={ <Text c="green" fw={700} ta="center" size={30}>
                         {performancePercentage.toFixed(0)}%
                         </Text>
                         }
-                        size={200}
+                        size={250}
                         />
-                        <Paper shadow="xs" withBorder style={{ marginRight: '10px' }}>
+                        <Paper shadow="xs" withBorder style={{ marginRight: '120px' }}>
                             <div style={{  textAlign: 'center' }}>
-                                <p>Time planned : {timePlanned} minutes</p>
-                                <p>Time actual : {timeActual} minutes</p>
+                                <p>Time planned : {Math.round(timePlanned)} minutes</p>
+                                <p>Time actual : {Math.round(timeActual)} minutes</p>
                             </div>
                         </Paper>
                 </div>
             </div>
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '-260px' }}>
-                <RingProgress sections={[{ value: roundedPercentage, color: 'green' }]} label={ <Text c="green" fw={700}
-                    ta="center" size="xl">
+                <RingProgress roundCaps thickness={40} sections={[{ value: roundedPercentage, color: 'green' }]} label={ <Text c="green" fw={700}
+                    ta="center" size={50}>
                     {roundedPercentage.toFixed()}%
                     </Text>
                     }
-                    size={500}
+                    size={600}
                     />
             </div>
 
@@ -534,24 +542,24 @@ console.log(qualityPercentage, 'qua');
                         </div>
                         <div
                             style={{ display: 'flex', fontSize: '50px', fontWeight: 'bold', color: 'skyblue', justifyContent: 'space-between', marginTop: '-70px' }}>
-                            <p style={{ marginLeft: '35px' }}>{oeeReport0}%</p>
-                            <p style={{ marginRight: '35px' }}>{oeeReport1}%</p>
+                            <p style={{ marginLeft: '15px' }}>{oeeReport0}%</p>
+                            <p style={{ marginRight: '15px' }}>{oeeReport1}%</p>
                         </div>
                     </div>
                 </div>
                 <div>
                     <div style={{ flex: '1', marginTop: '-50px', fontWeight: 'bold' }}>
-                        <p style={{ textAlign: 'right', marginRight: '70px' }}>QUALITY</p>
+                        <p style={{ textAlign: 'right', marginRight: '200px' }}>QUALITY</p>
                     </div>
                     <div>
-                        <RingProgress style={{ marginRight: '10px' }} sections={[{ value: qualityPercentage, color: 'green'
-                            }]} label={ <Text c="green" fw={700} ta="center" size="xl">
+                        <RingProgress roundCaps thickness={20} style={{ marginRight: '115px', marginTop: '-15px' }} sections={[{ value: qualityPercentage, color: 'green'
+                            }]} label={ <Text c="green" fw={700} ta="center" size={30}>
                             {qualityPercentage.toFixed(0)}%
                             </Text>
                             }
-                            size={200}
+                            size={250}
                             />
-                            <Paper shadow="xs" withBorder style={{ marginRight: '10px' }}>
+                            <Paper shadow="xs" withBorder style={{ marginRight: '110px' }}>
                                 <div style={{  textAlign: 'center' }}>
                                     <p>Total Production : {qtyActual} Pcs</p>
                                     <p>Total Product OK : {qtyOk} Pcs</p>
