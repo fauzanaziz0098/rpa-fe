@@ -42,10 +42,10 @@ export default function Home() {
     const [shiftName, setShiftName] = useState("");
     const [shiftToday, setShiftToday] = useState([])
 
-    console.log(activePlan, 'active');
-    console.log(shift, 'shift');
-    console.log(mqttData1, 'mqdata1');
-    console.log(mqttData2, 'mqdata2');
+    // console.log(activePlan, 'active');
+    // console.log(shift, 'shift');
+    // console.log(mqttData1, 'mqdata1');
+    // console.log(mqttData2, 'mqdata2');
 
     const fetchActiveData = async () => {
         try {
@@ -53,7 +53,7 @@ export default function Home() {
             setActivePlan(res1.data.data)
             const res2 = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_PLANNING_SERVICE}/report-shift/report`, getHeaderConfigAxios())
             setShift(res2.data.data)
-            console.log(res2.data.data, 'res2');
+            // console.log(res2.data.data, 'res2');
         } catch (error) {
             console.log(error, 'error fetch data');
         }
@@ -187,7 +187,7 @@ export default function Home() {
     };
 
     const quality = calculateQuality();
-    console.log(qualityPercentage, 'qua');
+    // console.log(qualityPercentage, 'qua');
 
 
     //   perfomance
@@ -215,7 +215,7 @@ export default function Home() {
             noPlnaTempry = totalNoPlan ?? 0;
         }
         const performance = timePlanned / (timeActual - noPlnaTempry) * 100;
-        console.log(cycleTime,qtyActual , timeActual, noPlnaTempry, 'perfomance');
+        // console.log(cycleTime,qtyActual , timeActual, noPlnaTempry, 'perfomance');
         const performancePercentage = Math.round(performance);
         return performancePercentage;
     };
@@ -336,7 +336,7 @@ export default function Home() {
             newPlannedActual = Math.max(newPlannedActual, 0);
             newPlannedActual -= mqttData2.TotalTime;
             setPlannedActual(timeDifference - mqttData2.TotalTime - noPlnaTempry ?? 0);
-            console.log(noPlnaTempry, 'noplan');
+            // console.log(noPlnaTempry, 'noplan');
         };
 
         
@@ -375,9 +375,9 @@ export default function Home() {
             noPlnaTempry += shiftToday?.filter(item => item.shift.includes(activePlan?.shift?.name))?.reduce((a, b ) => Number(a) + Number(b.no_plan),0)
             timeDifference += shiftToday?.filter(item => item.shift.includes(activePlan?.shift?.name))?.reduce((a, b) =>  Number(a) + Number(b.total_planning) ,0)
         }
-        console.log(noPlnaTempry, 'tpo');
+        // console.log(noPlnaTempry, 'tpo');
         const availabilityPercentage = Math.round((timeDifference - totalPlanningTime - noPlnaTempry) / (plannedAvailability - noPlnaTempry) * 100);
-        console.log(timeDifference, totalPlanningTime, noPlnaTempry, plannedActual, noPlnaTempry, 'pop');
+        // console.log(timeDifference, totalPlanningTime, noPlnaTempry, plannedActual, noPlnaTempry, 'pop');
 
 
         return availabilityPercentage;
@@ -418,7 +418,7 @@ export default function Home() {
     // oee
     // const multipliedPercentage = availabilityPercentage * performance * quality;
     const multipliedPercentage = availability * performance * quality * 100;
-    console.log(availability, performance, quality, 'data');
+    // console.log(availability, performance, quality, 'data');
 
     const roundedPercentage = Math.round(multipliedPercentage);
 
@@ -426,14 +426,14 @@ export default function Home() {
         setShiftToday(shift.filter(item => moment(item.created_at).format('YYYY-MM-DD') == moment(activePlan?.created_at).format('YYYY-MM-DD')))
     }, [shift])
     //shift
-    console.log(shiftToday, 'today');
+    // console.log(shiftToday, 'today');
     const nameShift0 = shiftToday?.[0]?.shift || '-';
     const nameShift1 = shiftToday?.[1]?.shift || '-';
     const createAt = moment(activePlan?.created_at).format('DD-MM-YYYY');
 
     const oeeReport0 = (shiftToday.length == 0 ? roundedPercentage : isNaN(Math.round((shiftToday?.[0]?.oee)* 100)) ? '-' : Math.round((shiftToday?.[0]?.oee)* 100) + roundedPercentage) / (shiftToday.length > 0 ? shiftToday.length : 1);
     const oeeReport1 = shiftToday.length == 1 && shiftToday.length != 0 && shiftToday?.find(item => item.shift != activePlan?.shift?.name) == true ? roundedPercentage : "-";
-    console.log(shiftToday.length != 0 && shiftToday?.find(item => item.shift != activePlan?.shift?.name) == true , 'gokil');
+    // console.log(shiftToday.length != 0 && shiftToday?.find(item => item.shift != activePlan?.shift?.name) == true , 'gokil');
 
     const router = useRouter()
     const changePage = () => {
